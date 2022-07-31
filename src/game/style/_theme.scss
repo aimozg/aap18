@@ -1,0 +1,66 @@
+@use "../../engine/style/cssutils";
+
+:root {
+  --theme-bg: #333; /* primary background */
+  --theme-font-face: Candara, Corbel, Calibri, sans-serif;
+  --theme-font-size: 16px;
+
+  //-------------//
+  // text colors //
+  //-------------//
+  --tc-fg: #ccc; /* primary text color */
+  --tc-bold: #fff; /* bold text color */
+  --tc-shadowed: #999;
+  --tc-disabled: #666;
+  --tc-focus: #07f;
+  --tc-link: #0ff;
+  --tc-hl: #dd2; /* highlighted text */
+
+  --tc-xp: #cc3;
+  --tc-hp: #3a3;
+  --tc-energy: #ccc;
+  --tc-lust: #c3c;
+  --tc-damage: #a33;
+
+  //-------------------//
+  // controls, borders //
+  //-------------------//
+  --theme-ctrl-fg: #aaa; /* control borders */
+  --theme-ctrl-bg: #555; /* control background */
+  --theme-ctrl-default: #fff;
+  --theme-ctrl-disabled: #666;
+  --theme-ctrl-font-face: monospace;
+  --theme-ctrl-font-size: 16px;
+}
+
+.text-damage-none {
+  color: var(--tc-shadowed);
+}
+.text-damage-sharp, .text-damage-blunt {
+  color: #a50;
+}
+
+.text-damage-fire {
+  color: #a00;
+}
+.text-damage-ice {
+  color: #4cc;
+}
+.text-damage-shock {
+  color: #44c;
+}
+.text-damage-acid {
+  color: #4c4;
+}
+.text-damage-magic {
+  color: #84c;
+}
+.text-damage-darkness {
+  color: #666;
+}
+.text-damage-light {
+  color: #cc8;
+}
+.text-damage-pure {
+  color: #fff;
+}

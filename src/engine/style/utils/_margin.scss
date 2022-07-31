@@ -1,0 +1,25 @@
+@for $i from 0 to 16 {
+  @each $cprefix, $pprefix in ("m":"margin", "p":"padding") {
+    $sz: ($i*0.25em);
+    @each $cname, $pname in (
+            "t": "top",
+            "b": "bottom",
+            "l": "left",
+            "r": "right") {
+      .#{$cprefix}#{$cname}-#{$i} {
+        #{$pprefix}-#{$pname}: $sz;
+      }
+    }
+    .#{$cprefix}x-#{$i} {
+      #{$pprefix}-left: $sz;
+      #{$pprefix}-right: $sz;
+    }
+    .#{$cprefix}y-#{$i} {
+      #{$pprefix}-top: $sz;
+      #{$pprefix}-bottom: $sz;
+    }
+    .#{$cprefix}a-#{$i} {
+      #{$pprefix}: $sz;
+    }
+  }
+}

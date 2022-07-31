@@ -1,0 +1,30 @@
+.d-grid {
+  display: grid;
+}
+
+.d-igrid {
+  display: inline-grid;
+}
+
+$grid-sizes: (3, 4, 6, 8, 10, 12);
+@each $i in $grid-sizes {
+  .grid-#{$i} {
+    display: grid;
+    grid-template-columns: repeat(#{$i}, 1fr);
+  }
+}
+
+@for $i from 1 to 13 {
+  .col-span-#{$i} {
+    grid-column: span $i / span $i;
+  }
+}
+
+.grid-border-1 {
+  border-left: 1px solid var(--theme-ctrl-fg);
+  border-top: 1px solid var(--theme-ctrl-fg);
+  > * {
+    border-right: 1px solid var(--theme-ctrl-fg);
+    border-bottom: 1px solid var(--theme-ctrl-fg);
+  }
+}

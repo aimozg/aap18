@@ -1,0 +1,37 @@
+.d-flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+@each $align in center, start, end, baseline, flex-start, flex-end, self-start, self-end, stretch {
+  .ai-#{$align} {
+    align-items: $align;
+  }
+}
+@each $align in center, start, end, left, right, flex-start, flex-end, stretch, space-around, space-between, space-evenly {
+  .jc-#{$align} {
+    justify-content: $align;
+  }
+}
+
+@for $i from 0 to 16 {
+  .gap-#{$i} {
+    gap: ($i*0.25em);
+  }
+}
+
+.flex-grow-0 {
+  flex-grow: 0;
+}
+.flex-grow-1 {
+  flex-grow: 1;
+}
+.flex-shrink-0 {
+  flex-shrink: 0;
+}
+.flex-shrink-1 {
+  flex-shrink: 1;
+}

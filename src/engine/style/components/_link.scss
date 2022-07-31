@@ -1,0 +1,11 @@
+@mixin link {
+  color: var(--tc-link);
+  text-decoration: underline;
+  &:visited {
+    color: var(--tc-link);
+  }
+}
+
+a, .link {
+  @include link;
+}

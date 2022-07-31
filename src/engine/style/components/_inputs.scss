@@ -1,0 +1,35 @@
+@mixin control {
+  border: 2px solid var(--theme-ctrl-fg);
+  border-radius: 4px;
+  background: var(--theme-ctrl-bg);
+  color: var(--tc-fg);
+  font-family: var(--theme-ctrl-font-face);
+  font-size: var(--theme-ctrl-font-size);
+  padding: 1px 6px;
+
+  &.-big {
+    padding: 8px 12px;
+  }
+
+  &:disabled, &.-disabled {
+    background: var(--theme-bg);
+    border-color: var(--theme-ctrl-disabled);
+    color: var(--tc-disabled);
+  }
+
+  &.-default {
+    border-color: var(--theme-ctrl-default);
+    color: var(--tc-bold);
+    font-weight: bold;
+  }
+
+  &.-shadowed {
+    border-color: var(--tc-shadowed);
+    color: var(--tc-shadowed);
+  }
+
+  &:focus, &.-focus {
+    outline: var(--tc-focus);
+    border-color: var(--tc-focus);
+  }
+}

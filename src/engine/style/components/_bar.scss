@@ -1,0 +1,20 @@
+@use "../cssutils";
+
+.bar {
+  background: rgba(0,0,0,0.25);
+  min-height: 1rem;
+  position: relative;
+  .bar-value {
+    background: var(--tc-shadowed);
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+  }
+  .bar-content {
+    position: relative;
+    text-align: center;
+    color: white;
+    @include cssutils.textcontour(black)
+  }
+}

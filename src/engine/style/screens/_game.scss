@@ -1,0 +1,47 @@
+@use "../utils/uibox";
+
+$leftPanelSize: 300px;
+$rightPanelSize: 300px;
+$duration: 0.5s;
+
+.game-layout {
+  display:flex;
+  flex-direction: column;
+  flex-grow: 1;
+  .gl-top {
+    @include uibox.uibox;
+    min-height: 1.5rem;
+  }
+  .gl-midrow {
+    flex-grow: 1;
+    display: flex;
+    overflow: hidden auto;
+  }
+  .gl-left, .gl-right {
+    @include uibox.uibox;
+    flex-grow: 0;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    flex-basis: $leftPanelSize;
+    transition:
+            visibility $duration steps(1, end),
+            margin-left $duration ease-in-out,
+            margin-right $duration ease-in-out;
+  }
+  &.-collapse-left .gl-left {
+    visibility: hidden;
+    margin-left: #{-$rightPanelSize};
+  }
+  &.-collapse-right .gl-right {
+    visibility: hidden;
+    margin-right: #{-$rightPanelSize};
+  }
+  .gl-center {
+    @include uibox.uibox;
+    flex-grow: 1;
+  }
+  .gl-bottom {
+    @include uibox.uibox;
+    min-height: 1.5rem;
+  }
+}

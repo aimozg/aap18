@@ -1,0 +1,60 @@
+.text-bold, .text-b, .text-strong {
+  font-weight: bold;
+}
+.text-i, .text-em {
+  font-style: italic;
+}
+.text-u {
+  text-decoration: underline;
+}
+.text-p {
+  display: block;
+  margin: 0 0.5em;
+  text-indent: 1em;
+}
+.text-div {
+  display: block;
+}
+.text-span {
+  display: inline;
+}
+.text-sub {
+  vertical-align: sub;
+  font-size: smaller;
+}
+.text-sup {
+  vertical-align: super;
+  font-size: smaller;
+}
+
+.text-error {
+  background: #111;
+  color: #a00;
+  font-weight: bold;
+}
+
+@each $align in left, right, center {
+  .text-#{$align} {
+    text-align: $align;
+  }
+}
+
+$sizes: (
+        "xxxs": 33%,
+        "xxs": 50%,
+        "xs": 67%,
+        "s": 80%,
+        "small": 80%,
+        "normal": 100%,
+        "large": 125%,
+        "l": 125%,
+        "xl": 150%,
+        "xxl": 200%,
+        "xxxl": 300%
+);
+
+@each $name, $size in $sizes {
+  .text-#{$name} {
+    font-size: $size;
+  }
+}

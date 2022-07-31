@@ -1,0 +1,9 @@
+@use "inputs";
+
+@mixin textinput {
+  @include inputs.control;
+}
+
+input[type=text], .text-input {
+  @include textinput;
+}

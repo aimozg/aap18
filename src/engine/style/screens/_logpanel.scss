@@ -1,0 +1,24 @@
+.log-panel {
+  min-height: 5em;
+  &.-collapsed {
+    min-height: 1em;
+  }
+  &.-expanded {
+    min-height: 20em;
+  }
+}
+.log-message {
+  &::after {
+    content: ' ';
+  }
+  color: var(--tc-fg);
+  &.-info {
+    color: var(--tc-hl);
+  }
+  &.-action {
+    .--actor {
+      color: var(--tc-bold);
+      font-weight: bold;
+    }
+  }
+}

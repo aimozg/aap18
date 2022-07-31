@@ -1,0 +1,25 @@
+.bar.bar-xp {
+  min-height: 6px;
+  .bar-value {
+    background: var(--tc-xp);
+  }
+}
+
+.bar.bar-hp {
+  background: var(--tc-damage);
+  .bar-value {
+    background: var(--tc-hp);
+  }
+}
+
+.bar.bar-ep {
+  .bar-value {
+    background: var(--tc-energy);
+  }
+}
+
+.bar.bar-lp {
+  .bar-value {
+    background: var(--tc-lust);
+  }
+}

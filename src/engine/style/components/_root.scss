@@ -1,0 +1,9 @@
+html, body, #root {
+  height: 100vh;
+  overflow: hidden;
+
+  background: var(--theme-bg);
+  color: var(--tc-fg);
+  font-size: var(--theme-font-size);
+  font-family: var(--theme-font-face);
+}

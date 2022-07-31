@@ -1,0 +1,14 @@
+@use "inputs";
+
+@mixin button {
+  @include inputs.control;
+  text-align: center;
+  &:not(:disabled):hover {
+    cursor: pointer;
+    color: var(--tc-focus);
+  }
+}
+
+button, .button {
+  @include button;
+}
