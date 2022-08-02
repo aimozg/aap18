@@ -37,6 +37,9 @@ export const enum AttackRollResult {
 	CRITICAL_HIT
 }
 
+export let TicksPerRound = 1000;
+export let AnimationTime = 500;
+
 export class CombatController {
 	constructor(
 		public readonly ctx: BattleContext,
@@ -46,6 +49,7 @@ export class CombatController {
 
 	public get rng() { return Game.instance.rng }
 	private _ended = false;
+	public get ended() { return this._ended }
 	public roundNo = 0;
 	public tickTime = 0;
 	public get partyLost(): boolean { return this.party.every(c => !c.isAlive) }
@@ -53,16 +57,16 @@ export class CombatController {
 	public get participants(): Creature[] { return [...this.party, ...this.enemies]}
 
 	battleStart() {
-		logger.info("battleStart({} vs {})", this.party, this.enemies)
+		logger.info("battleStart {} vs {}", this.party, this.enemies)
 		for (let p of this.participants) {
 			this.prepareForCombat(p)
 		}
 		this.roundNo = 0;
-		this.tickTime = 1000;
+		this.tickTime = TicksPerRound;
 	}
 	battleEnd() {
 		if (this._ended) return
-		logger.info("battleEnd()")
+		logger.info("battleEnd")
 		this._ended = true
 		for (let p of this.participants) {
 			this.cleanupAfterCombat(p)
@@ -70,16 +74,16 @@ export class CombatController {
 		this.ctx.battleEnded()
 	}
 	advanceTime(maxDT: number): CombatFlowResult {
-		logger.trace("advanceTime({},{},+{})", this.roundNo, this.tickTime, maxDT)
+		logger.trace("advanceTime {}.{} +{}", this.roundNo, this.tickTime, maxDT)
 		if (this.partyLost || this.enemiesLost) return {type: CombatFlowResultType.COMBAT_ENDED}
 		while (maxDT-- > 0) {
 			// check new round start
-			if (this.tickTime >= 1000) {
+			if (this.tickTime >= TicksPerRound) {
 				return {type: CombatFlowResultType.NEW_ROUND}
 			}
 			// TODO execute scheduled events
 			// find actor
-			let nextActor = this.participants.find(c => c.isAlive && c.ap >= 1000)
+			let nextActor = this.participants.find(c => c.isAlive && c.ap >= TicksPerRound)
 			if (nextActor) {
 				if (nextActor instanceof PlayerCharacter) {
 					// TODO if player-controller, actually
@@ -99,10 +103,10 @@ export class CombatController {
 	async applyFlowResult(fr: CombatFlowResult) {
 		if (fr.type === CombatFlowResultType.NOTHING_HAPPENED) {
 			// do nothing, call site should schedule advanceTime call
-			logger.trace("applyFlowResult({}, {})", fr.type, fr.creature)
+			logger.trace("applyFlowResult {} {}", fr.type, fr.creature)
 			return
 		}
-		logger.debug("applyFlowResult({}, {})", fr.type, fr.creature)
+		logger.debug("applyFlowResult {} {}", fr.type, fr.creature)
 		switch (fr.type) {
 			case CombatFlowResultType.PLAYER_ACTION:
 				// do nothing, call site should display player action menu
@@ -120,16 +124,17 @@ export class CombatController {
 	}
 
 	async nextRound() {
-		this.tickTime -= 1000
+		this.tickTime -= TicksPerRound
 		this.roundNo++
 		this.logInfo("Round " + this.roundNo + ".")
 		// TODO advance effects
 	}
 	async performAIAction(actor: Creature) {
-		logger.debug("performAIAction({})", actor.name)
+		logger.debug("performAIAction {}", actor.name)
 		// TODO select random action
 		let target = this.party.find(p => p.isAlive)
 		await this.performMeleeAttack(actor, target)
+		logger.debug("/performAIAction {}", actor.name)
 	}
 
 	/////////////////////
@@ -167,15 +172,15 @@ export class CombatController {
 	////////////////////
 
 	prepareForCombat(c: Creature) {
-		logger.info("prepareForCombat({})", c)
+		logger.debug("prepareForCombat {}", c)
 		// TODO clean combat buffs
 		// TODO setup AI
-		c.ap = this.rng.nextInt(1000)
+		c.ap = this.rng.nextInt(TicksPerRound)
 		this.logAction(c, "Initiative roll (" + c.ap + ").")
 	}
 
 	cleanupAfterCombat(c: Creature) {
-		logger.info("cleanupAfterCombat({})", c);
+		logger.debug("cleanupAfterCombat {}", c);
 		// TODO clean combat buffs
 		c.ap = 0;
 	}
@@ -185,7 +190,7 @@ export class CombatController {
 	////////////////////
 
 	async performMeleeAttack(attacker: Creature, target: Creature) {
-		logger.info("performMeleeAttack({}, {})", attacker, target)
+		logger.info("performMeleeAttack {} {}", attacker, target)
 		attacker.ap -= 1000 // TODO melee attack ap cost
 		// TODO animations
 		// TODO abstract this out!!
@@ -222,28 +227,84 @@ export class CombatController {
 		}
 	}
 
-	async doDamage(target: Creature, damage: number, damageType: DamageType, source?: Creature) {
-		logger.info("doDamage({}, {}, {}, {})",target,damage,damageType,source)
+	async doDamage(target: Creature, damage: number, damageType: DamageType, source: Creature|null) {
+		logger.info("doDamage {} {} {} {}",target,damage,damageType,source)
 		// TODO DR and other
 		if (damage < 0) damage = 0;
 		if (damage === 0) {
 			this.log("", <Fragment>(<span class="text-damage-none">0</span>)</Fragment>)
 		} else {
 			this.log("", <Fragment>(<span class={"text-damage-" + damageType.cssSuffix}>{damage} {damageType.name}</span>)</Fragment>)
-			// TODO deduceHP
-			let hp1 = target.hp
-			let hp2 = target.hp - damage
-			await (tween({
-				from: {hp: hp1},
-				to: {hp: hp2},
-				duration: 200,
-				render: ({hp}: { hp: number }) => {
-					target.hp = hp;
-					this.ctx.redraw()
-				}
-			}) as PromiseLike<any>)
-			target.hp = hp2;
-			this.ctx.redraw();
+			await this.deduceHP(target, damage, source);
 		}
+	}
+	async deduceHP(target: Creature, damage: number, source:Creature|null) {
+		logger.info("deduceHP")
+		let wasAlive = target.isAlive
+		await this.animateHpChange(target, target.hp - damage)
+		if (wasAlive && !target.isAlive) {
+			await this.onDeath(target, source)
+		}
+	}
+	/**
+	 * Handle death of {@param creature}
+	 * @param killer
+	 */
+	async onDeath(creature: Creature, killer: Creature|null) {
+		logger.info("onDeath {} {}",creature,killer)
+		if (killer) {
+			this.log("-death",<Fragment><b>{creature.name}</b> is killed by <b>{killer.name}</b>.</Fragment>)
+		} else {
+			this.log("-death",<Fragment><b>{creature.name}</b> dies.</Fragment>)
+		}
+		// TODO death animation
+		if (killer && killer instanceof PlayerCharacter) {
+			await this.awardXpFor(killer, creature)
+		}
+	}
+	/**
+	 * Award {@param player} XP for defeating {@param victim}
+	 */
+	async awardXpFor(player: PlayerCharacter, victim:Creature) {
+		logger.info("awardXpFor {} {}", victim)
+		// TODO calculate xp from level
+		let xp = 50
+		if (xp > 0) {
+			this.logInfo("+" + xp + " XP.")
+			await this.animateXpChange(player, player.xp + xp)
+			this.ctx.redraw()
+		}
+	}
+	async animateHpChange(creature: Creature, hp2:number) {
+		logger.debug("animateHpChange {} {}",creature, hp2)
+		// TODO move to CombatAnimations or something
+		let hp1 = creature.hp
+		await (tween({
+			from: {hp: hp1},
+			to: {hp: hp2},
+			duration: AnimationTime,
+			render: ({hp}: { hp: number }) => {
+				creature.hp = hp;
+				this.ctx.redraw()
+			}
+		}) as PromiseLike<any>)
+		creature.hp = hp2;
+		this.ctx.redraw()
+	}
+	async animateXpChange(creature: PlayerCharacter, xp2:number) {
+		logger.debug("animateXpChange {} {}",creature, xp2)
+		// TODO move to CombatAnimations or something
+		let xp1 = creature.xp
+		await (tween({
+			from: {xp: xp1},
+			to: {xp: xp2},
+			duration: AnimationTime,
+			render: ({xp}: { xp: number }) => {
+				creature.xp = xp;
+				this.ctx.redraw()
+			}
+		}) as PromiseLike<any>)
+		creature.xp = xp2;
+		this.ctx.redraw()
 	}
 }

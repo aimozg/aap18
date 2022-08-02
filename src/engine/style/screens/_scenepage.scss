@@ -4,3 +4,9 @@
     opacity: 0.5;
   }
 }
+.scene-actions {
+  .choices {
+    display: flex;
+    flex-direction: column;
+  }
+}

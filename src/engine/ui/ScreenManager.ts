@@ -27,7 +27,7 @@ export class ScreenManager {
 
 	private removeTop(activateScreenBelow: boolean): void {
 		let top = this.top;
-		logger.debug("removeTop()");
+		logger.debug("removeTop");
 		if (this.top) {
 			top.container.remove();
 			top.onDeactivate();
@@ -40,7 +40,7 @@ export class ScreenManager {
 	}
 
 	private addTop(screen: AbstractScreen): void {
-		logger.debug("addTop({})", screen);
+		logger.debug("addTop {}", screen);
 		this.screens.push(screen);
 		this.screenHolder.append(screen.container);
 		screen.render();

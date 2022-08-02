@@ -3,8 +3,8 @@
  */
 
 import {BodyPart, BodyPartReference, BodyPartType} from "../../../engine/objects/creature/BodyPart";
-import {Character} from "../../../engine/objects/creature/Character";
-import fxrng from "../../../engine/math/fxrng";
+import {CharacterBody} from "../../../engine/objects/creature/Character";
+import {BodyMaterialTypes} from "./Materials";
 
 export abstract class EarType extends BodyPartType<EarPart> {
 	protected constructor(id: string, name: string) {
@@ -13,21 +13,25 @@ export abstract class EarType extends BodyPartType<EarPart> {
 		this.texts.noun1 = "ear"
 		this.texts.noun2 = "ears"
 	}
-
-	description = (part: EarPart) => fxrng.either("a pair of ", "two ") + this.longName2(part)
+	materials = new Set([BodyMaterialTypes.SKIN])
 }
 
 export class EarPart extends BodyPart<EarType> {
-	constructor(host: Character) {
-		super(host);
+	constructor(body: CharacterBody) {
+		super(body);
 	}
-
 	ref() { return EarsRef }
 	typeNone() { return EarTypes.NONE; }
 	typeHuman() { return EarTypes.HUMAN; }
 }
 
-export const EarsRef = new BodyPartReference<EarPart, EarType>("/ears", host => host.body.ears, host => new EarPart(host));
+export const EarsRef:BodyPartReference<EarPart, EarType> = new class extends BodyPartReference<EarPart, EarType> {
+	constructor() {super("/ears");}
+	create(body: CharacterBody): EarPart {
+		return new EarPart(body);
+	}
+
+};
 
 export namespace EarTypes {
 	export const NONE = new class extends EarType {
@@ -35,6 +39,7 @@ export namespace EarTypes {
 			super("", "none")
 			this.texts.noun1 = "no ear"
 			this.texts.noun2 = "no ears"
+			this.materials.clear()
 		}
 		description = () => "no ears"
 	}
@@ -51,6 +56,7 @@ export namespace EarTypes {
 			super("/bunny", "bunny")
 			this.texts.type = ["rabbit", "bunny"]
 			this.texts.adj = ["floppy", "long", "fuzzy", "furry", "long floppy", "long fuzzy"]
+			this.materials.add(BodyMaterialTypes.FUR)
 		}
 	}
 	export const CAT = new class extends EarType {
@@ -58,6 +64,7 @@ export namespace EarTypes {
 			super("/cat", "cat")
 			this.texts.type = ["cat", "feline"]
 			this.texts.adj = ["cute", "soft", "small", "fuzzy", "furry", "cute fuzzy"]
+			this.materials.add(BodyMaterialTypes.FUR)
 		}
 	}
 	export const COW = new class extends EarType {
@@ -65,6 +72,7 @@ export namespace EarTypes {
 			super("/cow", "cow")
 			this.texts.type = ["cow", "bovine"]
 			this.texts.adj = ["fuzzy", "floppy"]
+			this.materials.add(BodyMaterialTypes.FUR)
 		}
 	}
 	export const DOG = new class extends EarType {
@@ -72,6 +80,7 @@ export namespace EarTypes {
 			super("/cat", "cat")
 			this.texts.type = ["dog", "canine"]
 			this.texts.adj = ["fuzzy", "soft", "furry", "floppy"]
+			this.materials.add(BodyMaterialTypes.FUR)
 		}
 	}
 	export const FOX = new class extends EarType {
@@ -79,6 +88,7 @@ export namespace EarTypes {
 			super("/fox", "fox")
 			this.texts.type = ["fox", "vulpine"]
 			this.texts.adj = ["cute", "soft", "fuzzy", "fluffy", "perky", "pointy"]
+			this.materials.add(BodyMaterialTypes.FUR)
 		}
 	}
 	export const WOLF = new class extends EarType {
@@ -86,6 +96,7 @@ export namespace EarTypes {
 			super("/wolf", "wolf")
 			this.texts.type = ["wolf", "lupine"]
 			this.texts.adj = ["fuzzy", "soft", "furry", "pointy"]
+			this.materials.add(BodyMaterialTypes.FUR)
 		}
 	}
 }

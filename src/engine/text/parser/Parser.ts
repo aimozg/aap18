@@ -8,6 +8,7 @@ import {TextOutput} from "../output/TextOutput";
 import {VNode} from "preact";
 import {Creature} from "../../objects/Creature";
 import {Game} from "../../Game";
+import fxrng from "../../math/fxrng";
 
 const logger = LogManager.loggerFor("engine.text.Parser")
 
@@ -29,8 +30,12 @@ export class Parser extends AbstractParser {
 		let isSelf = this.self && (this.self === this.target);
 		let target = this.target;
 		switch (tag) {
+			case 'either':
+				return fxrng.pick(tagArgs.split('|'));
 			case 'you':
 				return isSelf ? 'you' : target.name;
+			case 'your':
+				return isSelf ? 'your' : (target.name + "'s"); // TODO plural +"'"
 			case 'have':
 			case 'has':
 				return isSelf ? 'have' : 'has'; // TODO check target.isPlural

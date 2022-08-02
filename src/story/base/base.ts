@@ -19,10 +19,13 @@ export function gdRegisterPlayerBase(gd:GameDataBuilder) {
 
 					ctx.endScene()
 				},
-				async "Explore"(ctx:SceneContext) {
-					ctx.say("A monster attacks you!")
+				"Explore": {
+					async call(ctx:SceneContext) {
+						ctx.say("A monster attacks you!")
 
-					ctx.endAndBattle(new TutorialImp())
+						ctx.endAndBattle(new TutorialImp())
+					},
+					disabled: !ctx.player.isAlive
 				}
 			})
 		}

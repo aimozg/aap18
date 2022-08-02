@@ -24,9 +24,13 @@ export class ChargenStepFinalize extends ChargenStep {
 				You will play as {pc.name}, {SexNames[pc.sex]} {pc.rgroup.name.toLowerCase()} warrior.
 			</p>
 			<p>
-				{pc.body.ears.isPresent && parser.print(pc.body.ears.fullDescription())}{" "}
-				{pc.body.eyes.isPresent && parser.print(pc.body.eyes.fullDescription())}{" "}
-				{pc.body.tail.isPresent && parser.print(pc.body.tail.fullDescription())}{" "}
+				{parser.print(pc.body.ears.fullDescription())}{" "}
+				{parser.print(pc.body.eyes.fullDescription())}{" "}
+				{parser.print(pc.body.arms.fullDescription())}{" "}
+				{parser.print(pc.body.tail.fullDescription())}{" "}
+			</p>
+			<p>
+				{pc.body.materials.map(m=>m.isPresent && <Fragment>{parser.print(m.fullDescription())}{" "}</Fragment>)}
 			</p>
 			<p>
 				TODO display character sheet for review

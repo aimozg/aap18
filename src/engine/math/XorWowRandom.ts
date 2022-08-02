@@ -51,7 +51,7 @@ export class XorWowRandom extends Random {
 	}
 	private validate() {
 		if (this.x === 0 && this.y === 0 && this.z === 0 && this.w === 0 && this.v === 0)
-			throw new Error("Inivial state must have at least one non-zero element")
+			throw new Error("Initial state must have at least one non-zero element")
 	}
 	saveState(): object {
 		return ['XorWowRandom',this.x,this.y,this.z,this.w,this.v,this.addend];

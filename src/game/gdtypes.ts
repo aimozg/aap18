@@ -9,8 +9,8 @@ import {Place, PlaceDef} from "../engine/objects/Place";
 import {buildScenes, SceneDef} from "../engine/scene/builder";
 import {LogManager} from "../engine/logging/LogManager";
 import {BodyPart, BodyPartReference, BodyPartType} from "../engine/objects/creature/BodyPart";
-import {EarPart} from "./data/body/Ears";
 import {CharacterBody} from "../engine/objects/creature/Character";
+import {BodyMaterial, BodyMaterialType} from "../engine/objects/creature/BodyMaterial";
 
 // TODO ImportedGameData and GameData
 
@@ -87,8 +87,23 @@ export class GameDataBuilder {
 		Object.defineProperty(CharacterBody.prototype, propname, {
 			configurable: false,
 			enumerable: false,
-			get(this:CharacterBody): EarPart {
-				return this.parts[index] as EarPart
+			get(this:CharacterBody): PART {
+				return this.parts[index] as PART
+			}
+		})
+	}
+	addBodyMaterial<
+		PROP extends keyof CharacterBody,
+		MATERIAL extends BodyMaterial & CharacterBody[PROP]>(
+		propname: PROP,
+		ref: BodyMaterialType
+	):void {
+		const index = ref.index;
+		Object.defineProperty(CharacterBody.prototype, propname, {
+			configurable: false,
+			enumerable: false,
+			get(this:CharacterBody): BodyMaterial {
+				return this.materials[index]
 			}
 		})
 	}

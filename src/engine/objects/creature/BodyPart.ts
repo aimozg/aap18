@@ -2,9 +2,30 @@
  * Created by aimozg on 22.07.2022.
  */
 
-import {Character} from "./Character";
+import {Character, CharacterBody} from "./Character";
 import fxrng from "../../math/fxrng";
 import {formatPatternNames} from "../../utils/string";
+import {BodyMaterialType} from "./BodyMaterial";
+
+export const DefaultBodyPartTexts = {
+	/** noun, singular ("ear") */
+	noun1: "UNKNOWN PART",
+	/** noun, singular ("ears") */
+	noun2: "UNKNOWN PART",
+	/** primary determiner */
+	type: [""],
+	/** extra determiners (inserted before) */
+	adj: [""],
+	/** extra descriptions (inserted after) */
+	suffix: [""],
+	shortName1Pattern: "{type} {noun1}",
+	shortName2Pattern: "{type} {noun2}",
+	longName1Pattern: "{adj} {shortName1} {suffix}",
+	longName2Pattern: "{adj} {shortName2} {suffix}",
+	// TODO use "number of noun" fn
+	descriptionPattern: "{count} {longName}",
+	fullDescriptionPattern: "[You] [have] {description}.",
+}
 
 export abstract class BodyPartType<PART extends BodyPart<any>> {
 	protected constructor(
@@ -22,26 +43,16 @@ export abstract class BodyPartType<PART extends BodyPart<any>> {
 	// longName1/2 appear inside a phrase as a focus ("She touches your X")
 	// description is main focus of a sentence ("You have X" / "You now have X")
 
-	protected texts = {
-		/** noun, singular ("ear") */
-		noun1: "UNKNOWN PART",
-		/** noun, singular ("ears") */
-		noun2: "UNKNOWN PART",
-		/** primary determiner */
-		type: [""],
-		/** extra determiners (inserted before) */
-		adj: [""],
-		/** extra descriptions (inserted after) */
-		suffix: [""],
-		shortName1Pattern: "{type} {noun1}",
-		shortName2Pattern: "{type} {noun2}",
-		longName1Pattern: "{adj} {shortName1} {suffix}",
-		longName2Pattern: "{adj} {shortName2} {suffix}",
-		// TODO use "number of noun" fn
-		descriptionPattern: "{longName}",
-		fullDescriptionPattern: "[You] [have] {description}.",
-	}
-	protected textReplacer(s:string, part:PART):string {
+	protected texts = Object.assign({}, DefaultBodyPartTexts)
+	protected textReplacer(s: string, part: PART): string {
+		if (s === 'count') {
+			if (this.count === 0) return "no";
+			if (this.count === 1) return fxrng.either("one", "single");
+			if (this.count === 2) return fxrng.either("two", "a pair of");
+			if (this.count === 3) return fxrng.either("three", "a trio of");
+			// TODO us "number of noun" fn
+			return String(this.count);
+		}
 		if (s === 'type') return fxrng.pick(this.texts.type) ?? "";
 		if (s === 'adj') return fxrng.nextBoolean() ? fxrng.pick(this.texts.adj) ?? "" : "";
 		if (s === 'suffix') return fxrng.pick(this.texts.suffix) ?? "";
@@ -57,9 +68,13 @@ export abstract class BodyPartType<PART extends BodyPart<any>> {
 		if (s === 'description') return this.description(part);
 		return null
 	}
-	protected formatPattern(pattern:string, part:PART):string {
-		return formatPatternNames(pattern, s => this.textReplacer(s, part)).replace(/^ +| +$|  +/,'').trim();
+	protected formatPattern(pattern: string, part: PART): string {
+		return formatPatternNames(pattern, s => this.textReplacer(s, part))
+			.replace(/  +/g,' ')
+			.trim();
 	}
+	abstract materials: Set<BodyMaterialType>
+	hasMaterial(material:BodyMaterialType):boolean { return this.materials.has(material) }
 
 	/** noun, singular ("ear") */
 	noun1: BpTextFn<PART> = () => this.texts.noun1
@@ -89,10 +104,11 @@ export type BpTextFn<P extends BodyPart<any>> = (part: P) => string;
 
 export abstract class BodyPart<T extends BodyPartType<any>> {
 	protected constructor(
-		public readonly host: Character
+		public readonly body: CharacterBody
 	) {
 		this._type = this.typeHuman();
 	}
+	get host(): Character { return this.body.host }
 	abstract ref(): BodyPartReference<BodyPart<T>, T>;
 	abstract typeNone(): T;
 	abstract typeHuman(): T;
@@ -110,6 +126,7 @@ export abstract class BodyPart<T extends BodyPartType<any>> {
 	size = 0;
 	count = 0;
 	get isPresent() { return this._type.isPresent };
+	hasMaterial(material:BodyMaterialType):boolean { return this.type.hasMaterial(material) }
 
 	/** noun, singular ("ear") */
 	noun1() { return this.type.noun1(this) }
@@ -129,17 +146,18 @@ export abstract class BodyPart<T extends BodyPartType<any>> {
 	fullDescription() { return this.type.fullDescription(this) }
 }
 
-export class BodyPartReference<PART extends BodyPart<TYPE>, TYPE extends BodyPartType<PART>> {
+export abstract class BodyPartReference<PART extends BodyPart<TYPE>, TYPE extends BodyPartType<PART>> {
 	private static index = 0
 	static readonly All: BodyPartReference<any, any>[] = [];
 
 	readonly index = BodyPartReference.index++;
 	readonly types: Map<string, TYPE> = new Map();
-	constructor(
-		public readonly id: string,
-		public readonly get: (host: Character) => PART,
-		public readonly create: (host: Character) => PART
-	) {
+	protected constructor(public readonly id: string) {
 		BodyPartReference.All[this.index] = this;
+	}
+	abstract create(body: CharacterBody): PART;
+
+	get(body:CharacterBody):PART {
+		return body.parts[this.index] as PART
 	}
 }

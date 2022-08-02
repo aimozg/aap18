@@ -28,20 +28,20 @@ export class StateManager {
 	//////////////////
 
 	clearGameState() {
-		logger.info("clearGameState()");
+		logger.info("clearGameState");
 		this._player = new PlayerCharacter();
 		this._gcStack = [new NullGameContext()];
 	}
 
 	importGameState(data: object) {
-		logger.info("importGameState()");
+		logger.info("importGameState");
 		this.clearGameState();
 		// TODO importGameState
 		throw new Error("Not implemented");
 	}
 
 	exportGameState(): object {
-		logger.info("exportGameState()");
+		logger.info("exportGameState");
 		let save: object = {};
 		return save;
 	}
@@ -54,12 +54,12 @@ export class StateManager {
 	 * Set player. To be called during new game start only!
 	 */
 	setupPlayer(player: PlayerCharacter) {
-		logger.debug("setupPlayer()");
+		logger.debug("setupPlayer");
 		this._player = player;
 	}
 
 	pushGameContext(context: GameContext) {
-		logger.info("pushGameContext({})", context);
+		logger.info("pushGameContext {}", context);
 		this._gcStack.push(context);
 	}
 

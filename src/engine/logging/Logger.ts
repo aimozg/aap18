@@ -57,7 +57,7 @@ export abstract class Logger {
 	}
 	static formatMessage(message:string, ...rest:any[]): [string, any[]] {
 		let s = message.replace(/\{}/g, ()=> {
-			let x = rest.splice(0, 1)[0];
+			let x = rest.length === 0 ? "[[missing argument]]" : rest.splice(0, 1)[0];
 			return Logger.toString(x);
 		});
 		return [s,rest];

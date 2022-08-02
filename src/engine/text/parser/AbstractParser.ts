@@ -22,9 +22,9 @@ const LA_ENTITY = /^&(?:\w+|#x[a-fA-F\d]+|#\d+);/;
 const LA_ESCAPED = /^\\./;
 /**
  * Simple `[parsertag]` or `[tag arguments]`.
- * Group 1 = tag name, group 2 = tag arguments
+ * Group 1 = tag name, group 2 = tag arguments (including any leading whitespace)
  */
-const LA_SIMPLETAG = /^\[(\w+)(\b[^\]]*)\]/;
+const LA_SIMPLETAG = /^\[([\w-]+:?)(\b[^\]]*)\]/;
 /** Non-tag in square brackets like `[1]` */
 const LA_FALSETAG = /^\[(?:\W|\\.)/;
 /** Group 1 = tag name */

@@ -3,6 +3,7 @@
  */
 import {Creature} from "../Creature";
 import {BodyPart, BodyPartReference} from "./BodyPart";
+import {BodyMaterial, BodyMaterialType} from "./BodyMaterial";
 
 export class Character extends Creature {
 	readonly objectType: string = "Character";
@@ -19,7 +20,8 @@ export class Character extends Creature {
 }
 
 export class CharacterBody {
-	parts: BodyPart<any>[] = BodyPartReference.All.map(ref => ref.create(this.host));
+	parts: BodyPart<any>[] = BodyPartReference.All.map(ref => ref.create(this));
+	materials: BodyMaterial[] = BodyMaterialType.All.map(ref => ref.create(this));
 	constructor(public readonly host: Character) {
 	}
 }

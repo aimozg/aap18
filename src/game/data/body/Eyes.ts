@@ -3,9 +3,9 @@
  */
 
 import {BodyPart, BodyPartReference, BodyPartType} from "../../../engine/objects/creature/BodyPart";
-import {Character} from "../../../engine/objects/creature/Character";
-import fxrng from "../../../engine/math/fxrng";
+import {CharacterBody} from "../../../engine/objects/creature/Character";
 import {Color} from "../../../engine/objects/Color";
+import {BodyMaterialType} from "../../../engine/objects/creature/BodyMaterial";
 
 export abstract class EyeType extends BodyPartType<EyePart> {
 
@@ -17,27 +17,31 @@ export abstract class EyeType extends BodyPartType<EyePart> {
 		this.texts.shortName1Pattern = "{color} {type} {noun1}"
 		this.texts.shortName2Pattern = "{color} {type} {noun2}"
 	}
+	materials = new Set<BodyMaterialType>()
 	protected textReplacer(s: string, part: EyePart): string {
 		if (s === "color") return part.color.name;
 		return super.textReplacer(s, part);
 	}
-
-	description = (part: EyePart) => fxrng.either("a pair of ", "two ") + this.longName2(part)
 }
 
 export class EyePart extends BodyPart<EyeType> {
 
-	constructor(host: Character) {
-		super(host);
+	constructor(body: CharacterBody) {
+		super(body);
 	}
-
 	color:Color = Color.DEFAULT_WHITE
 	ref() { return EyesRef }
 	typeNone() { return EyeTypes.NONE }
 	typeHuman() { return EyeTypes.HUMAN }
 }
 
-export const EyesRef: BodyPartReference<EyePart, EyeType> = new BodyPartReference<EyePart, EyeType>("/eyes", host => host.body.eyes, host => new EyePart(host))
+export const EyesRef: BodyPartReference<EyePart, EyeType> = new class extends BodyPartReference<EyePart, EyeType> {
+	constructor() {super("/eyes");}
+	create(body: CharacterBody): EyePart {
+		return new EyePart(body);
+	}
+
+}
 
 export namespace EyeTypes {
 	export const NONE = new class extends EyeType {

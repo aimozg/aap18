@@ -20,6 +20,8 @@ export class GameData {
 	racialGroup(id: string): RacialGroup { return this.racialGroups.get(id) }
 
 	readonly scenes = new ResLib<Scene>(Symbols.ResTypeScene, "Scene");
-	scene(id: string): Scene { return this.scenes.get(id) }
+	scene(scene: string|Scene): Scene {
+		return typeof scene === 'string' ? this.scenes.get(scene) : scene
+	}
 	sceneOrNull(id: string): Scene|null { return this.scenes.getOrNull(id) }
 }

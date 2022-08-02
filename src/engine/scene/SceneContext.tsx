@@ -52,12 +52,12 @@ const logger = LogManager.loggerFor("engine.scene.SceneContext");
 
 export class SceneContext implements GameContext {
 	constructor(
+		public sceneId: string,
 		public output: TextOutput
 	) {
 	}
 	toString() { return `SceneContext(${this.sceneId})`}
 
-	sceneId: string = '';
 	lastValue: string = '';
 	readonly parser: Parser = new Parser();
 	readonly characterPanel = new CreaturePanel();
@@ -73,9 +73,11 @@ export class SceneContext implements GameContext {
 	get player(): PlayerCharacter { return Game.instance.state.player }
 	get gc(): GameController { return Game.instance.gameController }
 	get ended(): boolean { return this._ended; }
-	readonly layout: GameScreenLayout = {
-		left: this.characterPanel.astsx,
-		center: this.output.panel.astsx
+	get layout(): GameScreenLayout {
+		return {
+			left: this.characterPanel.astsx,
+			center: this.output.panel.astsx
+		}
 	}
 
 	private async beginScreen(append: boolean) {
@@ -84,7 +86,7 @@ export class SceneContext implements GameContext {
 		this.characterPanel.update(this.player)
 	}
 	private async flush() {
-		logger.debug("flush() in {}",this.sceneId);
+		logger.debug("flush in {}",this.sceneId);
 		if (this._ended) {
 			this._promise.tryResolve(String(this.lastValue ?? ''));
 			return;
@@ -107,7 +109,7 @@ export class SceneContext implements GameContext {
 		this.output.flush();
 	}
 	private async buttonClick(c: InternalChoiceData) {
-		logger.debug("buttonClick({})", c.value);
+		logger.debug("buttonClick {}", c.value);
 		this._dirty = true;
 		if (c.clear) {
 			this.output.clear()
@@ -124,8 +126,8 @@ export class SceneContext implements GameContext {
 	}
 	async play(scene: string | Scene, append: boolean = false): Promise<string> {
 		this._dirty = true;
-		if (typeof scene === 'string') scene = this.game.data.scene(scene);
-		logger.debug("play({})", scene.resId);
+		scene = this.game.data.scene(scene);
+		logger.debug("play {}", scene.resId);
 
 		this.sceneId = scene.resId;
 		await this.beginScreen(append);
@@ -136,20 +138,20 @@ export class SceneContext implements GameContext {
 	}
 
 	clear() {
-		logger.trace("clear()")
+		logger.trace("clear")
 		this._dirty = true;
 		this.output.flip();
 	}
 
 	say(text: string) {
-		logger.trace("say({})", text)
+		logger.trace("say {}", text)
 		this._dirty = true;
 		let parsed = this.parser.parse(text);
 		this.output.print(parsed);
 	}
 
 	choicelist(...choices: ChoiceListData[]) {
-		logger.trace("choiceList()")
+		logger.trace("choiceList")
 		this._dirty = true;
 		this.buttons = choices.map(c => {
 			let callback;
@@ -201,7 +203,7 @@ export class SceneContext implements GameContext {
 	}
 
 	next(sceneId: string, label: string = "Continue", clear: boolean = false) {
-		logger.trace("next({})", sceneId);
+		logger.trace("next {}", sceneId);
 		this._dirty = true;
 		this.choicelist({
 			label,
@@ -212,7 +214,7 @@ export class SceneContext implements GameContext {
 	}
 
 	endScene({value, label = "END"}: { value?: string, label?: string } = {}) {
-		logger.info("endScene({})", value ?? '')
+		logger.info("endScene {}", value ?? '')
 		this._dirty = true;
 		if (this._ended) {
 			throw new Error("Duplicate endScene call");
@@ -227,13 +229,13 @@ export class SceneContext implements GameContext {
 	}
 
 	async battleAndContinue(...enemies:Creature[]):Promise<BattleContext> {
-		logger.info("battleAndContinue({})", ...enemies);
+		logger.info("battleAndContinue {}", ...enemies);
 		let ctx = this.gc.startBattle(enemies);
 		return ctx.promise
 	}
 
 	endAndBattle(...enemies:Creature[]) {
-		logger.info("endAndBattle({})", ...enemies);
+		logger.info("endAndBattle {}", ...enemies);
 		this.endScene({label:"FIGHT"})
 		this.promise.then(()=>{
 			this.gc.startBattle(enemies);

@@ -10,7 +10,7 @@ import {CombatController, CombatFlowResultType} from "./CombatController";
 import {milliTime} from "../utils/time";
 import {coerce} from "../math/utils";
 import {LogPanel} from "../ui/panels/LogPanel";
-import {BattlePanel} from "../ui/panels/BattlePanel";
+import {BattleActionButton, BattlePanel} from "../ui/panels/BattlePanel";
 import {Game} from "../Game";
 
 export let MillisPerRound = 1000;
@@ -30,11 +30,6 @@ export class BattleContext implements GameContext {
 	get promise(): Promise<BattleContext> { return this._promise }
 	battleEnded() {
 		this.playerCanAct = false
-		// TODO add "Finish battle" final button
-		setTimeout(()=>{
-			this._promise.resolve(this)
-			Game.instance.gameController.showGameScreen()
-		}, 1000)
 	}
 
 	readonly characterPanel = new CreaturePanel()
@@ -47,9 +42,38 @@ export class BattleContext implements GameContext {
 		center: this.battlePanel.astsx,
 		bottom: this.logPanel.astsx
 	}
+	private _redrawing = false
+	private playerActions():BattleActionButton[] {
+		if (this.cc.ended) return [{
+			label: "Finish battle",
+			callback: ()=>{
+				this._promise.resolve(this)
+				Game.instance.gameController.showGameScreen()
+			}
+		}];
+		let actions:BattleActionButton[] = [];
+		// TODO targets
+		actions.push({
+			label: "Melee attack",
+			callback: async ()=> {
+				this.playerCanAct = false;
+				await this.cc.performMeleeAttack(this.cc.party[0], this.cc.enemies[0]);
+				this.scheduleTick();
+			}
+		})
+		// TODO tease
+		// TODO abilities
+		return actions;
+	}
 	redraw() {
-		this.characterPanel.update(this.cc.party[0])
-		this.enemyPanel.update(this.cc.enemies[0])
+		if (this._redrawing) return
+		this._redrawing = true
+		setTimeout(()=>{
+			this._redrawing = false;
+			this.characterPanel.update(this.cc.party[0])
+			this.enemyPanel.update(this.cc.enemies[0])
+			this.battlePanel.update(this.playerActions())
+		}, 0)
 	}
 	update() {
 		this.checkBattleStatus()
@@ -66,6 +90,8 @@ export class BattleContext implements GameContext {
 	private _scheduled = false
 	scheduleTick() {
 		if (this._scheduled) return
+		this.playerCanAct = false;
+		this._t1 = milliTime()
 		this._scheduled = true
 		requestAnimationFrame(() => {
 			this._scheduled = false
@@ -77,7 +103,6 @@ export class BattleContext implements GameContext {
 		let t2 = milliTime()
 		let dt = coerce(t2 - this._t1, 1, 1000)
 		dt = Math.round(dt*1000/MillisPerRound)
-		this._t1 = t2;
 		this.playerCanAct = false
 		let fr = this.cc.advanceTime(dt);
 		this.redraw()
@@ -88,13 +113,5 @@ export class BattleContext implements GameContext {
 		if (fr.type !== CombatFlowResultType.COMBAT_ENDED && fr.type !== CombatFlowResultType.PLAYER_ACTION) {
 			this.scheduleTick()
 		}
-	}
-
-	async playerMeleeAttack() {
-		this.playerCanAct = false;
-		this._t1 = milliTime();
-		this.scheduleTick();
-		await this.cc.performMeleeAttack(this.cc.party[0], this.cc.enemies[0])
-		this.redraw()
 	}
 }

@@ -27,7 +27,7 @@ export class GameController {
 	get player(): PlayerCharacter { return this.state.player }
 
 	async loadAutosave():Promise<void> {
-		logger.info("loadAutosave()");
+		logger.info("loadAutosave");
 		let data = await this.game.saveManager.loadAutosaveData();
 		await this.state.importGameState(data);
 		// TODO show post-load game screen
@@ -39,7 +39,7 @@ export class GameController {
 	 * @return new player character
 	 */
 	async startNewGame():Promise<boolean> {
-		logger.info("startNewGame()");
+		logger.info("startNewGame");
 		this.state.clearGameState();
 		let ngs = new NewGameScreen();
 		await this.game.screenManager.replaceTop(ngs, "fade-fast");
@@ -55,7 +55,7 @@ export class GameController {
 	}
 
 	async beginStory():Promise<void> {
-		logger.info("beginStory()")
+		logger.info("beginStory")
 		let ss = this.game.screenManager.gameScreen;
 		await this.game.screenManager.replaceTop(ss, 'fade-fast');
 		await this.playScene(this.game.idata.startingSceneId);
@@ -63,12 +63,11 @@ export class GameController {
 	}
 
 	async playScene(scene:string):Promise<string> {
-		logger.info("playScene({})", scene);
-		// TODO ensure center panel is story
-		let context:SceneContext = new SceneContext(new TextOutput(new ScenePanel()));
-		this.game.screenManager.gameScreen.applyLayout(context.layout);
+		logger.info("playScene {}", scene);
+		let context:SceneContext = new SceneContext(scene, new TextOutput(new ScenePanel()));
 		this.state.pushGameContext(context);
-		return context.play(scene);
+		this.showGameScreen();
+		return context.promise;
 	}
 
 	/**
@@ -76,6 +75,7 @@ export class GameController {
 	 */
 	showGameScreen() {
 		let context = this.state.flushGameContext();
+		logger.debug("showGameScreen {}",context)
 		if (context instanceof NullGameContext) {
 			this.state.pushGameContext(new PlaceContext(this.player.place));
 			this.showGameScreen();
@@ -84,7 +84,7 @@ export class GameController {
 		if (context instanceof SceneContext) {
 			context.output = new TextOutput(new ScenePanel());
 			this.game.screenManager.gameScreen.applyLayout(context.layout);
-			context.play(context.sceneId).then();
+			context.play(context.sceneId).then(()=>this.showGameScreen());
 			return;
 		}
 		if (context instanceof PlaceContext) {
@@ -92,7 +92,7 @@ export class GameController {
 				// TODO rescue?
 				throw new Error("Player stuck in limbo")
 			}
-			context.place.display().then();
+			context.place.display().then().then(()=>this.showGameScreen());
 			return;
 		}
 		if (context instanceof BattleContext) {
@@ -109,7 +109,7 @@ export class GameController {
 	 * @param placeId
 	 */
 	placePlayer(placeId:string) {
-		logger.debug("placePlayer({})", placeId);
+		logger.debug("placePlayer {}", placeId);
 		let place = this.game.data.place(placeId);
 		this.player.place.onLeave();
 		this.player.place = place;
