@@ -8,8 +8,10 @@ import {PlayerCharacter} from "../objects/creature/PlayerCharacter";
 import {LogManager} from "../logging/LogManager";
 import {ComponentChildren, h} from "preact";
 import {Fragment} from "preact/compat";
-import {DamageType} from "../rules/DamageType";
 import {tween} from "shifty";
+import {CombatAction} from "./CombatAction";
+import {MeleeAttackAction} from "../../game/combat/actions/MeleeAttackAction";
+import {Damage, DamageType} from "../rules/Damage";
 
 const logger = LogManager.loggerFor("engine.combat.CombatController")
 
@@ -39,6 +41,7 @@ export const enum AttackRollResult {
 
 export let TicksPerRound = 1000;
 export let AnimationTime = 500;
+export let AnimationTimeFast = 250;
 
 export class CombatController {
 	constructor(
@@ -133,7 +136,7 @@ export class CombatController {
 		logger.debug("performAIAction {}", actor.name)
 		// TODO select random action
 		let target = this.party.find(p => p.isAlive)
-		await this.performMeleeAttack(actor, target)
+		await this.performAction(new MeleeAttackAction(actor, target))
 		logger.debug("/performAIAction {}", actor.name)
 	}
 
@@ -189,44 +192,17 @@ export class CombatController {
 	// Combat actions //
 	////////////////////
 
-	async performMeleeAttack(attacker: Creature, target: Creature) {
-		logger.info("performMeleeAttack {} {}", attacker, target)
-		attacker.ap -= 1000 // TODO melee attack ap cost
-		// TODO animations
-		// TODO abstract this out!!
-		let attack = attacker.attack
-		let attackText = attack === 0 ? "" : attack < 0 ? String(attack) : ("+" + attack)
-		let defense = target.defense
-		let toHit = defense - attack
-		let attackRoll = this.rng.d20()
-		let rslt: AttackRollResult
-		let damageDice = attacker.weapon.baseDamage
-		if (attackRoll === 1) {
-			// TODO critical misses
-			rslt = AttackRollResult.CRITICAL_MISS
-			this.logActionVs(attacker, "attacks", target, ["critical miss (", attackRoll, ")"])
-		} else if (attackRoll === 20) {
-			// TODO critical hits
-			rslt = AttackRollResult.CRITICAL_HIT
-			this.logActionVs(attacker, "attacks", target, ["critical hit (", attackRoll, ")"])
-			damageDice = damageDice.repeat(2) // TODO diff multiplier
-		} else if (attackRoll >= toHit) {
-			this.logActionVs(attacker, "attacks", target, [
-				"hit (", attackRoll, attackText, " vs ", defense, ")"
-			])
-			rslt = AttackRollResult.HIT
-		} else {
-			this.logActionVs(attacker, "attacks", target, [
-				"miss (", attackRoll, attackText, " vs ", defense, ")"
-			])
-			rslt = AttackRollResult.MISS
-		}
-		if (rslt === AttackRollResult.HIT || rslt === AttackRollResult.CRITICAL_HIT) {
-			let damage = damageDice.roll(this.rng)
-			await this.doDamage(target, damage, attacker.weapon.damageType, attacker)
-		}
+	async performAction<T>(action:CombatAction<T>):Promise<T> {
+		logger.info("performAction {}", action)
+		return await action.perform(this)
 	}
 
+	async doDamageMulti(target: Creature, damage: Damage[], source: Creature|null) {
+		for (let d of damage) {
+			// TODO synchronize animations
+			await this.doDamage(target, d.damage, d.damageType, source)
+		}
+	}
 	async doDamage(target: Creature, damage: number, damageType: DamageType, source: Creature|null) {
 		logger.info("doDamage {} {} {} {}",target,damage,damageType,source)
 		// TODO DR and other
@@ -238,10 +214,15 @@ export class CombatController {
 			await this.deduceHP(target, damage, source);
 		}
 	}
+	async deduceAP(creature:Creature, value:number) {
+		logger.info("deduceAP",creature,value);
+		// TODO parallelize and detach animation from model
+		await this.animateValueChange(creature, "ap", creature.ap-value, AnimationTimeFast)
+	}
 	async deduceHP(target: Creature, damage: number, source:Creature|null) {
-		logger.info("deduceHP")
+		logger.info("deduceHP",target,damage,source)
 		let wasAlive = target.isAlive
-		await this.animateHpChange(target, target.hp - damage)
+		await this.animateValueChange(target, "hp", target.hp - damage)
 		if (wasAlive && !target.isAlive) {
 			await this.onDeath(target, source)
 		}
@@ -271,40 +252,30 @@ export class CombatController {
 		let xp = 50
 		if (xp > 0) {
 			this.logInfo("+" + xp + " XP.")
-			await this.animateXpChange(player, player.xp + xp)
+			await this.animateValueChange(player, "xp", player.xp+xp)
 			this.ctx.redraw()
 		}
 	}
-	async animateHpChange(creature: Creature, hp2:number) {
-		logger.debug("animateHpChange {} {}",creature, hp2)
+	private async animateValueChange<
+		T extends {[key in PROP]:number},
+		PROP extends keyof T
+		>(creature: T,
+	      prop:PROP,
+	      value2:number,
+	      duration: number = AnimationTime) {
+		logger.debug("animateValueChange {} {} {}",creature, prop, value2)
 		// TODO move to CombatAnimations or something
-		let hp1 = creature.hp
+		let value1 = creature[prop]
 		await (tween({
-			from: {hp: hp1},
-			to: {hp: hp2},
-			duration: AnimationTime,
-			render: ({hp}: { hp: number }) => {
-				creature.hp = hp;
+			from: {value: value1},
+			to: {value: value2},
+			duration: duration,
+			render: ({value}: { value: number }) => {
+				(creature as {[key in PROP]:number})[prop] = value;
 				this.ctx.redraw()
 			}
-		}) as PromiseLike<any>)
-		creature.hp = hp2;
-		this.ctx.redraw()
-	}
-	async animateXpChange(creature: PlayerCharacter, xp2:number) {
-		logger.debug("animateXpChange {} {}",creature, xp2)
-		// TODO move to CombatAnimations or something
-		let xp1 = creature.xp
-		await (tween({
-			from: {xp: xp1},
-			to: {xp: xp2},
-			duration: AnimationTime,
-			render: ({xp}: { xp: number }) => {
-				creature.xp = xp;
-				this.ctx.redraw()
-			}
-		}) as PromiseLike<any>)
-		creature.xp = xp2;
+		}) as PromiseLike<any>);
+		(creature as {[key in PROP]:number})[prop] = value2;
 		this.ctx.redraw()
 	}
 }

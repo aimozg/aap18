@@ -13,10 +13,9 @@ import fxrng from "../../math/fxrng";
 const logger = LogManager.loggerFor("engine.text.Parser")
 
 export class Parser extends AbstractParser {
-	constructor() {
+	constructor(public self:Creature = Game.instance.state.player) {
 		super();
 	}
-	self: Creature = Game.instance.state.player;
 	target: Creature = Game.instance.state.player;
 	select(creature: Creature) {
 		this.target = creature

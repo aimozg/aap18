@@ -2,7 +2,7 @@
  * Created by aimozg on 25.07.2022.
  */
 import {AbstractWeapon, BaseAbstractWeapon} from "./BaseAbstractWeapon";
-import {BaseDamageSpec} from "../../rules/BaseDamageSpec";
+import {BaseDamageSpec} from "../../rules/Damage";
 
 export class BaseMeleeWeapon extends BaseAbstractWeapon<MeleeWeapon> {
 

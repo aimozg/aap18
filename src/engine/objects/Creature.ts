@@ -187,16 +187,6 @@ export class Creature implements IGameObject {
 		// TODO other sources (base value, buffs)
 		return this.wisMod
 	}
-	/** Universal attack rating with current weapon */
-	get attack():number {
-		// TODO check weapon type and select accordingly
-		return 0
-	}
-	/** Universal defense */
-	get defense():number {
-		// TODO other sources (shield, buffs)
-		return 5 + this.dexMod
-	}
 	/** Universal damage reduction */
 	get dr():number {
 		// TODO other sources (equipment, buffs)

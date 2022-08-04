@@ -1,0 +1,27 @@
+.color-circle {
+  height: 24px;
+  width: 24px;
+  border-radius: 12px;
+  border-width: 2px;
+  &.-small {
+    height: 16px;
+    width: 16px;
+    border-radius: 8px;
+    border-width: 1px;
+  }
+  &.-large {
+    height: 32px;
+    width: 32px;
+    border-radius: 16px;
+  }
+  border-color: var(--tc-fg);
+  &.-selected {
+    border-color: var(--tc-focus)
+  }
+  &.-clickable {
+    cursor: pointer;
+  }
+  border-style: solid;
+  display: inline-block;
+  box-sizing: border-box;
+}

@@ -3,9 +3,9 @@
  */
 
 import {BaseMeleeWeapon} from "../../../engine/objects/item/BaseMeleeWeapon";
-import {baseDmgSpec} from "../../../engine/rules/BaseDamageSpec";
 import {DamageTypes} from "../../../engine/rules/DamageType";
+import {baseDmgSpec} from "../../../engine/rules/Damage";
 
 export namespace MeleeWeaponLib {
-	export const Dagger = new BaseMeleeWeapon("/mwpn_dagger", "dagger", baseDmgSpec("1d4", DamageTypes.SHARP, 19, 3));
+	export const Dagger = new BaseMeleeWeapon("/mwpn_dagger", "dagger", baseDmgSpec("1d4", DamageTypes.SHARP));
 }

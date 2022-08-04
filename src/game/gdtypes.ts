@@ -11,6 +11,7 @@ import {LogManager} from "../engine/logging/LogManager";
 import {BodyPart, BodyPartReference, BodyPartType} from "../engine/objects/creature/BodyPart";
 import {CharacterBody} from "../engine/objects/creature/Character";
 import {BodyMaterial, BodyMaterialType} from "../engine/objects/creature/BodyMaterial";
+import {Color} from "../engine/objects/Color";
 
 // TODO ImportedGameData and GameData
 
@@ -20,6 +21,7 @@ import {BodyMaterial, BodyMaterialType} from "../engine/objects/creature/BodyMat
 export interface ImportedGameData {
 	startingSceneId: string;
 	classes: CharacterClass[];
+	colors: GDColor[];
 	places: Place[];
 	playerOrigins: GDPlayerOrigin[];
 	racialGroups: RacialGroup[];
@@ -50,6 +52,7 @@ export class GameDataBuilder {
 		this.data = {
 			startingSceneId: options.startingSceneId,
 			classes: [],
+			colors: [],
 			places: [],
 			playerOrigins: [],
 			racialGroups: [],
@@ -60,6 +63,9 @@ export class GameDataBuilder {
 
 	addClasses(...classes: CharacterClass[]): void {
 		this.data.classes.push(...classes);
+	}
+	addColors(colors:GDColor[]):void {
+		this.data.colors.push(...colors);
 	}
 	addPlaces(...places: Place[]): void {
 		this.data.places.push(...places);
@@ -106,6 +112,42 @@ export class GameDataBuilder {
 				return this.materials[index]
 			}
 		})
+	}
+	/**
+	 * Create accessors for CharacterBody named {@param prop1} and {@param prop2} to access material {@param ref}'s color1 and color2
+	 */
+	addBodyMaterialColor<
+		PROP1 extends keyof CharacterBody,
+		PROP2 extends keyof CharacterBody,
+		CHARACTER extends CharacterBody & {
+			[key in PROP1]: Color
+		} & {
+			[key in PROP2]: Color
+		}>(
+			prop1:PROP1,
+			prop2:PROP2,
+			ref: BodyMaterialType):void {
+		const index = ref.index;
+		Object.defineProperty(CharacterBody.prototype, prop1, {
+			configurable: false,
+			enumerable: false,
+			get(this:CharacterBody): Color {
+				return this.materials[index].color1
+			},
+			set(this:CharacterBody, v: Color) {
+				this.materials[index].color1 = v
+			}
+		});
+		Object.defineProperty(CharacterBody.prototype, prop2, {
+			configurable: false,
+			enumerable: false,
+			get(this:CharacterBody): Color {
+				return this.materials[index].color2
+			},
+			set(this:CharacterBody, v: Color) {
+				this.materials[index].color2 = v
+			}
+		});
 	}
 
 	buildPlace(def: PlaceDef): void {

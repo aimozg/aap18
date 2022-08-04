@@ -8,10 +8,28 @@ import Symbols from "../symbols";
 import {RacialGroup} from "../rules/RacialGroup";
 import {Scene} from "../scene/Scene";
 import {Place} from "../objects/Place";
+import {Color} from "../objects/Color";
+import {Game} from "../Game";
 
 export class GameData {
+	constructor(public readonly game:Game) {}
+
 	readonly classes = new ResLib<CharacterClass>(Symbols.ResTypeClass, "CharacterClass");
 	class(id: string): CharacterClass { return this.classes.get(id) }
+
+	colorCache = new Map<string,Color>()
+	colorByName(name:string, palette:string="common"):Color {
+		let ccKey = palette+"/"+name;
+		if (this.colorCache.has(ccKey)) return this.colorCache.get(ccKey);
+		let gdcolor = this.game.idata.colors.find(c=>c.palette===palette && c.name===name)
+		if (!gdcolor && palette !== "common") {
+			gdcolor = this.game.idata.colors.find(c=>c.palette==="common" && c.name===name)
+			if (!gdcolor) throw new Error("Color not found: "+ccKey)
+		}
+		let color = new Color(gdcolor.name, gdcolor.rgb);
+		this.colorCache.set(ccKey,color)
+		return color;
+	}
 
 	readonly places = new ResLib<Place>(Symbols.ResTypePlace, "Place");
 	place(id: string): Place { return this.places.get(id) }

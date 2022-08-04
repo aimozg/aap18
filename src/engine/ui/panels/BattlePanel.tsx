@@ -5,6 +5,7 @@ import {DomComponent} from "../DomComponent";
 import {createRef, h, render} from "preact";
 import {BattleContext} from "../../combat/BattleContext";
 import {Button} from "../components/Button";
+import {CombatAction} from "../../combat/CombatAction";
 
 export interface BattleActionButton {
 	disabled?: boolean;
@@ -29,11 +30,11 @@ export class BattlePanel extends DomComponent {
 		this.refActions = refActions;
 	}
 
-	update(actions: BattleActionButton[]) {
+	update(actions: CombatAction<any>[]) {
 		render(actions.map(action =>
 			<Button label={action.label}
-			        onClick={() => action.callback()}
-			        disabled={action.disabled}/>
+			        onClick={() => this.context.execAction(action)}
+			        disabled={!action.isPossible()}/>
 		), this.refActions.current)
 	}
 }

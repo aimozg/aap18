@@ -1,13 +1,4 @@
-/*
- * Created by aimozg on 24.07.2022.
- */
-export class DamageType {
-	constructor(
-		public readonly id:string,
-		public readonly name:string,
-		public readonly cssSuffix:string
-		) {}
-}
+import {DamageType} from "./Damage";
 
 export const DamageTypes = {
 	SHARP: new DamageType("/sharp", "sharp", "sharp"),

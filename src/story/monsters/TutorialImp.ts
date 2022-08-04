@@ -3,6 +3,7 @@
  */
 import {Character} from "../../engine/objects/creature/Character";
 import {RacialGroups} from "../../game/data/racialGroups";
+import {Game} from "../../engine/Game";
 
 export class TutorialImp extends Character {
 	constructor() {
@@ -22,7 +23,7 @@ export class TutorialImp extends Character {
 		this.baseEpPerLevel = 5;
 		this.baseLpMax = 25;
 
-		this.eyeColor = "red";
+		this.body.eyes.color = Game.instance.data.colorByName("red", "eyes");
 		// this.body.ears.type = EarTypes.CAT
 
 		this.updateStats();

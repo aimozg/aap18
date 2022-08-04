@@ -101,7 +101,7 @@ export class SceneContext implements GameContext {
 		this.output.appendAction(<div class="choices">{this.buttons.map(btn =>
 			<Button label={btn.label}
 			        disabled={btn.disabled}
-			        className={btn.default ? "-default" : ""}
+			        className={"-link"+(btn.default ? " -default" : "")}
 			        onClick={() => this.buttonClick(btn)}
 			/>)
 		}</div>)

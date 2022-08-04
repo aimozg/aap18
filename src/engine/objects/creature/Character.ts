@@ -8,9 +8,6 @@ import {BodyMaterial, BodyMaterialType} from "./BodyMaterial";
 export class Character extends Creature {
 	readonly objectType: string = "Character";
 
-	hairColor: string = "brown";
-	eyeColor: string = "brown";
-
 	body = new CharacterBody(this);
 
 	constructor() {

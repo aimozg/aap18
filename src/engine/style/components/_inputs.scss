@@ -1,8 +1,15 @@
 @mixin control {
-  border: 2px solid var(--theme-ctrl-fg);
-  border-radius: 4px;
-  background: var(--theme-ctrl-bg);
-  color: var(--tc-fg);
+  &:not(.-link) {
+    border: 2px solid var(--theme-ctrl-fg);
+    border-radius: 4px;
+    background: var(--theme-ctrl-bg);
+    color: var(--tc-fg);
+  }
+  &.-link {
+    border: none;
+    background: none;
+    color: var(--tc-link);
+  }
   font-family: var(--theme-ctrl-font-face);
   font-size: var(--theme-ctrl-font-size);
   padding: 1px 6px;
@@ -19,7 +26,12 @@
 
   &.-default {
     border-color: var(--theme-ctrl-default);
-    color: var(--tc-bold);
+    &:not(.-link) {
+      color: var(--tc-bold);
+    }
+    &.-link {
+      text-decoration: underline;
+    }
     font-weight: bold;
   }
 

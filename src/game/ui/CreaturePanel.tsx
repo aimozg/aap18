@@ -6,6 +6,7 @@ import {Bar} from "../../engine/ui/components/Bar";
 import {removeChildren} from "../../engine/utils/dom";
 import {coerce} from "../../engine/math/utils";
 import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
+import {CombatRules} from "../combat/CombatRules";
 
 export interface CreaturePanelOptions {
 	ap: boolean;
@@ -146,8 +147,8 @@ export class CreaturePanel extends DomComponent {
 			<div>{c.reflex}</div>
 			<div>{c.will}</div>
 			<div></div>
-			<div>{c.attack}</div>
-			<div>{c.defense}</div>
+			<div>{CombatRules.meleeAttack(c)}</div>
+			<div>{CombatRules.meleeDefense(c)}</div>
 			<div>{c.dr}</div>
 			<div></div>
 		</div>

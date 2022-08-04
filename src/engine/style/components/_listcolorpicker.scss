@@ -1,0 +1,25 @@
+.list-color-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr 10fr;
+  grid-template-areas:
+        "prev next selection"
+        "colors colors colors";
+  gap: 0 4px;
+  .--prev {
+    grid-area: prev;
+  }
+  .--selection {
+    grid-area: selection;
+    min-height: 24px;
+  }
+  .--next {
+    grid-area: next;
+  }
+  .--colors {
+    grid-area: colors;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px;
+  }
+}
+

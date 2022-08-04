@@ -34,7 +34,7 @@ export class Game {
 	rng: Random = XorWowRandom.create();
 
 	// Resources
-	data: GameData = new GameData();
+	data: GameData = new GameData(this);
 
 	constructor(
 		options: GameOptions

@@ -2,7 +2,13 @@
 
 @mixin button {
   @include inputs.control;
-  text-align: center;
+  &:not(.-link) {
+    text-align: center;
+  }
+  &.-link {
+    text-align: left;
+  }
+
   &:not(:disabled):hover {
     cursor: pointer;
     color: var(--tc-focus);

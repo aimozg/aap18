@@ -4,11 +4,11 @@
 import {Random} from "./Random";
 
 export class Dice {
-	constructor(spec:string);
+	constructor(spec: string);
 	constructor(
-		rolls:number,
-		sides:number,
-		bonus?:number
+		rolls: number,
+		sides: number,
+		bonus?: number
 	);
 	constructor() {
 		if (arguments.length === 1) {
@@ -31,40 +31,45 @@ export class Dice {
 				}
 			}
 		} else {
-			this.rolls = arguments[0]|0;
-			this.sides = arguments[1]|0;
-			this.bonus = arguments[2]|0;
+			this.rolls = arguments[0] | 0;
+			this.sides = arguments[1] | 0;
+			this.bonus = arguments[2] | 0;
 		}
+		if (!isFinite(this.rolls) || !isFinite(this.sides) || !isFinite(this.rolls)) throw new Error("Invalid dice " + this.toString())
 	}
 	toString() {
-		const {rolls,sides,bonus} = this;
+		const {rolls, sides, bonus} = this;
 		if (rolls === 0 || sides === 0) return String(bonus);
-		let s = ""+rolls+"d"+sides;
-		if (bonus > 0) s += "+"+bonus;
+		let s = "" + rolls + "d" + sides;
+		if (bonus > 0) s += "+" + bonus;
 		else if (bonus < 0) s += bonus;
 		return s;
 	}
 
-	public readonly rolls:number;
-	public readonly sides:number;
-	public readonly bonus:number;
+	public readonly rolls: number;
+	public readonly sides: number;
+	public readonly bonus: number;
 
-	roll(rng:Random):number {
-		return rng.dice(this.rolls, this.sides)+this.bonus;
+	roll(rng: Random): number {
+		return rng.dice(this.rolls, this.sides) + this.bonus;
 	}
-	inverse():Dice {
-		return new Dice(-this.rolls,this.sides,-this.bonus)
+	inverse(): Dice {
+		return new Dice(-this.rolls, this.sides, -this.bonus)
 	}
-	repeat(n:number):Dice {
+	withBonus(bonus: number): Dice {
+		if (bonus === 0) return this;
+		return new Dice(this.rolls, this.sides, this.bonus + bonus)
+	}
+	repeat(n: number): Dice {
 		if (n === 0) return Dices.ZERO
 		if (n === 1) return this
-		return new Dice(this.rolls*n, this.sides, this.bonus*n)
+		return new Dice(this.rolls * n, this.sides, this.bonus * n)
 	}
 }
 
-let lib = new Map<string,Dice>();
+let lib = new Map<string, Dice>();
 
-export function dice(spec:string):Dice {
+export function dice(spec: string): Dice {
 	if (lib.has(spec)) return lib.get(spec);
 	let dice = new Dice(spec);
 	if (dice.bonus === 0) lib.set(spec, dice);

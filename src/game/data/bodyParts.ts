@@ -9,6 +9,7 @@ import {TailPart, TailRef} from "./body/Tail";
 import {ArmPart, ArmsRef} from "./body/Arms";
 import {BodyMaterial} from "../../engine/objects/creature/BodyMaterial";
 import {BodyMaterialTypes} from "./body/Materials";
+import {Color} from "../../engine/objects/Color";
 
 declare module "../../engine/objects/creature/Character" {
 	interface CharacterBody {
@@ -23,6 +24,19 @@ declare module "../../engine/objects/creature/Character" {
 		bmScales: BodyMaterial;
 		bmChitin: BodyMaterial;
 		bmFeathers: BodyMaterial;
+
+		skinColor1: Color;
+		skinColor2: Color;
+		hairColor1: Color;
+		hairColor2: Color;
+		furColor1: Color;
+		furColor2: Color;
+		scaleColor1: Color;
+		scaleColor2: Color;
+		chitinColor1: Color;
+		chitinColor2: Color;
+		featherColor1: Color;
+		featherColor2: Color;
 	}
 }
 
@@ -38,5 +52,11 @@ export function gdRegisterBodyParts(gd:GameDataBuilder) {
 	gd.addBodyMaterial("bmScales", BodyMaterialTypes.SCALES)
 	gd.addBodyMaterial("bmChitin", BodyMaterialTypes.CHITIN)
 	gd.addBodyMaterial("bmFeathers", BodyMaterialTypes.FEATHERS)
+	gd.addBodyMaterialColor("skinColor1", "skinColor2", BodyMaterialTypes.SKIN)
+	gd.addBodyMaterialColor("hairColor1", "hairColor2", BodyMaterialTypes.HAIR)
+	gd.addBodyMaterialColor("furColor1", "furColor2", BodyMaterialTypes.FUR)
+	gd.addBodyMaterialColor("scaleColor1", "scaleColor2", BodyMaterialTypes.SCALES)
+	gd.addBodyMaterialColor("chitinColor1", "chitinColor2", BodyMaterialTypes.CHITIN)
+	gd.addBodyMaterialColor("featherColor1", "featherColor2", BodyMaterialTypes.FEATHERS)
 }
 

@@ -117,7 +117,7 @@ export class GameController {
 	}
 
 	startBattle(enemies:Creature[]):BattleContext {
-		let ctx = new BattleContext([this.player], enemies);
+		let ctx = new BattleContext(this.player, [this.player], enemies);
 		this.state.pushGameContext(ctx);
 		this.showGameScreen();
 		return ctx;

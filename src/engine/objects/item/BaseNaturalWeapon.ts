@@ -2,7 +2,7 @@
  * Created by aimozg on 24.07.2022.
  */
 import {AbstractWeapon, BaseAbstractWeapon} from "./BaseAbstractWeapon";
-import {BaseDamageSpec} from "../../rules/BaseDamageSpec";
+import {BaseDamageSpec} from "../../rules/Damage";
 
 // TODO @aimozg - I think: keep it singleton and pick damage/type/crit from creature
 export class BaseNaturalWeapon extends BaseAbstractWeapon<NaturalWeapon> {

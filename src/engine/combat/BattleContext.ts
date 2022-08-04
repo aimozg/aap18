@@ -10,13 +10,31 @@ import {CombatController, CombatFlowResultType} from "./CombatController";
 import {milliTime} from "../utils/time";
 import {coerce} from "../math/utils";
 import {LogPanel} from "../ui/panels/LogPanel";
-import {BattleActionButton, BattlePanel} from "../ui/panels/BattlePanel";
+import {BattlePanel} from "../ui/panels/BattlePanel";
 import {Game} from "../Game";
+import {CombatAction} from "./CombatAction";
+import {PlayerCharacter} from "../objects/creature/PlayerCharacter";
+import {CombatRules} from "../../game/combat/CombatRules";
 
 export let MillisPerRound = 1000;
 
+class FinishCombatAction extends CombatAction<void> {
+	constructor(public ctx:BattleContext) {
+		super(ctx.player);
+	}
+	protected checkIsPossible(): boolean {
+		return this.ctx.cc.ended;
+	}
+	label: string = "Finish";
+	tooltip: string = "Finish battle";
+	async perform(cc: CombatController): Promise<void> {
+		this.ctx.onBattleFinishClick()
+	}
+}
+
 export class BattleContext implements GameContext {
 	constructor(
+		public player: PlayerCharacter,
 		party: Creature[],
 		enemies: Creature[]
 	) {
@@ -31,7 +49,10 @@ export class BattleContext implements GameContext {
 	battleEnded() {
 		this.playerCanAct = false
 	}
-
+	onBattleFinishClick() {
+		this._promise.resolve(this)
+		Game.instance.gameController.showGameScreen()
+	}
 	readonly characterPanel = new CreaturePanel()
 	readonly enemyPanel = new CreaturePanel()
 	readonly logPanel = new LogPanel()
@@ -43,27 +64,18 @@ export class BattleContext implements GameContext {
 		bottom: this.logPanel.astsx
 	}
 	private _redrawing = false
-	private playerActions():BattleActionButton[] {
-		if (this.cc.ended) return [{
-			label: "Finish battle",
-			callback: ()=>{
-				this._promise.resolve(this)
-				Game.instance.gameController.showGameScreen()
-			}
-		}];
-		let actions:BattleActionButton[] = [];
-		// TODO targets
-		actions.push({
-			label: "Melee attack",
-			callback: async ()=> {
-				this.playerCanAct = false;
-				await this.cc.performMeleeAttack(this.cc.party[0], this.cc.enemies[0]);
-				this.scheduleTick();
-			}
-		})
-		// TODO tease
-		// TODO abilities
-		return actions;
+	private playerActions():CombatAction<any>[] {
+		if (this.cc.ended) return [new FinishCombatAction(this)];
+		return CombatRules.playerActions(this.player, this.cc);
+	}
+	async execAction(action:CombatAction<any>) {
+		this.playerCanAct = false;
+		if (action instanceof FinishCombatAction) {
+			this.onBattleFinishClick()
+		} else {
+			await this.cc.performAction(action);
+			this.scheduleTick()
+		}
 	}
 	redraw() {
 		if (this._redrawing) return

@@ -17,10 +17,21 @@ export class BodyMaterial {
 		if (this.singleColor) return this.color1.name
 		return this.color1.name+" and "+this.color2.name
 	}
-	color1: Color = Color.DEFAULT_WHITE
-	color2: Color = Color.DEFAULT_WHITE
+	_color1: Color = Color.DEFAULT_WHITE
+	_color2: Color = Color.DEFAULT_WHITE
+	get color1():Color { return this._color1 }
+	get color2():Color { return this._color2 }
 	get singleColor() { return this.color1.equals(this.color2)}
 	get binaryColor() { return !this.singleColor }
+	set color1(value:Color) {
+		if (this.singleColor) {
+			this._color2 = value;
+		}
+		this._color1 = value;
+	}
+	set color2(value:Color) {
+		this._color2 = value;
+	}
 
 	get isPresent():boolean {
 		return this.body.parts.some(part=>part.hasMaterial(this.type));
