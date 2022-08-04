@@ -13,8 +13,6 @@ import {CharacterBody} from "../engine/objects/creature/Character";
 import {BodyMaterial, BodyMaterialType} from "../engine/objects/creature/BodyMaterial";
 import {Color} from "../engine/objects/Color";
 
-// TODO ImportedGameData and GameData
-
 /**
  * Essential game data (races, perks, items, ...)
  */

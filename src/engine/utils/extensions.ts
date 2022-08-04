@@ -45,7 +45,7 @@ export const SORT_DESCENDING_CASE_INSENSITIVE = 3;
 export function initExtensions() {
 	function formatNumber(x: number, format: string): string {
 		if (!isFinite(x)) return String(x);
-		if (x < 0) return "-" + formatNumber(x, format);
+		if (x < 0) return "-" + formatNumber(-x, format);
 		let match = /^([+]?)(\d*)(?:\.(\d+))?([dfp])(%?)$/.exec(format);
 		if (!match) throw new Error("Invalid or missing number format " + format);
 		let [_, sign, len, dec, type, percent] = match;

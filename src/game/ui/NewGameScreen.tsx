@@ -15,6 +15,7 @@ import {ChargenStep} from "../chargen/ChargenStep";
 import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
 import {randomName} from "../data/text/names";
 import fxrng from "../../engine/math/fxrng";
+import {ChargenStepAttrs} from "../chargen/ChargenStepAttrs";
 
 function randomStartingPlayer(empty:Boolean): PlayerCharacter {
 	let player = new PlayerCharacter();
@@ -52,8 +53,7 @@ export class NewGameScreen extends AbstractScreen {
 	private pcdata: CGPCData = {
 		player: randomStartingPlayer(true),
 		race: 'human',
-		ppoints: ChargenRules.primaryStatPoints,
-		spoints: ChargenRules.secondaryStatPoints,
+		ppoints: ChargenRules.attributePoints,
 		cclass: 'warrior',
 	};
 
@@ -72,11 +72,36 @@ export class NewGameScreen extends AbstractScreen {
 				label: 'Elf',
 				value: 'elf',
 				disabled: true
+			}, {
+				label: 'Halfkin Cat',
+				value: 'half-cat',
+				disabled: true
+			}, {
+				label: 'Beastkin Cat',
+				value: 'beast-cat',
+				disabled: true
+			}, {
+				label: 'Halfkin Wolf',
+				value: 'half-wolf',
+				disabled: true
+			}, {
+				label: 'Beastkin Wolf',
+				value: 'beast-wolf',
+				disabled: true
+			}, {
+				label: 'Halfkin Fox',
+				value: 'half-fox',
+				disabled: true
+			}, {
+				label: 'Beastkin Fox',
+				value: 'beast-fox',
+				disabled: true
 			}]),
+			new ChargenStepAppearance(pcdata, onUpdate),
 			new ChargenStepClass(pcdata, onUpdate),
+			new ChargenStepAttrs(pcdata, onUpdate),
 			new ChargenStepStats(pcdata, onUpdate),
 			new ChargenStepTraits(pcdata, onUpdate),
-			new ChargenStepAppearance(pcdata, onUpdate),
 			new ChargenStepFinalize(pcdata, onUpdate),
 		];
 		this.updateSteps();
@@ -121,7 +146,7 @@ export class NewGameScreen extends AbstractScreen {
 				<Button className="-big" label="Cancel" onClick={() => this.onCancelClick()}></Button>
 			</div>
 			<div class="col-span-10 d-flex flex-column">
-				<div style="min-height:12rem">
+				<div style="min-height:18.5rem">
 					{this.tabs[this.tab].node()}
 				</div>
 				<p class="mt-4">

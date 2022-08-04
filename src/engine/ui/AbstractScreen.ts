@@ -1,6 +1,5 @@
-import {VNode} from "preact";
+import {render, VNode} from "preact";
 import {Game} from "../Game";
-import {removeChildren, renderAppend} from "../utils/dom";
 
 export abstract class AbstractScreen {
 
@@ -17,8 +16,7 @@ export abstract class AbstractScreen {
 	abstract node():VNode
 
 	render():void {
-		removeChildren(this.container);
-		renderAppend(this.node(), this.container);
+		render(this.node(), this.container);
 	}
 
 	onAdd(): void {

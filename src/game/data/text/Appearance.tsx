@@ -12,6 +12,9 @@ export namespace Appearance {
 		parser.select(pc)
 		return <Fragment>
 			<p>
+				You are {pc.txt.sex} {pc.rgroup.name.toLowerCase()}. {/*TODO race*/}
+			</p>
+			<p>
 				{parser.print(pc.body.ears.fullDescription())}{" "}
 				{parser.print(pc.body.eyes.fullDescription())}{" "}
 				{parser.print(pc.body.arms.fullDescription())}{" "}

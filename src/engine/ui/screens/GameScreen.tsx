@@ -1,5 +1,5 @@
 import {AbstractScreen} from "../AbstractScreen";
-import {ComponentChild, createRef, Fragment, h, VNode} from "preact";
+import {ComponentChild, createRef, Fragment, h, render, VNode} from "preact";
 
 export interface GameScreenLayout {
 	top?: ComponentChild;
@@ -27,6 +27,7 @@ export class GameScreen extends AbstractScreen {
 
 	applyLayout(layout:GameScreenLayout) {
 		this.layout = layout;
+		render([], this.container);
 		this.render();
 	}
 

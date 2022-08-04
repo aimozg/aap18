@@ -4,15 +4,13 @@ import {TAttribute} from "../../engine/rules/TAttribute";
 export const ChargenRules = {
 	minPrimaryStat: 2,
 	maxPrimaryStat: 15,
-	primaryStatPoints: 8,
-	secondaryStatPoints: 20
+	attributePoints: 8
 }
 
 export interface CGPCData {
 	player: PlayerCharacter;
 	race: string | null;
 	ppoints: number;
-	spoints: number;
 	cclass: string | null;
 	// TODO traits
 }
@@ -92,7 +90,7 @@ export const primaryStats: CGStat[] = [
 		'Intellect',
 		'',
 		(mod) =>
-			`${mod.format('+d')} to certain skills`
+			`${mod.format('+d')} to something skill-related`
 	),
 	new CGPrimaryStat(
 		TAttribute.WIS,
@@ -106,23 +104,23 @@ export const primaryStats: CGStat[] = [
 		'Charisma',
 		'',
 		(mod) =>
-			`${mod.format('+d')} to seduction`
+			`${mod.format('+d')} to something seduction-related`
 	),
 	new CGPrimaryStat(
 		TAttribute.MAF,
 		'Magic Affinity',
 		'',
 		(mod) =>
-			`${mod.format('+d')} to something`
+			`${mod.format('+d')} to something magic-related`
 	)];
 
 export const secondaryStats: CGStat[] = [{
 	label: 'Libido',
 	description: 'Affects lust gain',
-	min: -100,
-	max: 100,
+	min: -20,
+	max: 20,
 	get: pc=>pc.lib + pc.cor,
-	getNatural: pc=>pc.lib,
+	getNatural: pc=>pc.naturalLib,
 	inc: pc=>pc.naturalLib++,
 	dec: pc=>pc.naturalLib--,
 	explain: (pc) => {
@@ -135,9 +133,9 @@ export const secondaryStats: CGStat[] = [{
 	label: 'Perversion',
 	description: "Your character's degrees of lewdity.",
 	min: 0,
-	max: 100,
+	max: 20,
 	get: pc=>Math.max(pc.cor, pc.perv),
-	getNatural: pc=>pc.perv,
+	getNatural: pc=>pc.naturalPerv,
 	inc: pc=>pc.naturalPerv++,
 	dec: pc=>pc.naturalPerv--,
 	explain: ()=>"Your character's degrees of lewdity."
@@ -145,7 +143,7 @@ export const secondaryStats: CGStat[] = [{
 	label: 'Corruption',
 	description: "",
 	min: 0,
-	max: 100,
+	max: 10,
 	get: pc=>pc.cor,
 	getNatural: pc=>pc.cor,
 	inc: pc=>pc.cor++,

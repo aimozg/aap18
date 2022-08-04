@@ -10,12 +10,10 @@ export class ChargenController {
 
 	player: PlayerCharacter;
 	ppoints: number;
-	spoints: number;
 
 	reset() {
 		this.player = new PlayerCharacter();
-		this.ppoints = ChargenRules.primaryStatPoints;
-		this.spoints = ChargenRules.secondaryStatPoints;
+		this.ppoints = ChargenRules.attributePoints;
 	}
 
 	incPrimaryStat(id:TAttribute) {

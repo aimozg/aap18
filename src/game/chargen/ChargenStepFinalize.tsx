@@ -1,7 +1,6 @@
 import {Fragment, h, VNode} from "preact";
 import {CGPCData} from "./chargenData";
 import {ChargenStep} from "./ChargenStep";
-import {SexNames} from "../data/text/gender";
 import {Parser} from "../../engine/text/parser/Parser";
 import {Appearance} from "../data/text/Appearance";
 
@@ -22,7 +21,7 @@ export class ChargenStepFinalize extends ChargenStep {
 		let parser = new Parser(pc);
 		return <Fragment>
 			<p>
-				You will play as {pc.name}, {SexNames[pc.sex]} {pc.rgroup.name.toLowerCase()} warrior.
+				You will play as warrior {pc.name}. {/*TODO classes*/}
 			</p>
 			{Appearance.characterAppearance(pc, parser)}
 			<p>
