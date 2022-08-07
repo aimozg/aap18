@@ -31,7 +31,7 @@ export abstract class ArmType extends BodyPartType<ArmPart> {
 		fingerNoun1: "finger",
 		fingerNoun2: "fingers",
 		fingerAdj: [""],
-		descriptionPattern: "{count} {longName} [either with|ending with|and] {fingerAdj} {fingerNoun2}"
+		descriptionPattern: "{count} {longName} [either:with|ending with] {fingerAdj} {fingerNoun2}"
 	})
 }
 

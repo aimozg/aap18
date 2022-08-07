@@ -9,6 +9,7 @@ import {VNode} from "preact";
 import {Creature} from "../../objects/Creature";
 import {Game} from "../../Game";
 import fxrng from "../../math/fxrng";
+import {Character} from "../../objects/creature/Character";
 
 const logger = LogManager.loggerFor("engine.text.Parser")
 
@@ -30,6 +31,7 @@ export class Parser extends AbstractParser {
 		let target = this.target;
 		switch (tag) {
 			case 'either':
+			case 'either:':
 				return fxrng.pick(tagArgs.split('|'));
 			case 'you':
 				return isSelf ? 'you' : target.name;
@@ -41,6 +43,12 @@ export class Parser extends AbstractParser {
 			case 'is':
 			case 'are':
 				return isSelf ? 'are' : 'is'; // TODO check target.isPlural
+			case 'foot':
+				if (!(target instanceof Character)) return "foot";
+				return target.body.legs.foot();
+			case 'feet':
+				if (!(target instanceof Character)) return "feet";
+				return target.body.legs.feet();
 			case 'pg':
 				return {
 					type: "group",

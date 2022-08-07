@@ -112,18 +112,15 @@ export class GameDataBuilder {
 		})
 	}
 	/**
-	 * Create accessors for CharacterBody named {@param prop1} and {@param prop2} to access material {@param ref}'s color1 and color2
+	 * Create accessors for CharacterBody named {@param prop1} and {@param prop2} to access material {@param ref}'s color1 and color2, and readonly property {@param props} for composite color name.
 	 */
 	addBodyMaterialColor<
 		PROP1 extends keyof CharacterBody,
 		PROP2 extends keyof CharacterBody,
-		CHARACTER extends CharacterBody & {
-			[key in PROP1]: Color
-		} & {
-			[key in PROP2]: Color
-		}>(
+		PROPS extends keyof CharacterBody>(
 			prop1:PROP1,
 			prop2:PROP2,
+			props:PROPS,
 			ref: BodyMaterialType):void {
 		const index = ref.index;
 		Object.defineProperty(CharacterBody.prototype, prop1, {
@@ -144,6 +141,13 @@ export class GameDataBuilder {
 			},
 			set(this:CharacterBody, v: Color) {
 				this.materials[index].color2 = v
+			}
+		});
+		Object.defineProperty(CharacterBody.prototype, props, {
+			configurable: false,
+			enumerable: false,
+			get(this:CharacterBody): string {
+				return this.materials[index].colorName
 			}
 		});
 	}

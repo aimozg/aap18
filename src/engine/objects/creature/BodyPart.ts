@@ -68,7 +68,7 @@ export abstract class BodyPartType<PART extends BodyPart<any>> {
 		if (s === 'description') return this.description(part);
 		return null
 	}
-	protected formatPattern(pattern: string, part: PART): string {
+	formatPattern(pattern: string, part: PART): string {
 		return formatPatternNames(pattern, s => this.textReplacer(s, part))
 			.replace(/  +/g,' ')
 			.trim();
@@ -107,6 +107,8 @@ export abstract class BodyPart<T extends BodyPartType<any>> {
 		public readonly body: CharacterBody
 	) {
 		this._type = this.typeHuman();
+		this.size = this._type.size;
+		this.count = this._type.count;
 	}
 	get host(): Character { return this.body.host }
 	abstract ref(): BodyPartReference<BodyPart<T>, T>;
@@ -123,10 +125,11 @@ export abstract class BodyPart<T extends BodyPartType<any>> {
 		}
 		this._type = value;
 	}
-	size = 0;
-	count = 0;
+	size: number
+	count: number
 	get isPresent() { return this._type.isPresent };
 	hasMaterial(material:BodyMaterialType):boolean { return this.type.hasMaterial(material) }
+	formatPattern(pattern:string):string { return this.type.formatPattern(pattern, this) }
 
 	/** noun, singular ("ear") */
 	noun1() { return this.type.noun1(this) }

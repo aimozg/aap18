@@ -20,8 +20,10 @@ declare global {
 	}
 
 	interface String {
-		capitalize(): string;
-		capitalize(skipPunctuation: boolean): string;
+		/**
+		 * Capitalize first character; if {@param skipPunctuation} is true - first non-punctuation character
+		 */
+		capitalize(skipPunctuation?: boolean): string;
 	}
 
 	interface Array<T> {
@@ -45,12 +47,15 @@ export const SORT_DESCENDING_CASE_INSENSITIVE = 3;
 export function initExtensions() {
 	function formatNumber(x: number, format: string): string {
 		if (!isFinite(x)) return String(x);
-		if (x < 0) return "-" + formatNumber(-x, format);
 		let match = /^([+]?)(\d*)(?:\.(\d+))?([dfp])(%?)$/.exec(format);
 		if (!match) throw new Error("Invalid or missing number format " + format);
 		let [_, sign, len, dec, type, percent] = match;
 		if (percent) x *= 100;
 		sign ??= '';
+		if (x < 0) {
+			sign = '-';
+			x = -x;
+		}
 		if (type === 'd') dec = '0';
 
 		let s: string;

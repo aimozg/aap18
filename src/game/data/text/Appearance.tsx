@@ -14,10 +14,15 @@ export namespace Appearance {
 			<p>
 				You are {pc.txt.sex} {pc.rgroup.name.toLowerCase()}. {/*TODO race*/}
 			</p>
-			<p>
+			<p>{/*Head*/}
 				{parser.print(pc.body.ears.fullDescription())}{" "}
 				{parser.print(pc.body.eyes.fullDescription())}{" "}
+				{parser.print(pc.body.hair.fullDescription())}{" "}
+			</p>
+			<p>{/*Extremities*/}
 				{parser.print(pc.body.arms.fullDescription())}{" "}
+				{parser.print(pc.body.legs.fullDescription())}{" "}
+				{parser.print(pc.body.wings.fullDescription())}{" "}
 				{parser.print(pc.body.tail.fullDescription())}{" "}
 			</p>
 			<p>
