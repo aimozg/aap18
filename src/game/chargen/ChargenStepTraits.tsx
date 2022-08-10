@@ -1,11 +1,11 @@
 import {Fragment, h, VNode} from "preact";
-import {CGPCData} from "./chargenData";
 import {ChargenStep} from "./ChargenStep";
+import {ChargenController} from "./ChargenController";
 
 export class ChargenStepTraits extends ChargenStep {
 
-	constructor(pcdata: CGPCData, onUpdate: () => void) {
-		super(pcdata, onUpdate);
+	constructor(cc: ChargenController) {
+		super(cc);
 	}
 
 	label: string = "Traits";
@@ -16,10 +16,8 @@ export class ChargenStepTraits extends ChargenStep {
 
 	node(): VNode {
 		return <Fragment>
+			<h3>Traits</h3>
 			TODO choose starting traits.
-			<ul>
-				<li></li>
-			</ul>
 		</Fragment>;
 	}
 

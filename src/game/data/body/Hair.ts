@@ -58,21 +58,24 @@ export class HairLengthTier {
 		options: {
 			value: number,
 			name: string,
+			reach: string,
 			shortPrefix: string[],
 			longDesc: string[]
 		}
 	) {
 		this.value = options.value;
 		this.name = options.name;
+		this.reach = options.reach;
 		this.shortPrefixes = options.shortPrefix;
 		this.longDescPatterns = options.longDesc;
 		HairLengthTier.All.set(this.value, this)
 		if ((HairLengthTier.Max?.value ?? 0) < this.value) HairLengthTier.Max = this;
 	}
-	value: number
-	name: string
-	shortPrefixes: string[]
-	longDescPatterns: string[]
+	value: number;
+	name: string;
+	reach: string;
+	shortPrefixes: string[];
+	longDescPatterns: string[];
 	shortPrefix(hair: HairPart): string {
 		return hair.formatPattern(fxrng.pick(this.shortPrefixes))
 	}
@@ -92,6 +95,7 @@ export namespace HairLengthTiers {
 	export const T0_BALD = new HairLengthTier({
 		value: 0,
 		name: "bald",
+		reach: "bald",
 		shortPrefix: ["no"],
 		longDesc: ["bald head", "no hair"]
 	});
@@ -99,6 +103,7 @@ export namespace HairLengthTiers {
 	export const T1_VERY_SHORT = new HairLengthTier({
 		value: 1,
 		name: "very short",
+		reach: "very short",
 		shortPrefix: ["very short"],
 		longDesc: ["very short {hair}"]
 	});
@@ -106,13 +111,15 @@ export namespace HairLengthTiers {
 	export const T2_SHORT = new HairLengthTier({
 		value: 2,
 		name: "short",
+		reach: "ear",
 		shortPrefix: ["short"],
 		longDesc: ["short {hair}"]
 	});
 	/** Chin-length (average masculine)  */
 	export const T3_BELOW_AVERAGE = new HairLengthTier({
 		value: 3,
-		name: "chin-length",
+		name: "average",
+		reach: "chin",
 		shortPrefix: ["average length", "chin-length"],
 		longDesc: ["{hair} reaching your chin", "chin-length {hair}"]
 	});
@@ -120,6 +127,7 @@ export namespace HairLengthTiers {
 	export const T4_ABOVE_AVERAGE = new HairLengthTier({
 		value: 4,
 		name: "shoulder-length",
+		reach: "shoulder",
 		shortPrefix: ["somewhat long", "shoulder-length"],
 		longDesc: ["{hair} reaching your shoulders", "shoulder-length {hair}"]
 	})
@@ -127,6 +135,7 @@ export namespace HairLengthTiers {
 	export const T5_LONG = new HairLengthTier({
 		value: 5,
 		name: "long",
+		reach: "chest",
 		shortPrefix: ["long", "chest-long"],
 		longDesc: ["long {hair} [either:reaching|that reaches] [either:your chest|middle of your back]", "chest-long {hair}"]
 	})
@@ -134,6 +143,7 @@ export namespace HairLengthTiers {
 	export const T6_VERY_LONG = new HairLengthTier({
 		value: 6,
 		name: "very long",
+		reach: "waist",
 		shortPrefix: ["very long", "waist-long"],
 		longDesc: ["very long {hair} [either:reaching|that reaches] [either:your butt|your waist|your hips]","[either:waist|butt|hip]-long {hair}"]
 	})
@@ -141,6 +151,7 @@ export namespace HairLengthTiers {
 	export const T7_EXTREMELY_LONG = new HairLengthTier({
 		value: 7,
 		name: "extremely long",
+		reach: "knee",
 		shortPrefix: ["extremely long", "knee-length"],
 		longDesc: ["extremely long {hair} [either:reaching|that reaches] your knees", "knee-length {hair}"]
 	}) /* TODO what if no knees? */
@@ -148,6 +159,7 @@ export namespace HairLengthTiers {
 	export const T8_ABSURDLY_LONG = new HairLengthTier({
 		value: 8,
 		name: "absurdly long",
+		reach: "foot",
 		shortPrefix: ["absurdly long", "feet-reaching", "floor-dragging"],
 		longDesc: ["absurdly long {hair} [either:reaching|that reaches] your [feet]"]
 	})

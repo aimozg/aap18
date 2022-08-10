@@ -3,24 +3,27 @@
  */
 
 import {ChargenStep} from "./ChargenStep";
-import {CGPCData, CGStat, ChargenRules, primaryStats} from "./chargenData";
 import {Fragment, h, VNode} from "preact";
 import {Button} from "../../engine/ui/components/Button";
 import {simpleparse} from "../../engine/text/utils";
+import {ChargenController} from "./ChargenController";
+import {TAttribute} from "../../engine/rules/TAttribute";
+import {AttrMetadata, IAttrMetadata} from "../data/stats";
 
 export class ChargenStepAttrs extends ChargenStep {
 
-	constructor(pcdata: CGPCData, onUpdate: () => void) {
-		super(pcdata, onUpdate);
+	constructor(cc: ChargenController) {
+		super(cc);
 	}
 
 	label = "Attributes"
 
 	complete(): boolean {
-		return this.pcdata.ppoints === 0;
+		return this.cc.attrPoints === 0;
 	}
-	private getStatValueName(stat: CGStat): string {
-		let x = stat.getNatural(this.player);
+	private getAttrValueName(attr: TAttribute): string {
+		// TODO move somewhere else
+		let x = this.player.attr(attr);
 		switch (x) {
 			case 0:
 				return "Non-existant"
@@ -48,58 +51,32 @@ export class ChargenStepAttrs extends ChargenStep {
 				return "Superb"
 		}
 	}
-
-	private upCost(stat: CGStat): number {
-		let x = stat.getNatural(this.player);
-		if (x >= 14) return 5;
-		if (x >= 12) return 4;
-		if (x >= 10) return 3;
-		if (x >= 8) return 2;
-		return 1;
+	private explainStat(meta: IAttrMetadata):string {
+		return meta.explain(this.player.attrMod(meta.id), this.player.attr(meta.id), this.player);
 	}
 
-	private canUpPrimary(stat: CGStat): boolean {
-		return stat.getNatural(this.player) < ChargenRules.maxPrimaryStat &&
-			this.pcdata.ppoints >= this.upCost(stat);
-	}
-
-	private canDownPrimary(stat: CGStat): boolean {
-		return stat.getNatural(this.player) > ChargenRules.minPrimaryStat;
-	}
-
-	private upPrimary(stat: CGStat) {
-		this.pcdata.ppoints -= this.upCost(stat);
-		stat.inc(this.player);
-		this.onUpdate();
-	}
-
-	private downPrimary(stat: CGStat) {
-		stat.dec(this.player);
-		this.pcdata.ppoints += this.upCost(stat);
-		this.onUpdate();
-	}
 	node(): VNode {
 		return <div class="d-grid gap-2" style="grid-template-columns: max-content max-content max-content 1fr">
 			<h3 class="col-span-4">
 				Attributes
 			</h3>
-			{primaryStats.map(ps => <Fragment>
-				<div>{ps.label}</div>
-				<div style="min-width:2rem" class="text-center">{ps.get(this.player)}</div>
+			{AttrMetadata.map(meta => <Fragment>
+				<div>{meta.name}</div>
+				<div style="min-width:2rem" class="text-center">{this.player.attr(meta.id)}</div>
 				<div>
-					<Button disabled={!this.canUpPrimary(ps)}
+					<Button disabled={!this.cc.canIncAttr(meta.id)}
 					        hold
-					        onClick={() => this.upPrimary(ps)}
+					        onClick={() => this.cc.attrInc(meta.id)}
 					        label="+"/>
-					<Button disabled={!this.canDownPrimary(ps)}
+					<Button disabled={!this.cc.canDecAttr(meta.id)}
 					        hold
-					        onClick={() => this.downPrimary(ps)}
+					        onClick={() => this.cc.attrDec(meta.id)}
 					        label="-"/>
 				</div>
-				<div>({this.getStatValueName(ps)}) {simpleparse(ps.explain(this.player))}</div>
+				<div>({this.getAttrValueName(meta.id)}) {simpleparse(this.explainStat(meta))}</div>
 			</Fragment>)}
 			<div class="col-span-4">
-				You have {this.pcdata.ppoints} points to allocate.
+				You have {this.cc.attrPoints} points to allocate.
 				You get +1 to any attribute every 4 levels.
 			</div>
 			<h3 className="col-span-4">

@@ -1,19 +1,19 @@
 import {Fragment, h, VNode} from "preact";
-import {CGPCData} from "./chargenData";
 import {ChargenStep} from "./ChargenStep";
 import {ButtonMenu, ButtonMenuItem} from "../../engine/ui/components/ButtonMenu";
 import {simpleparse} from "../../engine/text/utils";
+import {ChargenController} from "./ChargenController";
 
 export class ChargenStepClass extends ChargenStep {
 
-	constructor(pcdata: CGPCData, onUpdate: () => void) {
-		super(pcdata, onUpdate);
+	constructor(cc: ChargenController) {
+		super(cc);
 	}
 
 	label: string = "Class";
 
 	complete(): boolean {
-		return !!this.pcdata.cclass && this.game.data.class(this.pcdata.cclass).isStartingClass;
+		return !!this.cc.cclass && this.game.data.class(this.cc.cclass).isStartingClass;
 	}
 
 	private items: ButtonMenuItem<string>[] = this.game.data.classes.values().map(cls=>({
@@ -24,6 +24,7 @@ export class ChargenStepClass extends ChargenStep {
 
 	node(): VNode {
 		return <Fragment>
+			<h3>Class</h3>
 			<p>
 				Picking a class unlocks perks, skills, and abilities.
 				Every 6th level you can advance your class or pick another.
@@ -31,14 +32,13 @@ export class ChargenStepClass extends ChargenStep {
 			<div class="d-grid" style="grid-template-columns: max-content 1fr; min-height:6rem">
 				<div class="d-flex gap-2 flex-column ai-stretch mr-4">
 					<ButtonMenu items={this.items}
-					            selected={this.pcdata.cclass}
+					            selected={this.cc.cclass}
 					            onChange={(x)=>{
-									this.pcdata.cclass=x;
-									this.onUpdate();
+									this.cc.setClass(x);
 					            }}/>
 				</div>
 				<div>
-					{simpleparse(this.game.data.classes.getOrNull(this.pcdata.cclass)?.description)}
+					{simpleparse(this.game.data.classes.getOrNull(this.cc.cclass)?.description)}
 				</div>
 			</div>
 		</Fragment>;

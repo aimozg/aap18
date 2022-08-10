@@ -1,14 +1,12 @@
-import {CGPCData} from "./chargenData";
 import {VNode} from "preact";
 import {Game} from "../../engine/Game";
+import {ChargenController} from "./ChargenController";
 
 export abstract class ChargenStep {
-	protected constructor(
-		protected pcdata: CGPCData,
-		protected onUpdate: () => void) {
+	protected constructor(protected cc: ChargenController) {
 	}
 
-	protected player = this.pcdata.player;
+	protected get player() { return this.cc.player }
 
 	abstract label: string;
 

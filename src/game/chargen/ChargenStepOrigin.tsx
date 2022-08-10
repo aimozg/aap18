@@ -1,14 +1,14 @@
 import {Fragment, h, VNode} from "preact";
 import {ButtonMenu} from "../../engine/ui/components/ButtonMenu";
-import {CGPCData} from "./chargenData";
 import {ChargenStep} from "./ChargenStep";
 import {simpleparse} from "../../engine/text/utils";
+import {ChargenController} from "./ChargenController";
 
 export class ChargenStepOrigin extends ChargenStep {
 	label = "Origin";
 
-	constructor(pcdata: CGPCData, onUpdate: () => void) {
-		super(pcdata, onUpdate);
+	constructor(cc: ChargenController) {
+		super(cc);
 	}
 
 	private items = this.game.idata.playerOrigins.map(o => ({
@@ -17,24 +17,24 @@ export class ChargenStepOrigin extends ChargenStep {
 	}));
 
 	complete(): boolean {
-		return !!this.player.originId;
+		return !!this.cc.origin;
 	}
 
 	node(): VNode {
 		return <Fragment>
+			<h3>Origins</h3>
 			<p>
 				Where do you come from?
 			</p>
 			<p>
 				<ButtonMenu items={this.items}
-				            selected={this.player.originId}
+				            selected={this.cc.origin}
 				            onChange={(o) => {
-					            this.player.originId = o;
-					            this.onUpdate();
+								this.cc.setOrigin(o);
 				            }}/>
 			</p>
 			<p>
-				{simpleparse(this.game.idata.playerOrigins.find(o => o.id === this.player.originId)?.description)}
+				{simpleparse(this.game.idata.playerOrigins.find(o => o.id === this.cc.origin)?.description)}
 			</p>
 		</Fragment>;
 	}

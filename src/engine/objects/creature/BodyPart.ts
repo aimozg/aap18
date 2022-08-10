@@ -110,7 +110,7 @@ export abstract class BodyPart<T extends BodyPartType<any>> {
 		this.size = this._type.size;
 		this.count = this._type.count;
 	}
-	get host(): Character { return this.body.host }
+	get host(): Character|null { return this.body.host }
 	abstract ref(): BodyPartReference<BodyPart<T>, T>;
 	abstract typeNone(): T;
 	abstract typeHuman(): T;

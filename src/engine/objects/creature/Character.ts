@@ -29,7 +29,7 @@ export class CharacterBody {
 		this._height = coerce(value, CharacterBody.MinHeightCm, CharacterBody.MaxHeightCm)
 	}
 
-	constructor(public readonly host: Character) {
+	constructor(public readonly host: Character|null) {
 	}
 
 	copyFrom(src:CharacterBody) {

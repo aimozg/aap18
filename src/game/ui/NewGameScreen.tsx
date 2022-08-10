@@ -3,20 +3,20 @@ import {h, VNode} from "preact";
 import {Button} from "../../engine/ui/components/Button";
 import {ButtonMenu} from "../../engine/ui/components/ButtonMenu";
 import {ChargenStepOrigin} from "../chargen/ChargenStepOrigin";
-import {ChargenStepSex} from "../chargen/ChargenStepSex";
+import {ChargenStepIdentity} from "../chargen/ChargenStepIdentity";
 import {ChargenStepRace} from "../chargen/ChargenStepRace";
 import {ChargenStepStats} from "../chargen/ChargenStepStats";
 import {ChargenStepClass} from "../chargen/ChargenStepClass";
 import {ChargenStepTraits} from "../chargen/ChargenStepTraits";
 import {ChargenStepAppearance} from "../chargen/ChargenStepAppearance";
 import {ChargenStepFinalize} from "../chargen/ChargenStepFinalize";
-import {CGPCData, ChargenRules} from "../chargen/chargenData";
 import {ChargenStep} from "../chargen/ChargenStep";
 import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
 import {randomName} from "../data/text/names";
 import fxrng from "../../engine/math/fxrng";
 import {ChargenStepAttrs} from "../chargen/ChargenStepAttrs";
 import {BreastSizeTiers} from "../data/body/Breasts";
+import {ChargenController} from "../chargen/ChargenController";
 
 function randomStartingPlayer(empty:Boolean): PlayerCharacter {
 	let player = new PlayerCharacter();
@@ -53,61 +53,24 @@ export class NewGameScreen extends AbstractScreen {
 		this.completeResolve = resolve;
 	});
 	private tab: number = 0;
-	private pcdata: CGPCData = {
-		player: randomStartingPlayer(true),
-		race: 'human',
-		ppoints: ChargenRules.attributePoints,
-		cclass: 'warrior',
-	};
+	cc: ChargenController;
 
 	constructor() {
 		super();
-		let pcdata = this.pcdata;
+		let cc = this.cc = new ChargenController(this);
 
-		let onUpdate = this.updateSteps.bind(this);
 		this.tabs = [
-			new ChargenStepOrigin(pcdata, onUpdate),
-			new ChargenStepSex(pcdata, onUpdate, false), // TODO allow herm characters
-			new ChargenStepRace(pcdata, onUpdate, [{ // TODO list races
-				label: "Human",
-				value: 'human'
-			}, {
-				label: 'Elf',
-				value: 'elf',
-				disabled: true
-			}, {
-				label: 'Halfkin Cat',
-				value: 'half-cat',
-				disabled: true
-			}, {
-				label: 'Beastkin Cat',
-				value: 'beast-cat',
-				disabled: true
-			}, {
-				label: 'Halfkin Wolf',
-				value: 'half-wolf',
-				disabled: true
-			}, {
-				label: 'Beastkin Wolf',
-				value: 'beast-wolf',
-				disabled: true
-			}, {
-				label: 'Halfkin Fox',
-				value: 'half-fox',
-				disabled: true
-			}, {
-				label: 'Beastkin Fox',
-				value: 'beast-fox',
-				disabled: true
-			}]),
-			new ChargenStepAppearance(pcdata, onUpdate),
-			new ChargenStepClass(pcdata, onUpdate),
-			new ChargenStepAttrs(pcdata, onUpdate),
-			new ChargenStepStats(pcdata, onUpdate),
-			new ChargenStepTraits(pcdata, onUpdate),
-			new ChargenStepFinalize(pcdata, onUpdate),
+			new ChargenStepOrigin(cc),
+			new ChargenStepIdentity(cc),
+			new ChargenStepRace(cc),
+			new ChargenStepAppearance(cc),
+			new ChargenStepClass(cc),
+			new ChargenStepAttrs(cc),
+			new ChargenStepStats(cc),
+			new ChargenStepTraits(cc),
+			new ChargenStepFinalize(cc),
 		];
-		this.updateSteps();
+		this.update();
 	}
 
 	async display(): Promise<PlayerCharacter> {
@@ -119,19 +82,23 @@ export class NewGameScreen extends AbstractScreen {
 	}
 
 	private onCompleteClick() {
-		this.completeResolve(this.pcdata.player);
+		this.cc.update()
+		this.completeResolve(this.cc.player);
 	}
 
 	private readonly tabs: ChargenStep[];
+	private allowedTabs: number = 1;
 
 	private selectTab(tab: number) {
 		this.tab = tab;
-		this.render();
+		this.allowedTabs = Math.max(tab+1, this.allowedTabs)
+		this.update();
 	}
 
-	private updateSteps() {
+	update() {
 		let good = true;
 		for (let i = 0; i < this.tabs.length; i++) {
+			if (this.allowedTabs < i) good = false;
 			this.tabs[i].unlocked = good;
 			if (!this.tabs[i].complete()) good = false;
 		}
@@ -145,11 +112,11 @@ export class NewGameScreen extends AbstractScreen {
 				            className="-big"
 				            selected={this.tab}
 				            onChange={(i) => this.selectTab(i)}/>
-				<div style="visibility:hidden"><Button className="-big"/></div>
+				<div style="visibility:hidden" class="flex-grow-1"></div>
 				<Button className="-big" label="Cancel" onClick={() => this.onCancelClick()}></Button>
 			</div>
 			<div class="col-span-10 d-flex flex-column">
-				<div style="min-height:18.5rem">
+				<div>{/* style="min-height:23rem"*/}
 					{this.tabs[this.tab].node()}
 				</div>
 				<p class="mt-4">

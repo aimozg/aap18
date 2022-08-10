@@ -1,26 +1,26 @@
-import {ButtonMenu, ButtonMenuItem} from "../../engine/ui/components/ButtonMenu";
+import {ButtonMenu} from "../../engine/ui/components/ButtonMenu";
 import {Fragment, h, VNode} from "preact";
-import {CGPCData} from "./chargenData";
 import {ChargenStep} from "./ChargenStep";
+import {ChargenController} from "./ChargenController";
 
 export class ChargenStepRace extends ChargenStep {
 
-	constructor(pcdata: CGPCData, onUpdate: () => void, private races: ButtonMenuItem<string>[]) {
-		super(pcdata, onUpdate);
+	constructor(cc: ChargenController) {
+		super(cc);
 	}
 
 	label: string = "Race";
 
 	complete(): boolean {
-		return !!this.pcdata.race;
+		return !!this.cc.race;
 	}
 
 	node(): VNode {
 		return <Fragment>
+			<h3>Race</h3>
 			<p>What is your starting race?</p>
-			<p><ButtonMenu items={this.races} selected={this.pcdata.race} onChange={race => {
-				this.pcdata.race = race;
-				this.onUpdate();
+			<p><ButtonMenu items={this.cc.allowedRaces()} selected={this.cc.race} onChange={race => {
+				this.cc.setRace(race);
 			}}/></p>
 		</Fragment>
 	}

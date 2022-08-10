@@ -1,13 +1,13 @@
 import {Fragment, h, VNode} from "preact";
 import {simpleparse} from "../../engine/text/utils";
 import {Button} from "../../engine/ui/components/Button";
-import {CGPCData, CGStat, secondaryStats} from "./chargenData";
 import {ChargenStep} from "./ChargenStep";
+import {ChargenController} from "./ChargenController";
 
 export class ChargenStepStats extends ChargenStep {
 
-	constructor(pcdata: CGPCData, onUpdate: () => void) {
-		super(pcdata, onUpdate);
+	constructor(cc: ChargenController) {
+		super(cc);
 	}
 
 	label: string = "Stats";
@@ -16,52 +16,28 @@ export class ChargenStepStats extends ChargenStep {
 		return true;
 	}
 
-	private getStat(stat: CGStat): number {
-		return stat.get(this.player);
-	}
-
-	private canUpSecondary(stat: CGStat):boolean {
-		let x = stat.getNatural(this.player);
-		if (x >= stat.max) return false;
-		return true;
-	}
-	private canDownSecondary(stat: CGStat):boolean {
-		let x = stat.getNatural(this.player);
-		if (x <= stat.min) return false;
-		return true;
-	}
-	private upSecondary(stat: CGStat) {
-		stat.inc(this.player);
-		this.onUpdate();
-	}
-
-	private downSecondary(stat: CGStat) {
-		stat.dec(this.player);
-		this.onUpdate();
-	}
-
 	node(): VNode {
 		return <Fragment>
-			<div class="d-grid gap-2" style="grid-template-columns: max-content max-content max-content 1fr">
-				<h3 class="col-span-4">
+			<div class="d-grid gap-2" style="grid-template-columns: repeat(5, max-content) 1fr">
+				<h3 class="col-span-6">
 					Secondary stats
 				</h3>
-				{secondaryStats.map(ss => <Fragment>
-					<div>{ss.label}</div>
-					<div style="min-width:2rem" class="text-center">{this.getStat(ss)>=0?'\xA0':''}{this.getStat(ss)}</div>
-					<div>
-						<Button disabled={!this.canUpSecondary(ss)}
+
+				{this.cc.secondaryStats().map(ss => <Fragment>
+					<div>{ss.meta.name}</div>
+					<Button disabled={!this.cc.canIncStat(ss)}
+					        hold
+					        onClick={() => this.cc.statInc(ss)}
+					        label="+"/>
+					<div style="min-width:2rem" class="text-center">({ss.natural})</div>
+					<Button disabled={!this.cc.canDecStat(ss)}
 						        hold
-						        onClick={() => this.upSecondary(ss)}
-						        label="+"/>
-						<Button disabled={!this.canDownSecondary(ss)}
-						        hold
-						        onClick={() => this.downSecondary(ss)}
+						        onClick={() => this.cc.statDec(ss)}
 						        label="-"/>
-					</div>
-					<div>{simpleparse(ss.explain(this.player))}</div>
+					<div style="min-width:2rem" className={"text-center"+(ss.total>ss.natural?' text-positive':ss.total<ss.natural?' text-negative':'')}>{ss.total>=0?'\xA0':''}{ss.total}</div>
+					<div>{simpleparse(ss.meta.explain(ss.total,this.player))}</div>
 				</Fragment>)}
-				<div class="col-span-4">
+				<div class="col-span-6">
 					<i>These stats are not beneficial, you can leave them unchanged.</i>
 				</div>
 			</div>

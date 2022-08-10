@@ -32,6 +32,12 @@
   color: #a00;
   font-weight: bold;
 }
+.text-positive {
+  color: var(--tc-plus);
+}
+.text-negative {
+  color: var(--tc-minus);
+}
 
 @each $align in left, right, center {
   .text-#{$align} {

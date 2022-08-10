@@ -1,13 +1,13 @@
 import {Fragment, h, VNode} from "preact";
-import {CGPCData} from "./chargenData";
 import {ChargenStep} from "./ChargenStep";
 import {Parser} from "../../engine/text/parser/Parser";
 import {Appearance} from "../data/text/Appearance";
+import {ChargenController} from "./ChargenController";
 
 export class ChargenStepFinalize extends ChargenStep {
 
-	constructor(pcdata: CGPCData, onUpdate: () => void) {
-		super(pcdata, onUpdate);
+	constructor(cc: ChargenController) {
+		super(cc);
 	}
 
 	label: string = "Finalize";
@@ -20,6 +20,7 @@ export class ChargenStepFinalize extends ChargenStep {
 		let pc = this.player;
 		let parser = new Parser(pc);
 		return <Fragment>
+			<h3>Review</h3>
 			<p>
 				You will play as warrior {pc.name}. {/*TODO classes*/}
 			</p>
