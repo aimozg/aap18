@@ -16,6 +16,7 @@ import {Color} from "../../engine/objects/Color";
 import {HumanEyeColorNames, HumanHairColorNames, HumanSkinColorNames} from "../data/colors";
 import {Game} from "../../engine/Game";
 import {IStatMetadata, StatMetadata} from "../data/stats";
+import {CharacterClass} from "../../engine/rules/classes/CharacterClass";
 
 interface IChargenSecondaryStat {
 	key: keyof ChargenController;
@@ -189,6 +190,9 @@ export class ChargenController {
 		this.cclass = cclass;
 		this.update();
 	}
+	get classObject(): CharacterClass|null {
+		return Game.instance.data.classes.get(this.cclass)
+	}
 
 	///////////////
 	// Internals //
@@ -266,7 +270,7 @@ export class ChargenController {
 		this.update()
 	}
 	attrCost(id:TAttribute):number {
-		let x = this.player.naturalAttrs[id];
+		let x = this.attrs[id];
 		// 1 at 8 and below, +1 for each 2
 		return Math.max(1, 1 + Math.floor((x - 8)/2));
 	}
@@ -277,11 +281,11 @@ export class ChargenController {
 		return this.attrs[id] > ChargenRules.minAttr
 	}
 	statInc(stat:IChargenSecondaryStat) {
-		this[stat.key]++;
+		(this as any)[stat.key]++;
 		this.update()
 	}
 	statDec(stat:IChargenSecondaryStat) {
-		this[stat.key]--;
+		(this as any)[stat.key]--;
 		this.update()
 	}
 	canIncStat(stat:IChargenSecondaryStat):boolean {

@@ -32,6 +32,9 @@ export class Button extends Component<ButtonProps, ButtonState> {
 			}, 100);
 		}, 500);
 	}
+	private onMouseLeave(ev: MouseEvent) {
+		this.clear();
+	}
 	private onMouseUp(ev: MouseEvent) {
 		ev.preventDefault();
 		this.clear();
@@ -54,6 +57,7 @@ export class Button extends Component<ButtonProps, ButtonState> {
 			disabled={!!props.disabled}
 			onMouseDown={props.hold?this.onMouseDown.bind(this):undefined}
 			onMouseUp={props.hold?this.onMouseUp.bind(this):undefined}
+			onMouseLeave={props.hold?this.onMouseLeave.bind(this):undefined}
 			onClick={this.onClick.bind(this)}>{props.children}{props.label}</button>
 	}
 

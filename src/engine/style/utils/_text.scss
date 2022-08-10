@@ -39,7 +39,7 @@
   color: var(--tc-minus);
 }
 
-@each $align in left, right, center {
+@each $align in left, right, center, justify {
   .text-#{$align} {
     text-align: $align;
   }
