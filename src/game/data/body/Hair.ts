@@ -37,7 +37,9 @@ export class HairPart extends BodyPart<HairType> {
 	ref() { return HairRef}
 	typeNone() { return HairTypes.NONE }
 	typeHuman() { return HairTypes.NORMAL }
-
+	get isPresent(): boolean {
+		return this.size > 0 && super.isPresent;
+	}
 	get length() { return this.size }
 	set length(value: number) { this.size = value }
 }

@@ -5,10 +5,11 @@ import {Parser} from "../../engine/text/parser/Parser";
 import {Appearance} from "../data/text/Appearance";
 import {ListColorPicker} from "../../engine/ui/components/ListColorPicker";
 import {HumanEyeColorNames, HumanHairColorNames, HumanSkinColorNames} from "../data/colors";
-import {Color, colorSortKey} from "../../engine/objects/Color";
+import {Color} from "../../engine/objects/Color";
 import {ButtonMenu} from "../../engine/ui/components/ButtonMenu";
 import {HairLengthTier} from "../data/body/Hair";
 import fxrng from "../../engine/math/fxrng";
+import {BreastSizeTier} from "../data/body/Breasts";
 
 export class ChargenStepAppearance extends ChargenStep {
 
@@ -21,9 +22,9 @@ export class ChargenStepAppearance extends ChargenStep {
 	}
 
 	label: string = "Appearance";
-	hairColors = HumanHairColorNames.map(cname => this.game.data.colorByName(cname, "hair")).sortWith(colorSortKey)
-	eyeColors = HumanEyeColorNames.map(cname => this.game.data.colorByName(cname, "eyes")).sortWith(colorSortKey)
-	skinColors = HumanSkinColorNames.map(cname => this.game.data.colorByName(cname, "skin")).sortWith(colorSortKey)
+	hairColors = this.game.data.colorsByNames(HumanHairColorNames, "hair")
+	eyeColors = this.game.data.colorsByNames(HumanEyeColorNames, "eyes")
+	skinColors = this.game.data.colorsByNames(HumanSkinColorNames, "skin")
 
 	complete(): boolean {
 		return this.player.body.hairColor1 !== Color.DEFAULT_WHITE && this.player.body.skinColor1 !== Color.DEFAULT_WHITE && this.player.body.eyes.color !== Color.DEFAULT_WHITE;
@@ -49,17 +50,23 @@ export class ChargenStepAppearance extends ChargenStep {
 		this.onUpdate()
 	}
 
+	setBreastSize(size: number) {
+		this.player.body.breasts.size = size;
+		this.onUpdate()
+	}
+
 	node(): VNode {
 
 		let parser = new Parser(this.player);
+		let body = this.player.body;
 		return <Fragment>
 			<div class="grid-12 gap-2">
-				<div class="col-span-4">
+				<div class="col-span-6">
 					{Appearance.characterAppearance(this.player, parser)}
 				</div>
-				<div class="col-span-8">
+				<div class="col-span-6">
 					{/*TODO configurables:
-					 - hair length,  style
+					 - hair style
 					 - other body materials (if present)
 					 - height
 					 - dick size
@@ -69,21 +76,31 @@ export class ChargenStepAppearance extends ChargenStep {
 					<p>
 						<label>Hair length</label>
 						<div>
-							<ButtonMenu items={HairLengthTier.list().map(hlt => ({label:hlt.name, value:hlt.value}))} onChange={length => this.setHairLength(length)} selected={this.player.body.hair.length}/>
+							<ButtonMenu items={HairLengthTier.list().map(hlt => ({label:hlt.name, value:hlt.value}))} onChange={length => this.setHairLength(length)} selected={body.hair.length}/>
 						</div>
 						<label>Hair color</label>
 						<ListColorPicker colors={this.hairColors}
-						                 startValue={this.player.body.hairColor1}
+						                 startValue={body.hairColor1}
 						                 onChange={color => this.setHairColor(color)}/>
 					</p>
-					<label>Eye color</label>
-					<ListColorPicker colors={this.eyeColors}
-					                 startValue={this.player.body.eyes.color}
-					                 onChange={color => this.setEyeColor(color)}/>
-					<label>Skin color</label>
-					<ListColorPicker colors={this.skinColors}
-					                 startValue={this.player.body.skinColor1}
-					                 onChange={color => this.setSkinColor(color)}/>
+					<p>
+						<label>Eye color</label>
+						<ListColorPicker colors={this.eyeColors}
+						                 startValue={body.eyes.color}
+						                 onChange={color => this.setEyeColor(color)}/>
+					</p>
+					<p>
+						<label>Skin color</label>
+						<ListColorPicker colors={this.skinColors}
+						                 startValue={body.skinColor1}
+						                 onChange={color => this.setSkinColor(color)}/>
+					</p>
+					<p>
+						<label>Breast size</label>{/*TODO limit allowed ranges*/}
+						<div>
+							<ButtonMenu items={BreastSizeTier.list().map(bst => ({label:bst.name, value:bst.value}))} onChange={size => this.setBreastSize(size)} selected={body.breasts.size}/>
+						</div>
+					</p>
 				</div>
 			</div>
 		</Fragment>;

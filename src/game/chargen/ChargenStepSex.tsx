@@ -6,6 +6,8 @@ import {ChargenStep} from "./ChargenStep";
 import {TextInput} from "../../engine/ui/components/TextInput";
 import {Button} from "../../engine/ui/components/Button";
 import {randomName} from "../data/text/names";
+import {BreastSizeTiers} from "../data/body/Breasts";
+import fxrng from "../../engine/math/fxrng";
 
 export class ChargenStepSex extends ChargenStep {
 
@@ -33,6 +35,7 @@ export class ChargenStepSex extends ChargenStep {
 		this.player.gender =
 			sex === 'm' ? 'm' :
 				sex === 'f' || sex === 'h' ? 'f' : 'x';
+		this.player.body.breasts.size = sex === 'm' ? BreastSizeTiers.FLAT.value : fxrng.nextInt(BreastSizeTiers.A_CUP.value, BreastSizeTiers.DD_CUP.value);
 		this.onUpdate()
 	}
 	setName(name:string) {

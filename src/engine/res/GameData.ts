@@ -8,7 +8,7 @@ import Symbols from "../symbols";
 import {RacialGroup} from "../rules/RacialGroup";
 import {Scene} from "../scene/Scene";
 import {Place} from "../objects/Place";
-import {Color} from "../objects/Color";
+import {Color, colorSortKey} from "../objects/Color";
 import {Game} from "../Game";
 
 export class GameData {
@@ -29,6 +29,9 @@ export class GameData {
 		let color = new Color(gdcolor.name, gdcolor.rgb);
 		this.colorCache.set(ccKey,color)
 		return color;
+	}
+	colorsByNames(names:string[], palette:string="common"):Color[] {
+		return names.map(name=>this.colorByName(name,palette)).sortWith(colorSortKey);
 	}
 
 	readonly places = new ResLib<Place>(Symbols.ResTypePlace, "Place");

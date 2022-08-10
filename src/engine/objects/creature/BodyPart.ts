@@ -128,7 +128,7 @@ export abstract class BodyPart<T extends BodyPartType<any>> {
 	size: number
 	count: number
 	get isPresent() { return this._type.isPresent };
-	hasMaterial(material:BodyMaterialType):boolean { return this.type.hasMaterial(material) }
+	hasMaterial(material:BodyMaterialType):boolean { return this.isPresent && this.type.hasMaterial(material) }
 	formatPattern(pattern:string):string { return this.type.formatPattern(pattern, this) }
 
 	/** noun, singular ("ear") */

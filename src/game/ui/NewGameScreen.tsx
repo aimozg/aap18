@@ -16,6 +16,7 @@ import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
 import {randomName} from "../data/text/names";
 import fxrng from "../../engine/math/fxrng";
 import {ChargenStepAttrs} from "../chargen/ChargenStepAttrs";
+import {BreastSizeTiers} from "../data/body/Breasts";
 
 function randomStartingPlayer(empty:Boolean): PlayerCharacter {
 	let player = new PlayerCharacter();
@@ -35,6 +36,7 @@ function randomStartingPlayer(empty:Boolean): PlayerCharacter {
 
 	// appearance
 	// TODO
+	player.body.breasts.size = player.sex === 'm' ? BreastSizeTiers.FLAT.value : fxrng.nextInt(BreastSizeTiers.A_CUP.value, BreastSizeTiers.DD_CUP.value);
 
 	if (!empty) {
 		// TODO origin, attrs, skills, class

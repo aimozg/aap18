@@ -12,7 +12,7 @@ import {CharacterBody} from "../../../engine/objects/creature/Character";
 import fxrng from "../../../engine/math/fxrng";
 import {BodyMaterialTypes} from "./Materials";
 
-// TODO different leg configurations: biped(2), digitrigrade(2) taur(4), drider(8), kraken(8/10)
+// TODO different leg configurations: biped(2), digitrigrade(2) taur(4), drider(8), kraken(8/10), blob(0/1)
 
 export abstract class LegType extends BodyPartType<LegPart> {
 	protected constructor(id: string, name: string) {
@@ -97,6 +97,17 @@ export namespace LegTypes {
 			this.texts.footAdj = ["soft", "padded", "cat"];
 			this.texts.footNoun = "paw";
 			this.texts.feetNoun = "paws";
+			this.materials.add(BodyMaterialTypes.FUR)
+		}
+	}
+	export const COW = new class extends LegType {
+		constructor() {
+			super("/cow", "cow");
+			this.texts.type = ["cow", "bovine"];
+			this.texts.adj = ["furry"];
+			this.texts.footAdj = [""];
+			this.texts.footNoun = "hoof";
+			this.texts.feetNoun = "hooves";
 			this.materials.add(BodyMaterialTypes.FUR)
 		}
 	}

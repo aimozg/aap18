@@ -13,13 +13,19 @@ import {Color} from "../../engine/objects/Color";
 import {LegPart, LegsRef} from "./body/Legs";
 import {HairPart, HairRef} from "./body/Hair";
 import {WingPart, WingsRef} from "./body/Wings";
+import {HornPart, HornsRef} from "./body/Horns";
+import {FacePart, FaceRef} from "./body/Face";
+import {BreastPart, BreastsRef} from "./body/Breasts";
 
 declare module "../../engine/objects/creature/Character" {
 	interface CharacterBody {
 		readonly arms: ArmPart;
+		readonly breasts: BreastPart;
 		readonly ears: EarPart;
 		readonly eyes: EyePart;
+		readonly face: FacePart;
 		readonly hair: HairPart;
+		readonly horns: HornPart;
 		readonly legs: LegPart;
 		readonly tail: TailPart;
 		readonly wings: WingPart;
@@ -55,9 +61,12 @@ declare module "../../engine/objects/creature/Character" {
 export function gdRegisterBodyParts(gd:GameDataBuilder) {
 	gd.logger.debug("gdRegisterBodyParts");
 	gd.addBodyPart("arms", ArmsRef);
+	gd.addBodyPart("breasts", BreastsRef);
 	gd.addBodyPart("ears", EarsRef);
 	gd.addBodyPart("eyes", EyesRef);
+	gd.addBodyPart("face", FaceRef);
 	gd.addBodyPart("hair", HairRef);
+	gd.addBodyPart("horns", HornsRef);
 	gd.addBodyPart("legs", LegsRef);
 	gd.addBodyPart("tail", TailRef);
 	gd.addBodyPart("wings", WingsRef);
