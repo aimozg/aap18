@@ -55,6 +55,12 @@ export class ChargenStepAppearance extends ChargenStep {
 		this.onUpdate()
 	}
 
+	setHeight(value:number) {
+		if (!isFinite(value)) return;
+		this.player.body.height = value;
+		this.onUpdate();
+	}
+
 	node(): VNode {
 
 		let parser = new Parser(this.player);
@@ -74,8 +80,18 @@ export class ChargenStepAppearance extends ChargenStep {
 					 - thickness & tone
 					*/}
 					<p>
+						<label>Height</label>
+						<input type="number"
+						       step="5"
+						       value={body.height}
+						       min="120"
+						       max="210"
+						       class="ml-1"
+						       onInput={event => this.setHeight(+(event.target as HTMLInputElement).value)}/>cm
+					</p>
+					<p>
 						<label>Hair length</label>
-						<div>
+						<div class="d-flex flex-wrap gap-1">
 							<ButtonMenu items={HairLengthTier.list().map(hlt => ({label:hlt.name, value:hlt.value}))} onChange={length => this.setHairLength(length)} selected={body.hair.length}/>
 						</div>
 						<label>Hair color</label>
@@ -97,7 +113,7 @@ export class ChargenStepAppearance extends ChargenStep {
 					</p>
 					<p>
 						<label>Breast size</label>{/*TODO limit allowed ranges*/}
-						<div>
+						<div class="d-flex flex-wrap gap-1">
 							<ButtonMenu items={BreastSizeTier.list().map(bst => ({label:bst.name, value:bst.value}))} onChange={size => this.setBreastSize(size)} selected={body.breasts.size}/>
 						</div>
 					</p>

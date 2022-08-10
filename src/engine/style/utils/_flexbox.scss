@@ -6,6 +6,10 @@
   flex-direction: column;
 }
 
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
 @each $align in center, start, end, baseline, flex-start, flex-end, self-start, self-end, stretch {
   .ai-#{$align} {
     align-items: $align;

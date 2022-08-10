@@ -17,8 +17,8 @@ export class BodyMaterial {
 		if (this.singleColor) return this.color1.name
 		return this.color1.name+" and "+this.color2.name
 	}
-	_color1: Color = Color.DEFAULT_WHITE
-	_color2: Color = Color.DEFAULT_WHITE
+	private _color1: Color = Color.DEFAULT_WHITE
+	private _color2: Color = Color.DEFAULT_WHITE
 	get color1():Color { return this._color1 }
 	get color2():Color { return this._color2 }
 	get singleColor() { return this.color1.equals(this.color2)}
@@ -31,6 +31,10 @@ export class BodyMaterial {
 	}
 	set color2(value:Color) {
 		this._color2 = value;
+	}
+	copyFrom(other:BodyMaterial) {
+		this._color1 = other._color1;
+		this._color2 = other._color2;
 	}
 
 	get isPresent():boolean {

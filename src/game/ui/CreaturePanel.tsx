@@ -4,9 +4,9 @@ import {Creature} from "../../engine/objects/Creature";
 import {Fragment, render} from "preact/compat";
 import {Bar} from "../../engine/ui/components/Bar";
 import {removeChildren} from "../../engine/utils/dom";
-import {coerce} from "../../engine/math/utils";
 import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
 import {CombatRules} from "../combat/CombatRules";
+import {stripedBackground} from "../../engine/utils/css";
 
 export interface CreaturePanelOptions {
 	ap: boolean;
@@ -68,11 +68,8 @@ export class CreaturePanel extends DomComponent {
 		//-------------------//
 		// Name and AP as bg //
 		//-------------------//
-		let apPercent = coerce(100 * c.ap / 1000, 0, 100);
 		let sectionName = <div className="text-center text-l" style={{
-			'background': 'linear-gradient(90deg,' +
-				' var(--theme-ctrl-bg) ' + apPercent + '%,' +
-				' transparent ' + apPercent + '%)'
+			'background': stripedBackground('var(--theme-ctrl-bg', 'transparent', c.ap/1000)
 		}}>{c.name.capitalize()}</div>
 		//------------------//
 		// Level, sex, race //

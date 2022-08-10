@@ -32,7 +32,7 @@ export class ButtonMenu<V> extends Component<ButtonMenuProps<V>, ButtonMenuState
 
 	render(props: RenderableProps<ButtonMenuProps<V>>, state: Readonly<ButtonMenuState>, context: any): ComponentChild {
 		return props.items.map(item =>
-			<Button label={props.selected === item.value ? '<' + item.label + '>' : item.label}
+			<Button label={props.selected === item.value ? '<' + item.label + '>' : ('\xA0' + item.label + '\xA0')}
 			        className={
 				        (item.className ?? '') + ' ' +
 				        (props.className ?? '') + ' ' +

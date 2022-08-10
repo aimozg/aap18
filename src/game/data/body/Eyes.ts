@@ -33,6 +33,10 @@ export class EyePart extends BodyPart<EyeType> {
 	ref() { return EyesRef }
 	typeNone() { return EyeTypes.NONE }
 	typeHuman() { return EyeTypes.HUMAN }
+	copyFrom(other: EyePart) {
+		super.copyFrom(other);
+		this.color = other.color;
+	}
 }
 
 export const EyesRef: BodyPartReference<EyePart, EyeType> = new class extends BodyPartReference<EyePart, EyeType> {

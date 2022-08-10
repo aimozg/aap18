@@ -5,8 +5,8 @@ import * as tinycolor from "tinycolor2";
 
 export class Color {
 	constructor(
-		public name: string,
-		public rgb: string
+		public readonly name: string,
+		public readonly rgb: string
 	) {}
 
 	hsv: tinycolor.ColorFormats.HSVA = tinycolor(this.rgb).toHsv()

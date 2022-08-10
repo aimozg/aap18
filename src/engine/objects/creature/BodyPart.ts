@@ -114,6 +114,11 @@ export abstract class BodyPart<T extends BodyPartType<any>> {
 	abstract ref(): BodyPartReference<BodyPart<T>, T>;
 	abstract typeNone(): T;
 	abstract typeHuman(): T;
+	copyFrom(other: BodyPart<T>):void {
+		this.setType(other.type);
+		this.size = other.size;
+		this.count = other.count;
+	}
 
 	_type: T;
 	get type() { return this._type }

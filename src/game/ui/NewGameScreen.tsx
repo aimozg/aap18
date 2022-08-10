@@ -37,6 +37,7 @@ function randomStartingPlayer(empty:Boolean): PlayerCharacter {
 	// appearance
 	// TODO
 	player.body.breasts.size = player.sex === 'm' ? BreastSizeTiers.FLAT.value : fxrng.nextInt(BreastSizeTiers.A_CUP.value, BreastSizeTiers.DD_CUP.value);
+	player.body.height = 145 + (player.sex === 'm' ? fxrng.d6(2) : fxrng.d6(1))*5;
 
 	if (!empty) {
 		// TODO origin, attrs, skills, class
