@@ -14,3 +14,10 @@ export const GENDER_MALE = 'm';
 export const GENDER_FEMALE = 'f';
 export const GENDER_OTHER = 'x';
 export const GENDERS: TGender[] = ['m', 'f', 'x'];
+
+export function defaultGender(sex:TSex, futa:TGender='f'):TGender {
+	if (sex === 'n') return 'x';
+	if (sex === 'm') return 'm';
+	if (sex === 'h') return futa;
+	return 'f';
+}

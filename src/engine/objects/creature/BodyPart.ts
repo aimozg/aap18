@@ -47,6 +47,7 @@ export abstract class BodyPartType<PART extends BodyPart<any>> {
 	protected textReplacer(s: string, part: PART): string {
 		if (s === 'count') {
 			if (this.count === 0) return "no";
+			// TODO empty if count is default count?? and bring {count} back to description pattern
 			if (this.count === 1) return fxrng.either("one", "single");
 			if (this.count === 2) return fxrng.either("two", "a pair of");
 			if (this.count === 3) return fxrng.either("three", "a trio of");
@@ -135,6 +136,10 @@ export abstract class BodyPart<T extends BodyPartType<any>> {
 	get isPresent() { return this._type.isPresent };
 	hasMaterial(material:BodyMaterialType):boolean { return this.isPresent && this.type.hasMaterial(material) }
 	formatPattern(pattern:string):string { return this.type.formatPattern(pattern, this) }
+
+	remove() {
+		this.setType(this.typeNone());
+	}
 
 	/** noun, singular ("ear") */
 	noun1() { return this.type.noun1(this) }

@@ -3,7 +3,7 @@
  */
 import {IGameObject} from "../GameObject";
 import {TAttribute, TAttributes} from "../rules/TAttribute";
-import {GENDER_OTHER, SEX_NONE, TGender, TSex} from "../rules/gender";
+import {defaultGender, SEX_NONE, TGender, TSex} from "../rules/gender";
 import {IPronouns, Pronouns} from "../../game/data/text/gender";
 import {coerce} from "../math/utils";
 import {NaturalWeapon} from "./item/BaseNaturalWeapon";
@@ -38,8 +38,12 @@ export class Creature implements IGameObject {
 	// Body Stats - Data
 	//////////////////////
 	name: string = "Unnamed";
-	sex: TSex = SEX_NONE;
-	gender: TGender = GENDER_OTHER;
+	protected _sex: TSex = SEX_NONE;
+	get sex():TSex { return this._sex }
+	genderOverride: TGender|null = null;
+	get gender():TGender {
+		return this.genderOverride ?? defaultGender(this.sex) // TODO futa gender is fem-dependent
+	}
 	rgroup: RacialGroup = Game.instance.idata.rgHumanoid;
 
 	/////////////////////////

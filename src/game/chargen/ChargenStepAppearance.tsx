@@ -45,6 +45,11 @@ export class ChargenStepAppearance extends ChargenStep {
 		this.cc.update()
 	}
 
+	setPenisSize(size: number) {
+		this.cc.body.penis.size = size;
+		this.cc.update()
+	}
+
 	setHeight(value:number) {
 		if (!isFinite(value)) return;
 		this.cc.body.height = value;
@@ -100,9 +105,15 @@ export class ChargenStepAppearance extends ChargenStep {
 						                 onChange={color => this.setSkinColor(color)}/>
 					</p>
 					<p>
-						<label>Breast size</label>{/*TODO limit allowed ranges*/}
+						<label>Breast size</label>
 						<div class="d-flex flex-wrap gap-1">
 							<ButtonMenu items={this.cc.allowedBreastSizes()} onChange={size => this.setBreastSize(size)} selected={body.breasts.size}/>
+						</div>
+					</p>
+					<p>
+						<label>Penis size</label>{/*TODO or number slider?*/}
+						<div class="d-flex flex-wrap gap-1">
+							<ButtonMenu items={this.cc.allowedPenisSizes()} onChange={size => this.setPenisSize(size)} selected={body.penis.size}/>
 						</div>
 					</p>
 				</div>

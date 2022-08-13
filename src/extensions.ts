@@ -44,7 +44,7 @@ export const SORT_CASE_INSENSITIVE = 1;
 export const SORT_DESCENDING = 2;
 export const SORT_DESCENDING_CASE_INSENSITIVE = 3;
 
-export function initExtensions() {
+function initExtensions() {
 	function formatNumber(x: number, format: string): string {
 		if (!isFinite(x)) return String(x);
 		let match = /^([+]?)(\d*)(?:\.(\d+))?([dfp])(%?)$/.exec(format);
@@ -145,3 +145,4 @@ export function initExtensions() {
 		}
 	});
 }
+initExtensions();

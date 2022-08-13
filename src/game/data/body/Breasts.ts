@@ -22,11 +22,10 @@ export abstract class BreastType extends BodyPartType<BreastPart> {
 	materials = new Set([BodyMaterialTypes.SKIN])
 
 	noun1 = () => fxrng.either("breast", "tit")
-	noun2 = () => fxrng.either("breassts", "tits")
+	noun2 = () => fxrng.either("breasts", "tits")
 	protected textReplacer(s: string, part: BreastPart): string {
 		if (s === 'count' && part.size === 0) return '';
-		if (s === 'breast') return this.textReplacer('noun1', part)
-		if (s === 'breasts') return this.textReplacer('noun2', part)
+		if (s === 'breasts') return this.textReplacer('noun', part)
 		if (s === 'sizePrefixNoCup') return BreastSizeTier.find(part.size).shortPrefixNoCup(part)
 		if (s === 'sizePrefix') return BreastSizeTier.find(part.size).shortPrefix(part)
 		if (s === 'cup') return BreastSizeTier.find(part.size).name

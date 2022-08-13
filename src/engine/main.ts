@@ -3,7 +3,6 @@
  */
 import "./style/index.scss";
 import {Game, GameOptions} from "./Game";
-import {initExtensions} from "./utils/extensions";
 
 async function main(options: GameOptions) {
 	let game = new Game(options);
@@ -11,7 +10,6 @@ async function main(options: GameOptions) {
 }
 
 export function runGame(options:GameOptions) {
-	initExtensions();
 	if (document.readyState === "complete") {
 		main(options).then();
 	} else {

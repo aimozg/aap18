@@ -40,7 +40,7 @@ export function gdRegisterOrigins(gd: GameDataBuilder) {
 			"You're an ordinary highschool student who just turned eighteen. Overstressed by upcoming exams and constant pranks from your childhood friend of opposite sex, you rushed to the school but were hit by a truck. By the will of unknown powers, you were reincarnated in an 18+ fantasy world. " +
 			"\n\n" +
 			"<i>Lucky Newbie: Bonus defense, and XP gain until level 6. <b>(NOT IMPLEMENTED)</b></i>",
-		introText: "You're an ordinary highschool student who just turned eighteen. Overstressed by upcoming exams and constant pranks from your childhood friend of opposite sex, you were hit by a truck as you rushed to the school. By the will of unknown powers, you were reincarnated in an 18+ fantasy world. "
+		introText: "You're an ordinary highschool student who just turned eighteen. Overstressed by upcoming exams and constant pranks from your childhood friend of opposite sex, you rushed to the school but were hit by a truck. By the will of unknown powers, you were reincarnated in an 18+ fantasy world. "
 	}/*, {
 		id: 'amnesia',
 		name: 'Amnesiac',

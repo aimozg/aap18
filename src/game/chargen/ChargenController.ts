@@ -6,7 +6,7 @@ import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
 import {ChargenRules} from "./ChargenRules";
 import {TAttribute, TAttributes} from "../../engine/rules/TAttribute";
 import fxrng from "../../engine/math/fxrng";
-import {TGender, TSex} from "../../engine/rules/gender";
+import {defaultGender, TGender, TSex} from "../../engine/rules/gender";
 import {NewGameScreen} from "../ui/NewGameScreen";
 import {CharacterBody} from "../../engine/objects/creature/Character";
 import {BreastSizeTier, BreastSizeTiers} from "../data/body/Breasts";
@@ -17,6 +17,7 @@ import {HumanEyeColorNames, HumanHairColorNames, HumanSkinColorNames} from "../d
 import {Game} from "../../engine/Game";
 import {IStatMetadata, StatMetadata} from "../data/stats";
 import {CharacterClass} from "../../engine/rules/classes/CharacterClass";
+import {PenisSizeTier} from "../data/body/Penis";
 
 interface IChargenSecondaryStat {
 	key: keyof ChargenController;
@@ -29,17 +30,17 @@ interface IChargenSecondaryStat {
 
 export class ChargenController {
 
-	constructor(private readonly screen:NewGameScreen) {
+	constructor(private readonly screen: NewGameScreen) {
 		this.reset()
 	}
 
 	///////////
 	// Rules //
 	///////////
-	futanariAllowed():boolean {
+	futanariAllowed(): boolean {
 		return this.origin === "native";
 	}
-	allowedRaces():ButtonMenuItem<string>[] {
+	allowedRaces(): ButtonMenuItem<string>[] {
 		// TODO list actual races from somewhere
 		return [{
 			label: "Human",
@@ -74,26 +75,26 @@ export class ChargenController {
 			disabled: true
 		}]
 	}
-	allowedHairColors():Color[] {
+	allowedHairColors(): Color[] {
 		// TODO race-dependent
 		return Game.instance.data.colorsByNames(HumanHairColorNames, "hair");
 	}
-	allowedEyeColors():Color[] {
+	allowedEyeColors(): Color[] {
 		// TODO race-dependent
 		return Game.instance.data.colorsByNames(HumanEyeColorNames, "eyes");
 	}
-	allowedSkinColors():Color[] {
+	allowedSkinColors(): Color[] {
 		// TODO race-dependent
 		return Game.instance.data.colorsByNames(HumanSkinColorNames, "skin");
 	}
-	allowedBreastSizes():ButtonMenuItem<number>[] {
+	allowedBreastSizes(): ButtonMenuItem<number>[] {
 		let min: number, max: number;
 		if (this.sex === 'm') {
 			min = BreastSizeTiers.FLAT.value;
-			max = BreastSizeTiers.A_CUP.value;
+			max = ChargenRules.breastsMaxMale;
 		} else {
-			min = BreastSizeTiers.A_CUP.value;
-			max = BreastSizeTiers.H_CUP.value;
+			min = ChargenRules.breastsMinFemale;
+			max = ChargenRules.breastsMaxFemale;
 		}
 		return BreastSizeTier.list().map(bst => ({
 			label: bst.name,
@@ -101,7 +102,16 @@ export class ChargenController {
 			disabled: bst.value < min || bst.value > max
 		}))
 	}
-	secondaryStats():IChargenSecondaryStat[] {
+	allowedPenisSizes(): ButtonMenuItem<number>[] {
+		let min = ChargenRules.penisMin;
+		let max = ChargenRules.penisMax;
+		return PenisSizeTier.list().map(pst => ({
+			label: pst.name,
+			value:pst.value,
+			disabled: !this.body.penis.isPresent || pst.value < min || pst.value > max
+		}))
+	}
+	secondaryStats(): IChargenSecondaryStat[] {
 		return [{
 			key: "lib",
 			total: this.player.lib,
@@ -133,16 +143,16 @@ export class ChargenController {
 	player: PlayerCharacter;
 	private internalUpdate = false;
 	// Origin
-	origin: string|null;
+	origin: string | null;
 	// Identity
 	sex: TSex;
-	gender: TGender;
+	gender: TGender | null;
 	name: string;
 	race: string;
 	// Appearance
 	body: CharacterBody;
 	// Class
-	cclass: string|null;
+	cclass: string | null;
 	// Attributes
 	attrPoints: number;
 	attrs: number[];
@@ -156,7 +166,7 @@ export class ChargenController {
 	// Setters //
 	/////////////
 
-	setOrigin(originId:string) {
+	setOrigin(originId: string) {
 		this.origin = originId;
 		this.internalUpdate = true;
 		if (this.sex === 'h' && !this.futanariAllowed()) {
@@ -166,31 +176,35 @@ export class ChargenController {
 		this.internalUpdate = false;
 		this.update()
 	}
-	setName(name:string) {
+	setName(name: string) {
 		this.name = name;
 		this.update()
 	}
 	setRandomName() {
-		this.name = randomName(this.gender)
+		this.name = randomName(defaultGender(this.sex))
 		this.update()
 	}
-	setSex(sex:TSex) {
+	setSex(sex: TSex) {
 		this.sex = sex;
-		this.gender = sex === 'm' ? 'm' : 'f';
-		this.body.breasts.size = sex === 'm' ? BreastSizeTiers.FLAT.value : fxrng.nextInt(BreastSizeTiers.A_CUP.value, BreastSizeTiers.DD_CUP.value);
+		this.body.setSex(sex);
+		this.body.breasts.size = sex === 'm' ? BreastSizeTiers.FLAT.value : fxrng.nextInt(ChargenRules.breastsMinFemale, ChargenRules.breastsMaxFemale + 1);
+		if (this.body.penis.isPresent) {
+			this.body.penis.size =
+				PenisSizeTier.find(fxrng.nextInt(ChargenRules.penisMin, ChargenRules.penisMax + 1)).value;
+		}
 		this.body.height = 145 + (sex === 'm' ? fxrng.d6(2) : fxrng.d6(1)) * 5;
 		this.update();
 	}
-	setRace(race:string) {
+	setRace(race: string) {
 		this.race = race;
 		// TODO set body
 		this.update();
 	}
-	setClass(cclass:string) {
+	setClass(cclass: string) {
 		this.cclass = cclass;
 		this.update();
 	}
-	get classObject(): CharacterClass|null {
+	get classObject(): CharacterClass | null {
 		return Game.instance.data.classes.get(this.cclass)
 	}
 
@@ -237,8 +251,7 @@ export class ChargenController {
 		// Origin
 		if (this.origin) this.player.originId = this.origin;
 		// Identity
-		this.player.sex = this.sex;
-		this.player.gender = this.gender;
+		this.player.genderOverride = this.gender;
 		this.player.name = this.name;
 		// TODO race
 		// Appearance
@@ -259,39 +272,39 @@ export class ChargenController {
 		this.screen.update()
 	}
 
-	attrInc(id:TAttribute) {
+	attrInc(id: TAttribute) {
 		this.attrPoints -= this.attrCost(id);
 		this.attrs[id]++;
 		this.update()
 	}
-	attrDec(id:TAttribute) {
+	attrDec(id: TAttribute) {
 		this.attrs[id]--;
 		this.attrPoints += this.attrCost(id);
 		this.update()
 	}
-	attrCost(id:TAttribute):number {
+	attrCost(id: TAttribute): number {
 		let x = this.attrs[id];
 		// 1 at 8 and below, +1 for each 2
-		return Math.max(1, 1 + Math.floor((x - 8)/2));
+		return Math.max(1, 1 + Math.floor((x - 8) / 2));
 	}
-	canIncAttr(id:TAttribute) {
+	canIncAttr(id: TAttribute) {
 		return this.attrs[id] < ChargenRules.maxAttr && this.attrPoints >= this.attrCost(id)
 	}
-	canDecAttr(id:TAttribute) {
+	canDecAttr(id: TAttribute) {
 		return this.attrs[id] > ChargenRules.minAttr
 	}
-	statInc(stat:IChargenSecondaryStat) {
+	statInc(stat: IChargenSecondaryStat) {
 		(this as any)[stat.key]++;
 		this.update()
 	}
-	statDec(stat:IChargenSecondaryStat) {
+	statDec(stat: IChargenSecondaryStat) {
 		(this as any)[stat.key]--;
 		this.update()
 	}
-	canIncStat(stat:IChargenSecondaryStat):boolean {
+	canIncStat(stat: IChargenSecondaryStat): boolean {
 		return stat.natural < stat.max;
 	}
-	canDecStat(stat:IChargenSecondaryStat):boolean {
+	canDecStat(stat: IChargenSecondaryStat): boolean {
 		return stat.natural > stat.min;
 	}
 }

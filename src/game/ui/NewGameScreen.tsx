@@ -12,39 +12,8 @@ import {ChargenStepAppearance} from "../chargen/ChargenStepAppearance";
 import {ChargenStepFinalize} from "../chargen/ChargenStepFinalize";
 import {ChargenStep} from "../chargen/ChargenStep";
 import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
-import {randomName} from "../data/text/names";
-import fxrng from "../../engine/math/fxrng";
 import {ChargenStepAttrs} from "../chargen/ChargenStepAttrs";
-import {BreastSizeTiers} from "../data/body/Breasts";
 import {ChargenController} from "../chargen/ChargenController";
-
-function randomStartingPlayer(empty:Boolean): PlayerCharacter {
-	let player = new PlayerCharacter();
-
-	// sex and name
-	fxrng.pick([
-		() => {
-			player.sex = 'm';
-			player.gender = 'm';
-		},
-		() => {
-			player.sex = 'f';
-			player.gender = 'f';
-		}
-	])();
-	player.name = randomName(player.gender);
-
-	// appearance
-	// TODO
-	player.body.breasts.size = player.sex === 'm' ? BreastSizeTiers.FLAT.value : fxrng.nextInt(BreastSizeTiers.A_CUP.value, BreastSizeTiers.DD_CUP.value);
-	player.body.height = 145 + (player.sex === 'm' ? fxrng.d6(2) : fxrng.d6(1))*5;
-
-	if (!empty) {
-		// TODO origin, attrs, skills, class
-	}
-
-	return player;
-}
 
 export class NewGameScreen extends AbstractScreen {
 

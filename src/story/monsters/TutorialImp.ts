@@ -11,8 +11,6 @@ export class TutorialImp extends Character {
 
 		this.rgroup = RacialGroups.DEMON;
 		this.name = "imp";
-		this.sex = "m";
-		this.gender = "m";
 
 		this.level = 1;
 		this.naturalAttrs = [

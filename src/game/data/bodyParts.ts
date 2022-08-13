@@ -16,6 +16,8 @@ import {WingPart, WingsRef} from "./body/Wings";
 import {HornPart, HornsRef} from "./body/Horns";
 import {FacePart, FaceRef} from "./body/Face";
 import {BreastPart, BreastsRef} from "./body/Breasts";
+import {PenisPart, PenisRef} from "./body/Penis";
+import {VaginaPart, VaginaRef} from "./body/Vagina";
 
 declare module "../../engine/objects/creature/Character" {
 	interface CharacterBody {
@@ -27,7 +29,9 @@ declare module "../../engine/objects/creature/Character" {
 		readonly hair: HairPart;
 		readonly horns: HornPart;
 		readonly legs: LegPart;
+		readonly penis: PenisPart;
 		readonly tail: TailPart;
+		readonly vagina: VaginaPart;
 		readonly wings: WingPart;
 
 		readonly bmSkin: BodyMaterial;
@@ -68,7 +72,9 @@ export function gdRegisterBodyParts(gd:GameDataBuilder) {
 	gd.addBodyPart("hair", HairRef);
 	gd.addBodyPart("horns", HornsRef);
 	gd.addBodyPart("legs", LegsRef);
+	gd.addBodyPart("penis", PenisRef);
 	gd.addBodyPart("tail", TailRef);
+	gd.addBodyPart("vagina", VaginaRef);
 	gd.addBodyPart("wings", WingsRef);
 	gd.addBodyMaterial("bmSkin", BodyMaterialTypes.SKIN)
 	gd.addBodyMaterial("bmHair", BodyMaterialTypes.HAIR)

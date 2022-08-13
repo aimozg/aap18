@@ -21,16 +21,18 @@ export namespace Appearance {
 				{parser.print(pc.body.hair.fullDescription())}{" "}
 				{parser.print(pc.body.ears.fullDescription())}{" "}
 				{parser.print(pc.body.eyes.fullDescription())}{" "}
-				{parser.print(pc.body.horns.fullDescription())}{" "}
+				{pc.body.horns.isPresent && parser.print(pc.body.horns.fullDescription())}{" "}
 			</p>
 			<p>{/*Extremities*/}
 				{parser.print(pc.body.arms.fullDescription())}{" "}
 				{parser.print(pc.body.legs.fullDescription())}{" "}
-				{parser.print(pc.body.wings.fullDescription())}{" "}
-				{parser.print(pc.body.tail.fullDescription())}{" "}
+				{pc.body.wings.isPresent && parser.print(pc.body.wings.fullDescription())}{" "}
+				{pc.body.tail.isPresent && parser.print(pc.body.tail.fullDescription())}{" "}
 			</p>
 			<p>{/*Chest and genitalia*/}
 				{parser.print(pc.body.breasts.fullDescription())}{" "}
+				{pc.body.penis.isPresent && parser.print(pc.body.penis.fullDescription())}{" "}
+				{pc.body.vagina.isPresent && parser.print(pc.body.vagina.fullDescription())}{" "}
 			</p>
 			{Appearance.characterColors(pc, parser)}
 		</Fragment>
