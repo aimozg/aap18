@@ -4,8 +4,8 @@
 
 import {BaseItem} from "./BaseItem";
 
-export abstract class Item {
-	protected constructor(
+export class Item {
+	constructor(
 		public readonly base:BaseItem<any>
 	) {}
 

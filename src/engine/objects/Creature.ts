@@ -6,11 +6,10 @@ import {TAttribute, TAttributes} from "../rules/TAttribute";
 import {defaultGender, SEX_NONE, TGender, TSex} from "../rules/gender";
 import {IPronouns, Pronouns} from "../../game/data/text/gender";
 import {coerce} from "../math/utils";
-import {NaturalWeapon} from "./item/BaseNaturalWeapon";
 import {NaturalWeaponLib} from "../../game/data/items/NaturalWeaponLib";
-import {AbstractWeapon} from "./item/BaseAbstractWeapon";
 import {RacialGroup} from "../rules/RacialGroup";
 import {Game} from "../Game";
+import {Item} from "./Item";
 
 let objectIdCounter = 0;
 
@@ -201,23 +200,23 @@ export class Creature implements IGameObject {
 	// Equipment - Data //
 	//------------------//
 	// TODO externalize
-	private _fists: NaturalWeapon = NaturalWeaponLib.NaturalFists.spawn();
-	get fists(): NaturalWeapon { return this._fists }
-	setFists(item:NaturalWeapon) { this._fists = item }
+	private _fists: Item = NaturalWeaponLib.NaturalFists.spawn();
+	get fists(): Item { return this._fists }
+	setFists(item:Item) { this._fists = item }
 
-	private _mainWeapon: AbstractWeapon = null;
-	get mainWeapon(): AbstractWeapon { return this._mainWeapon }
-	setMainWeapon(item:AbstractWeapon) { this._mainWeapon = item }
+	private _mainHandItem: Item = null;
+	get mainHandItem(): Item { return this._mainHandItem }
+	setMainHandItem(item:Item) { this._mainHandItem = item }
 
 	////////////////////////
 	// Equipment - Helpers
 	////////////////////////
-	get weapon(): AbstractWeapon {
-		return this.mainWeapon ?? this.fists
+	get currentWeapon(): Item {
+		return this.mainHandItem?.ifWeapon ?? this.fists
 	}
-	get meleeWeapon(): AbstractWeapon {
-		let mw = this.mainWeapon;
-		if (mw /* TODO and mw is melee weapon */) return mw;
+	get meleeWeapon(): Item {
+		let mw = this.mainHandItem;
+		if (mw?.ifWeapon/* TODO and mw is melee weapon */) return mw;
 		return this.fists;
 	}
 

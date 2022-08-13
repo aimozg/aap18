@@ -14,7 +14,7 @@ export function gdRegisterIntro(gd:GameDataBuilder) {
 		async intro(ctx: SceneContext) {
 			// Set player location
 			ctx.gc.placePlayer('/base');
-			ctx.player.setMainWeapon(MeleeWeaponLib.Dagger.spawn());
+			ctx.player.setMainHandItem(MeleeWeaponLib.Dagger.spawn());
 
 			let origin = ctx.game.idata.playerOrigins.find(o=>o.id===ctx.player.originId);
 			if (origin && origin.introText) {
