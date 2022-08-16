@@ -191,9 +191,12 @@ export class Creature implements IGameObject {
 		return this.wisMod
 	}
 	/** Universal damage reduction */
-	get dr():number {
+	get dmgRedAll():number {
+		let value = 0;
+		// TODO or natural armor
+		value += this.bodyArmor?.asArmor?.drBonus ?? 0;
 		// TODO other sources (equipment, buffs)
-		return 0
+		return value
 	}
 
 	//------------------//
@@ -207,6 +210,10 @@ export class Creature implements IGameObject {
 	private _mainHandItem: Item = null;
 	get mainHandItem(): Item { return this._mainHandItem }
 	setMainHandItem(item:Item) { this._mainHandItem = item }
+
+	private _bodyArmor: Item = null;
+	get bodyArmor(): Item { return this._bodyArmor }
+	setBodyArmor(item:Item) { this._bodyArmor = item }
 
 	////////////////////////
 	// Equipment - Helpers

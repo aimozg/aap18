@@ -6,7 +6,7 @@ import {BaseItem} from "./BaseItem";
 
 export class Item {
 	constructor(
-		public readonly base:BaseItem<any>
+		public readonly base:BaseItem
 	) {}
 
 	public customName:string = null;

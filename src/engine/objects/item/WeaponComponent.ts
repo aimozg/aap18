@@ -5,26 +5,25 @@ import {BaseItem, BaseItemComponent, registerItemComponent} from "../BaseItem";
 import {BaseDamageSpec, DamageType} from "../../rules/Damage";
 import {Dice} from "../../math/Dice";
 import {IResource} from "../../IResource";
-import {Item} from "../Item";
 
 declare module "../BaseItem" {
-	export interface BaseItem<out ITEM extends Item> extends IResource {
-		weapon: WeaponComponent;
+	export interface BaseItem extends IResource {
+		weapon: WeaponComponent | undefined;
 		isWeapon: boolean;
 	}
 }
 declare module "../Item" {
 	export interface Item {
-		asWeapon: WeaponComponent;
+		asWeapon: WeaponComponent | undefined;
 		isWeapon: boolean;
-		ifWeapon: Item|null;
+		ifWeapon: this | null;
 	}
 }
 
 export class WeaponComponent extends BaseItemComponent {
-	constructor(base: BaseItem<any>, public dmgSpec: BaseDamageSpec) {
+	constructor(base: BaseItem, public dmgSpec: BaseDamageSpec) {
 		super(base);
-		if (base.weapon) throw new Error("Cannot add WeaponComponent to "+base);
+		if (base.weapon) throw new Error("Cannot add WeaponComponent to " + base);
 		base.weapon = this;
 	}
 
@@ -34,8 +33,8 @@ export class WeaponComponent extends BaseItemComponent {
 
 registerItemComponent(
 	"asWeapon",
-		"isWeapon",
-		"ifWeapon",
-		base => base.weapon);
+	"isWeapon",
+	"ifWeapon",
+	base => base.weapon);
 
 

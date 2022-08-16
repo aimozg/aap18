@@ -7,6 +7,7 @@ import {removeChildren} from "../../engine/utils/dom";
 import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
 import {CombatRules} from "../combat/CombatRules";
 import {stripedBackground} from "../../engine/utils/css";
+import {Item} from "../../engine/objects/Item";
 
 export interface CreaturePanelOptions {
 	ap: boolean;
@@ -146,7 +147,7 @@ export class CreaturePanel extends DomComponent {
 			<div></div>
 			<div>{CombatRules.meleeAttack(c)}</div>
 			<div>{CombatRules.meleeDefense(c)}</div>
-			<div>{c.dr}</div>
+			<div>{c.dmgRedAll}</div>
 			<div></div>
 		</div>
 		//-------------//
@@ -165,10 +166,22 @@ export class CreaturePanel extends DomComponent {
 		//-----------//
 		// Equipment //
 		//-----------//
+		function armordesc(a:Item):string {
+			if (!a?.isArmor) return ""
+			let def = a.asArmor.defenseBonus ? "Def "+a.asArmor.defenseBonus : ""
+			let dr = a.asArmor.drBonus ? "DR "+a.asArmor.drBonus : ""
+			if (dr && def) return def+"/"+dr
+			if (dr) return dr
+			if (def) return def
+			return "-"
+		}
 		let sectionEquipment = options.equipment && <div className="grid-4 my-2">
 			<div>Weapon:</div>
 			<div className="col-span-2 text-center">{c.currentWeapon.name}</div>
 			<div className="text-center">{c.currentWeapon.asWeapon.damage.toString()}</div>
+			<div>Armor:</div>
+			<div className="col-span-2 text-center">{c.bodyArmor?.name ?? "(none)"}</div>
+			<div className="text-center">{armordesc(c.bodyArmor)}</div>
 		</div>
 		render(<Fragment>
 			{sectionName}

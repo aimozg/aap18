@@ -6,18 +6,20 @@ import {IResource} from "../IResource";
 import Symbols from "../symbols";
 import {Item} from "./Item";
 
-export abstract class BaseItem<out ITEM extends Item> implements IResource {
+export abstract class BaseItem implements IResource {
 	get resType() { return Symbols.ResTypeBaseItem }
 	protected constructor(
 		public readonly resId:string,
 		public name: string) { }
 
-	abstract spawn():ITEM
+	spawn():Item {
+		return new Item(this);
+	}
 	readonly components: BaseItemComponent[] = [];
 }
 
 export abstract class BaseItemComponent {
-	protected constructor(public readonly base:BaseItem<any>) {
+	protected constructor(public readonly base:BaseItem) {
 		base.components.push(this);
 	}
 }
@@ -27,7 +29,7 @@ export function registerItemComponent<
 	PROP_IS extends keyof Item,
 	PROP_IF extends keyof Item,
 	COMPONENT extends Item[PROP_COMP] & BaseItemComponent
-	>(propComp:PROP_COMP, propIs:PROP_IS, propIf:PROP_IF, accessor:(base:BaseItem<any>)=>COMPONENT) {
+	>(propComp:PROP_COMP, propIs:PROP_IS, propIf:PROP_IF, accessor:(base:BaseItem)=>COMPONENT) {
 	Object.defineProperty(Item.prototype, propComp, {
 		enumerable: false,
 		configurable: false,

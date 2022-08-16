@@ -205,7 +205,11 @@ export class CombatController {
 	}
 	async doDamage(target: Creature, damage: number, damageType: DamageType, source: Creature|null) {
 		logger.info("doDamage {} {} {} {}",target,damage,damageType,source)
-		// TODO DR and other
+		// TODO conditioned DR
+		let dr = target.dmgRedAll
+		// let drText = dr > 0 ? <span class="text-positive">(-{dr})</span> :
+		// 	dr < 0 ? <span class="text-negative">(+{-dr})</span> : null
+		damage -= dr
 		if (damage < 0) damage = 0;
 		if (damage === 0) {
 			this.log("", <Fragment>(<span class="text-damage-none">0</span>)</Fragment>)

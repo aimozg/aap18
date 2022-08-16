@@ -49,6 +49,7 @@ export namespace CombatRules {
 	export function meleeDefense(creature:Creature):number {
 		let value = 5
 		value += creature.dexMod
+		value += creature.bodyArmor?.asArmor?.defenseBonus ?? 0
 		// TODO armor
 		// TODO enchantments
 		return value

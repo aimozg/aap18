@@ -5,6 +5,7 @@
 import {SceneContext} from "../../engine/scene/SceneContext";
 import {GameDataBuilder} from "../../game/gdtypes";
 import {MeleeWeaponLib} from "../../game/data/items/MeleeWeaponLib";
+import {ArmorLib} from "../../game/data/items/ArmorLib";
 
 const namespace = '/000';
 
@@ -15,6 +16,7 @@ export function gdRegisterIntro(gd:GameDataBuilder) {
 			// Set player location
 			ctx.gc.placePlayer('/base');
 			ctx.player.setMainHandItem(MeleeWeaponLib.Dagger.spawn());
+			ctx.player.setBodyArmor(ArmorLib.LeatherArmor.spawn());
 
 			let origin = ctx.game.idata.playerOrigins.find(o=>o.id===ctx.player.originId);
 			if (origin && origin.introText) {
