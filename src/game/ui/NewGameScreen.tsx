@@ -74,6 +74,11 @@ export class NewGameScreen extends AbstractScreen {
 		this.render();
 	}
 
+	randomChar() {
+		this.cc.createRandomPlayer();
+		this.selectTab(this.tabs.length-1);
+	}
+
 	node(): VNode {
 		return <div class="grid-12 ui-box gap-4" style="width: 960px; grid-template-rows: auto min-content">
 			<div class="col-span-2 d-flex flex-column">
@@ -81,6 +86,8 @@ export class NewGameScreen extends AbstractScreen {
 				            className="-big"
 				            selected={this.tab}
 				            onChange={(i) => this.selectTab(i)}/>
+				<div class="mt-9"></div>
+				<Button className="-big" label="Random" onClick={() => this.randomChar()}></Button>
 				<div style="visibility:hidden" class="flex-grow-1"></div>
 				<Button className="-big" label="Cancel" onClick={() => this.onCancelClick()}></Button>
 			</div>

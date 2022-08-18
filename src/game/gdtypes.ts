@@ -30,6 +30,8 @@ export interface ImportedGameData {
 export interface GDPlayerOrigin {
 	id: string;
 	name: string;
+	/** suitable to be prefixed with "You are.../NAME is..." */
+	shortDesc: string;
 	description: string;
 	introText?: string;
 }

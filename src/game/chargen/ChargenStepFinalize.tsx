@@ -27,8 +27,11 @@ export class ChargenStepFinalize extends ChargenStep {
 			<div class="grid-12 gap-4 text-justify">
 				<div class="col-span-6">
 					<p>
-						You will play as <b>{pc.name} the {this.cc.race} {this.cc.classObject.name.capitalize()}.</b>
+						You will play as <b>{pc.origin.shortDesc}, {pc.name} the {pc.txt.sex} {this.cc.race} {this.cc.classObject.name.capitalize()}.</b>
 					</p>
+					{/* TODO
+					<h5>Traits</h5>*/}
+					<h5>Appearance</h5>
 					{Appearance.characterAppearance(pc, parser)}
 				</div>
 				<div class="col-span-6">

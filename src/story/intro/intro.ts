@@ -18,7 +18,7 @@ export function gdRegisterIntro(gd:GameDataBuilder) {
 			ctx.player.setMainHandItem(MeleeWeaponLib.Dagger.spawn());
 			ctx.player.setBodyArmor(ArmorLib.LeatherArmor.spawn());
 
-			let origin = ctx.game.idata.playerOrigins.find(o=>o.id===ctx.player.originId);
+			let origin = ctx.player.origin;
 			if (origin && origin.introText) {
 				ctx.say(origin.introText);
 

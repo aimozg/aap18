@@ -6,7 +6,7 @@ import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
 import {ChargenRules} from "./ChargenRules";
 import {TAttribute, TAttributes} from "../../engine/rules/TAttribute";
 import fxrng from "../../engine/math/fxrng";
-import {defaultGender, TGender, TSex} from "../../engine/rules/gender";
+import {defaultGender, TSex} from "../../engine/rules/gender";
 import {NewGameScreen} from "../ui/NewGameScreen";
 import {CharacterBody} from "../../engine/objects/creature/Character";
 import {BreastSizeTier, BreastSizeTiers} from "../data/body/Breasts";
@@ -146,7 +146,6 @@ export class ChargenController {
 	origin: string | null;
 	// Identity
 	sex: TSex;
-	gender: TGender | null;
 	name: string;
 	race: string;
 	// Appearance
@@ -251,8 +250,8 @@ export class ChargenController {
 		// Origin
 		if (this.origin) this.player.originId = this.origin;
 		// Identity
-		this.player.genderOverride = this.gender;
 		this.player.name = this.name;
+		// Race
 		// TODO race
 		// Appearance
 		this.player.body.copyFrom(this.body);
@@ -265,6 +264,34 @@ export class ChargenController {
 		this.player.naturalPerv = this.perv;
 		this.player.cor = this.cor;
 		// Traits
+	}
+	createRandomPlayer() {
+		this.internalUpdate = true;
+		this.createEmptyPlayer()
+		// Origin
+		this.origin = fxrng.pick(Game.instance.idata.playerOrigins).id;
+		// Identity
+		this.setSex(this.futanariAllowed() ? fxrng.either('m','f','h') : fxrng.either('m','f'));
+		this.setRandomName()
+		// Race
+		// TODO random race
+		// Appearance
+		// random appearance is generated in createEmptyPlayer() and setSex()
+		// Class
+		this.cclass = fxrng.pick(Game.instance.data.classes.keys())
+		// Attributes
+		// TODO class-dependent attributes
+		while (this.attrPoints > 0) {
+			let attr = fxrng.pick(TAttributes);
+			if (this.attrPoints >= this.attrCost(attr)) this.attrInc(attr);
+		}
+		// Stats
+		// TODO class-dependent starting stats
+		// Traits
+		// TODO random/class-dependent trait
+		// Finalize
+		this.updatePlayer();
+		this.internalUpdate = false;
 	}
 	update() {
 		if (this.internalUpdate) return;
