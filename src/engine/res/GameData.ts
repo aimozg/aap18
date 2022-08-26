@@ -10,6 +10,7 @@ import {Scene} from "../scene/Scene";
 import {Place} from "../objects/Place";
 import {Color, colorSortKey} from "../objects/Color";
 import {Game} from "../Game";
+import {TraitType} from "../rules/TraitType";
 
 export class GameData {
 	constructor(public readonly game:Game) {}
@@ -45,4 +46,9 @@ export class GameData {
 		return typeof scene === 'string' ? this.scenes.get(scene) : scene
 	}
 	sceneOrNull(id: string): Scene|null { return this.scenes.getOrNull(id) }
+
+	readonly traits = new ResLib<TraitType>(Symbols.ResTypeTrait, "Trait");
+	trait(id: string): TraitType {
+		return this.traits.get(id)
+	}
 }

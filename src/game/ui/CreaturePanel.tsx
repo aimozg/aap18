@@ -182,10 +182,10 @@ export class CreaturePanel extends DomComponent {
 		}
 		let sectionEquipment = options.equipment && <div className="grid-4 my-2">
 			<div>Weapon:</div>
-			<div className="col-span-2 text-center">{c.currentWeapon.name}</div>
+			<div className="cols-2 text-center">{c.currentWeapon.name}</div>
 			<div className="text-center">{c.currentWeapon.asWeapon.damage.toString()}</div>
 			<div>Armor:</div>
-			<div className="col-span-2 text-center">{c.bodyArmor?.name ?? "-"}</div>
+			<div className="cols-2 text-center">{c.bodyArmor?.name ?? "-"}</div>
 			<div className="text-center">{armordesc(c.bodyArmor)}</div>
 		</div>
 		render(<Fragment>

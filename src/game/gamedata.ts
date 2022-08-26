@@ -9,6 +9,7 @@ import {gdRegisterRacialGroups} from "./data/racialGroups";
 import {gdRegisterStory} from "../story";
 import {gdRegisterBodyParts} from "./data/bodyParts";
 import {gdRegisterColors} from "./data/colors";
+import {gdRegisterTraits} from "./data/traits";
 
 export async function loadGameData():Promise<ImportedGameData> {
 	let startingSceneId = '/000_intro';
@@ -23,6 +24,7 @@ export async function loadGameData():Promise<ImportedGameData> {
 	gdRegisterOrigins(gd);
 	gdRegisterRacialGroups(gd);
 	gdRegisterStory(gd);
+	gdRegisterTraits(gd);
 
 	return gd.data;
 }

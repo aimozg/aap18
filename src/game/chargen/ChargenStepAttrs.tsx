@@ -57,7 +57,7 @@ export class ChargenStepAttrs extends ChargenStep {
 
 	node(): VNode {
 		return <div class="d-grid gap-2" style="grid-template-columns: max-content max-content max-content 1fr">
-			<h3 class="col-span-4">
+			<h3 class="cols-4">
 				Attributes
 			</h3>
 			{AttrMetadata.map(meta => <Fragment>
@@ -75,11 +75,11 @@ export class ChargenStepAttrs extends ChargenStep {
 				</div>
 				<div>({this.getAttrValueName(meta.id)}) {simpleparse(this.explainStat(meta))}</div>
 			</Fragment>)}
-			<div class="col-span-4">
+			<div class="cols-4">
 				You have {this.cc.attrPoints} points to allocate.
 				You get +1 to any attribute every 4 levels.
 			</div>
-			<h3 className="col-span-4">
+			<h3 className="cols-4">
 				Derived stats
 			</h3>
 

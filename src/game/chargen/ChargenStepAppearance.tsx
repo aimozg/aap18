@@ -63,7 +63,7 @@ export class ChargenStepAppearance extends ChargenStep {
 		return <Fragment>
 			<h3>Appearance</h3>
 			<div class="grid-12 gap-2">
-				<div class="col-span-7 vscroll">
+				<div class="cols-7 vscroll">
 					{/*TODO configurables:
 					 - hair style
 					 - other body materials (if present)
@@ -117,7 +117,7 @@ export class ChargenStepAppearance extends ChargenStep {
 						</div>
 					</p>
 				</div>
-				<div className="col-span-5">
+				<div className="cols-5">
 					{Appearance.characterAppearance(this.player, parser)}
 				</div>
 			</div>

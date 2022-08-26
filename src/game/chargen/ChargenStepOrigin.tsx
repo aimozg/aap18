@@ -26,16 +26,19 @@ export class ChargenStepOrigin extends ChargenStep {
 			<p>
 				Where do you come from?
 			</p>
-			<p>
-				<ButtonMenu items={this.items}
-				            selected={this.cc.origin}
-				            onChange={(o) => {
-								this.cc.setOrigin(o);
-				            }}/>
-			</p>
-			<p>
-				{simpleparse(this.game.idata.playerOrigins.find(o => o.id === this.cc.origin)?.description)}
-			</p>
+			<div class="grid-12">
+				<div class="cols-3 d-flex flex-column ai-stretch mr-4">
+					<ButtonMenu items={this.items}
+					            className="-big"
+					            selected={this.cc.origin}
+					            onChange={(o) => {
+									this.cc.setOrigin(o);
+					            }}/>
+				</div>
+				<div class="cols-9">
+					{simpleparse(this.game.idata.playerOrigins.find(o => o.id === this.cc.origin)?.description)}
+				</div>
+			</div>
 		</Fragment>;
 	}
 }

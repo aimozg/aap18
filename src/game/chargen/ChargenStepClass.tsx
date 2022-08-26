@@ -26,19 +26,18 @@ export class ChargenStepClass extends ChargenStep {
 		return <Fragment>
 			<h3>Class</h3>
 			<p>
-				Picking a class unlocks perks, skills, and abilities.
+				Picking a class unlocks traits, skills, and abilities.
 				Every 6th level you can advance your class or pick another.
 			</p>
-			<div class="d-grid" style="grid-template-columns: max-content 1fr; min-height:6rem">
-				<div class="d-flex gap-2 flex-column ai-stretch mr-4">
+			<div class="grid-12">
+				<div class="cols-3 d-flex gap-2 flex-column ai-stretch mr-4">
 					<ButtonMenu items={this.items}
+					            className="-big"
 					            selected={this.cc.cclass}
-					            onChange={(x)=>{
-									this.cc.setClass(x);
-					            }}/>
+					            onChange={x=>this.cc.setClass(x)}/>
 				</div>
-				<div>
-					{simpleparse(this.game.data.classes.getOrNull(this.cc.cclass)?.description)}
+				<div class="cols-9">
+					{simpleparse(this.cc.classObject?.description)}
 				</div>
 			</div>
 		</Fragment>;

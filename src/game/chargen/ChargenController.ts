@@ -18,6 +18,8 @@ import {Game} from "../../engine/Game";
 import {IStatMetadata, StatMetadata} from "../data/stats";
 import {CharacterClass} from "../../engine/rules/classes/CharacterClass";
 import {PenisSizeTier} from "../data/body/Penis";
+import {GdStartingTraits} from "../data/traits/starting";
+import {TraitType} from "../../engine/rules/TraitType";
 
 interface IChargenSecondaryStat {
 	key: keyof ChargenController;
@@ -50,27 +52,27 @@ export class ChargenController {
 			value: 'elf',
 			disabled: true
 		}, {
-			label: 'Halfkin Cat',
+			label: 'Half-cat',
 			value: 'half-cat',
 			disabled: true
 		}, {
-			label: 'Beastkin Cat',
+			label: 'Cat-morph',
 			value: 'beast-cat',
 			disabled: true
 		}, {
-			label: 'Halfkin Wolf',
+			label: 'Half-wolf',
 			value: 'half-wolf',
 			disabled: true
 		}, {
-			label: 'Beastkin Wolf',
+			label: 'Wolf-morph',
 			value: 'beast-wolf',
 			disabled: true
 		}, {
-			label: 'Halfkin Fox',
+			label: 'Half-fox',
 			value: 'half-fox',
 			disabled: true
 		}, {
-			label: 'Beastkin Fox',
+			label: 'Fox-morph',
 			value: 'beast-fox',
 			disabled: true
 		}]
@@ -135,6 +137,17 @@ export class ChargenController {
 			meta: StatMetadata.cor
 		}]
 	}
+	allowedTraits(withNone:boolean=true): ButtonMenuItem<string | null>[] {
+		let list: ButtonMenuItem<string>[] = GdStartingTraits.ALL.map(t=>({
+			label: t.name(null),
+			value: t.resId
+		})).sortOn("label");
+		if (withNone) list.unshift({
+			label: "(None)",
+			value: null
+		});
+		return list;
+	}
 
 	//////////
 	// Data //
@@ -160,6 +173,7 @@ export class ChargenController {
 	perv: number;
 	cor: number;
 	// Traits
+	trait: string|null; // TODO allow multiple traits in chargen
 
 	/////////////
 	// Setters //
@@ -204,7 +218,16 @@ export class ChargenController {
 		this.update();
 	}
 	get classObject(): CharacterClass | null {
+		if (!this.cclass) return null;
 		return Game.instance.data.classes.get(this.cclass)
+	}
+	setTrait(trait: string|null) {
+		this.trait = trait;
+		this.update();
+	}
+	get traitObject(): TraitType | null {
+		if (!this.trait) return null;
+		return Game.instance.data.traits.get(this.trait);
 	}
 
 	///////////////
@@ -240,6 +263,7 @@ export class ChargenController {
 		this.perv = 0;
 		this.cor = 0;
 		// Traits
+		this.trait = null;
 	}
 	/** Recreate player */
 	private updatePlayer() {
@@ -264,6 +288,8 @@ export class ChargenController {
 		this.player.naturalPerv = this.perv;
 		this.player.cor = this.cor;
 		// Traits
+		if (this.traitObject) this.player.addTrait(this.traitObject);
+
 		this.player.origin.adjustPlayer?.(this.player);
 	}
 	createRandomPlayer() {
@@ -289,7 +315,8 @@ export class ChargenController {
 		// Stats
 		// TODO class-dependent starting stats
 		// Traits
-		// TODO random/class-dependent trait
+		// TODO class-dependent trait
+		this.trait = fxrng.pick(this.allowedTraits(false)).value;
 		// Finalize
 		this.updatePlayer();
 		this.internalUpdate = false;

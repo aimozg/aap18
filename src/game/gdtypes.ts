@@ -13,9 +13,10 @@ import {CharacterBody} from "../engine/objects/creature/Character";
 import {BodyMaterial, BodyMaterialType} from "../engine/objects/creature/BodyMaterial";
 import {Color} from "../engine/objects/Color";
 import {PlayerCharacter} from "../engine/objects/creature/PlayerCharacter";
+import {SimpleTraitType, TraitType} from "../engine/rules/TraitType";
 
 /**
- * Essential game data (races, perks, items, ...)
+ * Essential game data (races, traits, items, ...)
  */
 export interface ImportedGameData {
 	startingSceneId: string;
@@ -26,6 +27,7 @@ export interface ImportedGameData {
 	racialGroups: RacialGroup[];
 	rgHumanoid: RacialGroup;
 	scenes: Scene[][];
+	traits: TraitType[];
 }
 
 export interface GDPlayerOrigin {
@@ -59,7 +61,8 @@ export class GameDataBuilder {
 			playerOrigins: [],
 			racialGroups: [],
 			rgHumanoid: null,
-			scenes: []
+			scenes: [],
+			traits: [],
 		}
 	}
 
@@ -154,6 +157,15 @@ export class GameDataBuilder {
 				return this.materials[index].colorName
 			}
 		});
+	}
+	addTrait(trait:TraitType):void {
+		this.data.traits.push(trait);
+	}
+	addTraits(traits:TraitType[]):void {
+		this.data.traits.push(...traits);
+	}
+	mkTrait(id:string, name:string, desc:string):void {
+		this.addTrait(new SimpleTraitType(id,name,desc));
 	}
 
 	buildPlace(def: PlaceDef): void {

@@ -81,7 +81,7 @@ export class NewGameScreen extends AbstractScreen {
 
 	node(): VNode {
 		return <div class="grid-12 ui-box gap-4" style="width: 960px; grid-template-rows: auto min-content">
-			<div class="col-span-2 d-flex flex-column">
+			<div class="cols-2 d-flex flex-column">
 				<ButtonMenu items={this.tabs.map((tab, i) => ({label: tab.label, value: i, disabled: !tab.unlocked}))}
 				            className="-big"
 				            selected={this.tab}
@@ -91,11 +91,11 @@ export class NewGameScreen extends AbstractScreen {
 				<div style="visibility:hidden" class="flex-grow-1"></div>
 				<Button className="-big" label="Cancel" onClick={() => this.onCancelClick()}></Button>
 			</div>
-			<div class="col-span-10 d-flex flex-column">
+			<div class="cols-10 d-flex flex-column">
 				<div>{/* style="min-height:23rem"*/}
 					{this.tabs[this.tab].node()}
 				</div>
-				<p class="mt-4">
+				<p class="mt-8">
 					{this.tabs[this.tab + 1] &&
 						<Button label="Next"
 						        className="-big"

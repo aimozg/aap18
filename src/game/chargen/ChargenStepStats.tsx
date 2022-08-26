@@ -19,7 +19,7 @@ export class ChargenStepStats extends ChargenStep {
 	node(): VNode {
 		return <Fragment>
 			<div class="d-grid gap-2" style="grid-template-columns: repeat(5, max-content) 1fr">
-				<h3 class="col-span-6">
+				<h3 class="cols-6">
 					Secondary stats
 				</h3>
 
@@ -37,7 +37,7 @@ export class ChargenStepStats extends ChargenStep {
 					<div style="min-width:2rem" className={"text-center"+(ss.total>ss.natural?' text-positive':ss.total<ss.natural?' text-negative':'')}>{ss.total>=0?'\xA0':''}{ss.total}</div>
 					<div>{simpleparse(ss.meta.explain(ss.total,this.player))}</div>
 				</Fragment>)}
-				<div class="col-span-6">
+				<div class="cols-6">
 					<i>These stats are not beneficial, you can leave them unchanged.</i>
 				</div>
 			</div>

@@ -30,6 +30,8 @@ export class ResourceManager {
 		data.racialGroups.registerMany(idata.racialGroups)
 		data.scenes.clear();
 		for (let list of idata.scenes) data.scenes.registerMany(list);
+		data.traits.clear();
+		data.traits.registerMany(idata.traits)
 	}
 
 

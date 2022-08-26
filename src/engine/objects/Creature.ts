@@ -10,6 +10,7 @@ import {NaturalWeaponLib} from "../../game/data/items/NaturalWeaponLib";
 import {RacialGroup} from "../rules/RacialGroup";
 import {Game} from "../Game";
 import {Item} from "./Item";
+import {TraitType} from "../rules/TraitType";
 
 let objectIdCounter = 0;
 
@@ -237,6 +238,27 @@ export class Creature implements IGameObject {
 	// Combat - Helpers //
 	//////////////////////
 	get isAlive():boolean { return this.hp > 0 }
+
+	///////////////////
+	// Traits - Data //
+	///////////////////
+
+	traits = new Set<TraitType>();
+
+	//////////////////////
+	// Traits - Helpers //
+	//////////////////////
+
+	traitList():TraitType[] {
+		return Array.from(this.traits.values()).sortOn("name");
+	}
+	hasTrait(trait:TraitType|string):boolean {
+		if (typeof trait === 'string') trait = Game.instance.data.trait(trait);
+		return this.traits.has(trait);
+	}
+	addTrait(trait:TraitType):void {
+		this.traits.add(trait)
+	}
 
 	////////////////////////////////////////////////////////////////////////////////
 	//     METHODS
