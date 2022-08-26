@@ -36,7 +36,7 @@ const rfnConstants = [
 function namegenRcv(femininity: number, rng: Random): string {
 	let name = '';
 	let c = rng.nextBoolean() ? 'c' : 'v';
-	let n = rng.d3(3);
+	let n = rng.d3()+rng.d6();
 	while (n-- > 0) {
 		if (c === 'c') {
 			name += rng.pick(rfnConstants)

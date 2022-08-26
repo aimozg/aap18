@@ -12,7 +12,7 @@ export function gdRegisterOrigins(gd: GameDataBuilder) {
 		description:
 			"Your origins are a mystery." +
 			"\n\n" +
-			"<i>No starting bonuses.</i>",
+			"<i>No starting bonuses.</i>"
 	}, {
 		id: 'native',
 		name: 'Native',
@@ -33,9 +33,12 @@ export function gdRegisterOrigins(gd: GameDataBuilder) {
 			"You're a knight who led the purge of a village of Notingnam, a dark village with foul traditions, buried deep in the wilds. After executing demon-worshipping heretics, you've discovered a portal to some kind of Demon Realm. You and your loyal followers entered it bravely, but you were the only one who passed through. " +
 			"\n\n" +
 			"<i>Extra starting races: Elf, Half-Elf, Dwarf. <b>(NOT IMPLEMENTED)</b><br/>" +
-			"Bonus XP: start at level 2. <b>(NOT IMPLEMENTED)</b><br/>" +
+			"Bonus XP: start at level 2.<br/>" +
 			"Good starting equipment. <b>(NOT IMPLEMENTED)</b></i>",
-		introText: "You're a knight who led the purge of a village of Notingnam, a dark village with foul traditions, buried deep in the wilds. After executing demon-worshipping heretics, you've discovered a portal to some kind of Demon Realm. You and your loyal followers entered it bravely..."
+		introText: "You're a knight who led the purge of a village of Notingnam, a dark village with foul traditions, buried deep in the wilds. After executing demon-worshipping heretics, you've discovered a portal to some kind of Demon Realm. You and your loyal followers entered it bravely...",
+		adjustPlayer: (pc)=>{
+			pc.xp += 1000;
+		}
 	}, {
 		id: 'isekai',
 		name: 'Isekai Hero',

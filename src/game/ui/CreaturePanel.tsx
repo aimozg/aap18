@@ -66,11 +66,12 @@ export class CreaturePanel extends DomComponent {
 		}
 		let options = this.options;
 
+		this.node.classList.toggle("-dead", !c.isAlive);
 		//-------------------//
 		// Name and AP as bg //
 		//-------------------//
 		let sectionName = <div className="text-center text-l" style={{
-			'background': stripedBackground('var(--theme-ctrl-bg', 'transparent', c.ap/1000)
+			'background': stripedBackground('var(--theme-ctrl-bg)', 'transparent', c.ap/1000)
 		}}>{c.name.capitalize()}</div>
 		//------------------//
 		// Level, sex, race //
@@ -87,10 +88,14 @@ export class CreaturePanel extends DomComponent {
 		if (c instanceof PlayerCharacter) {
 			let xp = c.xp;
 			let xpmax = c.nextLevelXp();
+			let className = "bar-xp"
 			if (!isFinite(xpmax)) {
 				xp = xpmax = 100;
+				className += " -cap";
+			} else if (xp >= xpmax) {
+				className += " -up"
 			}
-			sectionXp = <Bar value={xp} max={xpmax} className="bar-xp"></Bar>
+			sectionXp = <Bar value={xp} max={xpmax} className={className}></Bar>
 		} else {
 			sectionXp = null
 		}
@@ -167,7 +172,7 @@ export class CreaturePanel extends DomComponent {
 		// Equipment //
 		//-----------//
 		function armordesc(a:Item):string {
-			if (!a?.isArmor) return ""
+			if (!a?.isArmor) return "-"
 			let def = a.asArmor.defenseBonus ? "Def "+a.asArmor.defenseBonus : ""
 			let dr = a.asArmor.drBonus ? "DR "+a.asArmor.drBonus : ""
 			if (dr && def) return def+"/"+dr
@@ -180,7 +185,7 @@ export class CreaturePanel extends DomComponent {
 			<div className="col-span-2 text-center">{c.currentWeapon.name}</div>
 			<div className="text-center">{c.currentWeapon.asWeapon.damage.toString()}</div>
 			<div>Armor:</div>
-			<div className="col-span-2 text-center">{c.bodyArmor?.name ?? "(none)"}</div>
+			<div className="col-span-2 text-center">{c.bodyArmor?.name ?? "-"}</div>
 			<div className="text-center">{armordesc(c.bodyArmor)}</div>
 		</div>
 		render(<Fragment>

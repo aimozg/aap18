@@ -13,4 +13,10 @@ export class LogPanel extends DomComponent {
 	append(t:ComponentChildren) {
 		renderAppend(t, this.node)
 	}
+	appendToLast(t:ComponentChildren) {
+		renderAppend(t, this.last())
+	}
+	last(): Element {
+		return this.node.lastElementChild
+	}
 }

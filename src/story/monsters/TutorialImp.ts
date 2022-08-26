@@ -22,6 +22,7 @@ export class TutorialImp extends Character {
 		this.baseLpMax = 25;
 
 		this.body.eyes.color = Game.instance.data.colorByName("red", "eyes");
+		this.setSex('m');
 		// this.body.ears.type = EarTypes.CAT
 
 		this.updateStats();

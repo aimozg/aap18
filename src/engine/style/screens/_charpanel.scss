@@ -3,6 +3,12 @@
   .bar-value {
     background: var(--tc-xp);
   }
+  &.-cap .bar-value {
+    background: var(--tc-xp-max);
+  }
+  &.-up .bar-value {
+    background: var(--tc-xp-up);
+  }
 }
 
 .bar.bar-hp {
@@ -21,5 +27,13 @@
 .bar.bar-lp {
   .bar-value {
     background: var(--tc-lust);
+  }
+}
+
+.creature-panel {
+  padding: 0.25rem;
+  &.-dead {
+    opacity: 0.8;
+    background: var(--tc-disabled);
   }
 }

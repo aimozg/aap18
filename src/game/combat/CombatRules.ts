@@ -8,11 +8,13 @@ import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
 import {Creature} from "../../engine/objects/Creature";
 import {Damage, DamageSpec, DamageSpecEntry} from "../../engine/rules/Damage";
 import {Game} from "../../engine/Game";
+import {SkipCombatAction} from "../../engine/combat/SkipCombatAction";
 
 export namespace CombatRules {
 
 	export function playerActions(player:PlayerCharacter, cc:CombatController):CombatAction<any>[] {
 		let actions:CombatAction<any>[] = [];
+		actions.push(new SkipCombatAction(player));
 		// TODO targets
 		actions.push(new MeleeAttackAction(player, cc.enemies[0]))
 		// TODO tease

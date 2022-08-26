@@ -12,6 +12,7 @@ import {BodyPart, BodyPartReference, BodyPartType} from "../engine/objects/creat
 import {CharacterBody} from "../engine/objects/creature/Character";
 import {BodyMaterial, BodyMaterialType} from "../engine/objects/creature/BodyMaterial";
 import {Color} from "../engine/objects/Color";
+import {PlayerCharacter} from "../engine/objects/creature/PlayerCharacter";
 
 /**
  * Essential game data (races, perks, items, ...)
@@ -34,6 +35,7 @@ export interface GDPlayerOrigin {
 	shortDesc: string;
 	description: string;
 	introText?: string;
+	adjustPlayer?: (pc:PlayerCharacter)=>void;
 }
 
 export interface GDColor {

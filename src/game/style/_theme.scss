@@ -17,6 +17,8 @@
   --tc-hl: #dd2; /* highlighted text */
 
   --tc-xp: #cc3;
+  --tc-xp-max: #c83; /* max level */
+  --tc-xp-up: #3cc; /* levelup */
   --tc-hp: #3a3;
   --tc-energy: #ccc;
   --tc-lust: #c3c;
@@ -40,11 +42,11 @@
   color: var(--tc-shadowed);
 }
 .text-damage-sharp, .text-damage-blunt {
-  color: #a50;
+  color: #a85;
 }
 
 .text-damage-fire {
-  color: #a00;
+  color: #a40;
 }
 .text-damage-ice {
   color: #4cc;

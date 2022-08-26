@@ -107,7 +107,7 @@ export namespace BreastSizeTiers {
 	export const A_CUP = new BreastSizeTier({
 		value: 1,
 		cup: "A",
-		shortPrefix: ["tiny", "almost flat"]
+		shortPrefix: ["tiny", "very small"]
 	});
 	export const B_CUP = new BreastSizeTier({
 		value: 2,

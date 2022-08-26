@@ -51,21 +51,21 @@ export class MeleeAttackAction extends CombatAction<MeleeAttackResult> {
 		if (attackRoll === 1) {
 			// TODO critical miss effects
 			result.crit = true
-			cc.logActionVs(attacker, "attacks", target, "critical miss")
+			cc.logActionVs(attacker, "attacks", target, "critical miss.")
 		} else if (canCrit && attackRoll === 20) {
 			// TODO critical hit effects
 			result.hit = true
 			result.crit = true
-			cc.logActionVs(attacker, "attacks", target, "critical hit")
+			cc.logActionVs(attacker, "attacks", target, "critical hit.")
 		} else if (attackRoll >= toHit || attackRoll === 20) {
-			cc.logActionVs(attacker, "attacks", target, "hit")
+			cc.logActionVs(attacker, "attacks", target, "hit.")
 			result.hit = true
 		} else {
-			cc.logActionVs(attacker, "attacks", target, "miss")
+			cc.logActionVs(attacker, "attacks", target, "miss.")
 		}
 		if (result.hit) {
 			result.damage = CombatRules.rollDamage(damageSpec, result.crit, 2)
-			await cc.doDamageMulti(target, result.damage, attacker)
+			await cc.doDamages(target, result.damage, attacker)
 		}
 		return result
 	}

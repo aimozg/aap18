@@ -5,4 +5,4 @@
 import {createArray} from "../engine/utils/collections";
 
 export const MaxLevel = 30;
-export const XpPerLevel: number[] = createArray(MaxLevel+1, l => (l===MaxLevel) ? Infinity : l * 1000);
+export const XpPerLevel: number[] = createArray(MaxLevel*2, l => (l===MaxLevel) ? Infinity : l * 1000);

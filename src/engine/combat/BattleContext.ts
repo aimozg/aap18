@@ -58,6 +58,7 @@ export class BattleContext implements GameContext {
 	readonly logPanel = new LogPanel()
 	readonly battlePanel = new BattlePanel(this)
 	layout: GameScreenLayout = {
+		className: "-combat",
 		left: this.characterPanel.astsx,
 		right: this.enemyPanel.astsx,
 		center: this.battlePanel.astsx,

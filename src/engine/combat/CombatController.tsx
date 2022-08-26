@@ -42,6 +42,7 @@ export const enum AttackRollResult {
 export let TicksPerRound = 1000;
 export let AnimationTime = 500;
 export let AnimationTimeFast = 250;
+export let AnimationTimeVeryFast = 125;
 
 export class CombatController {
 	constructor(
@@ -129,6 +130,7 @@ export class CombatController {
 	async nextRound() {
 		this.tickTime -= TicksPerRound
 		this.roundNo++
+		this.logbr()
 		this.logInfo("Round " + this.roundNo + ".")
 		// TODO advance effects
 	}
@@ -146,7 +148,27 @@ export class CombatController {
 
 	log(messageClass: string, message: ComponentChildren) {
 		logger.info("{}", message)
-		this.ctx.logPanel.append(<span className={"log-message " + (messageClass ?? "")}>{message}</span>)
+		/*if (this._logmsg > 0) {
+			this.ctx.logPanel.appendToLast(message)
+		} else {*/
+			this.ctx.logPanel.append(<span className={"log-message " + (messageClass ?? "")}>{message}</span>)
+		/*}*/
+	}
+
+	/* TODO need to organize message with sufficient atomicity
+	ex. A attacks B, deals 3 + 5 damage, kills, gets XP
+	private _logmsg = 0;
+	logStart(messageClass?:string) {
+		this._logmsg++;
+		this.ctx.logPanel.append(<span className={"log-message "+(messageClass??"")}/>)
+	}
+	logEnd() {
+		this._logmsg--;
+	}
+	 */
+
+	logbr() {
+		this.ctx.logPanel.append(<br/>)
 	}
 
 	logInfo(message: ComponentChildren) {
@@ -197,7 +219,7 @@ export class CombatController {
 		return await action.perform(this)
 	}
 
-	async doDamageMulti(target: Creature, damage: Damage[], source: Creature|null) {
+	async doDamages(target: Creature, damage: Damage[], source: Creature|null) {
 		for (let d of damage) {
 			// TODO synchronize animations
 			await this.doDamage(target, d.damage, d.damageType, source)
@@ -206,28 +228,30 @@ export class CombatController {
 	async doDamage(target: Creature, damage: number, damageType: DamageType, source: Creature|null) {
 		logger.info("doDamage {} {} {} {}",target,damage,damageType,source)
 		// TODO conditioned DR
-		let dr = target.dmgRedAll
-		// let drText = dr > 0 ? <span class="text-positive">(-{dr})</span> :
-		// 	dr < 0 ? <span class="text-negative">(+{-dr})</span> : null
+		if (damage < 0) damage = 0;
+		let dr = Math.min(target.dmgRedAll, damage);
+		let drText = dr > 0 ? <span class="text-positive">/{dr}</span> :
+		 	dr < 0 ? <span class="text-negative">/{dr}</span> : ""
 		damage -= dr
 		if (damage < 0) damage = 0;
 		if (damage === 0) {
-			this.log("", <Fragment>(<span class="text-damage-none">0</span>)</Fragment>)
+			this.log("", <Fragment>(<span class="text-damage-none">0</span>{drText})</Fragment>)
 		} else {
-			this.log("", <Fragment>(<span class={"text-damage-" + damageType.cssSuffix}>{damage} {damageType.name}</span>)</Fragment>)
+			this.log("", <Fragment>(<span class={"text-damage-" + damageType.cssSuffix}>{damage} {damageType.name}</span>{drText})</Fragment>)
 			await this.deduceHP(target, damage, source);
 		}
 	}
 	async deduceAP(creature:Creature, value:number) {
 		logger.info("deduceAP",creature,value);
 		// TODO parallelize and detach animation from model
-		await this.animateValueChange(creature, "ap", creature.ap-value, AnimationTimeFast)
+		await this.animateValueChange(creature, "ap", creature.ap-value, AnimationTimeVeryFast)
 	}
 	async deduceHP(target: Creature, damage: number, source:Creature|null) {
 		logger.info("deduceHP",target,damage,source)
 		let wasAlive = target.isAlive
 		await this.animateValueChange(target, "hp", target.hp - damage)
 		if (wasAlive && !target.isAlive) {
+			// TODO consider handling death later, as an immediate follow-up event
 			await this.onDeath(target, source)
 		}
 	}
@@ -238,7 +262,7 @@ export class CombatController {
 	async onDeath(creature: Creature, killer: Creature|null) {
 		logger.info("onDeath {} {}",creature,killer)
 		if (killer) {
-			this.log("-death",<Fragment><b>{creature.name}</b> is killed by <b>{killer.name}</b>.</Fragment>)
+			this.log("-death",<Fragment><b>{creature.name}</b> is defeated by <b>{killer.name}</b>.</Fragment>)
 		} else {
 			this.log("-death",<Fragment><b>{creature.name}</b> dies.</Fragment>)
 		}

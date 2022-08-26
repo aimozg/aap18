@@ -264,6 +264,7 @@ export class ChargenController {
 		this.player.naturalPerv = this.perv;
 		this.player.cor = this.cor;
 		// Traits
+		this.player.origin.adjustPlayer?.(this.player);
 	}
 	createRandomPlayer() {
 		this.internalUpdate = true;
