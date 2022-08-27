@@ -38,6 +38,9 @@
 .text-negative {
   color: var(--tc-minus);
 }
+.text-lust {
+  color: var(--tc-lust);
+}
 
 @each $align in left, right, center, justify {
   .text-#{$align} {

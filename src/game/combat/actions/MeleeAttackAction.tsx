@@ -25,15 +25,16 @@ export class MeleeAttackAction extends CombatAction<MeleeAttackResult> {
 		return "[MeleeAttackAction " + this.actor.name + " " + this.target.name + (this.free ? " (free)" : "") + "]"
 	}
 	protected checkIsPossible(): boolean {
+		// TODO impossible if actor has condition, or target is invulnerable/dead
 		return true;
 	}
 	label = "Strike " + this.target.name
 	tooltip = "Strike " + this.target.name // TODO details
 	async perform(cc: CombatController): Promise<MeleeAttackResult> {
-		// TODO melee attack AP cost
 		let attacker = this.actor;
 		let target = this.target;
 		if (!this.free) {
+			// TODO melee attack AP cost
 			await cc.deduceAP(attacker, 1000)
 		}
 		// TODO animations
@@ -42,7 +43,6 @@ export class MeleeAttackAction extends CombatAction<MeleeAttackResult> {
 		let defense = CombatRules.meleeDefenseVs(target, attacker)
 		let toHit = defense - attack
 		let attackRoll = cc.rng.d20()
-		// TODO affected by STR
 		let damageSpec = CombatRules.meleeDamageVs(attacker, target)
 		let canCrit = damageSpec.some(d=>d.canCrit)
 		let result: MeleeAttackResult = {
@@ -50,17 +50,17 @@ export class MeleeAttackAction extends CombatAction<MeleeAttackResult> {
 			crit: false,
 			damage: []
 		}
-		if (attackRoll === 1) {
+		if (canCrit && attackRoll === 1) {
 			// TODO critical miss effects
 			result.crit = true
 			cc.logActionVs(attacker, "attacks", target,
-				<Fragment><span title={""+attackRoll}>critical miss</span>.</Fragment>)
+				<Fragment><span title={""+attackRoll}>critical miss</span>!</Fragment>)
 		} else if (canCrit && attackRoll === 20) {
 			// TODO critical hit effects
 			result.hit = true
 			result.crit = true
-			cc.logActionVs(attacker, "attacks", target, <Fragment><span title={""+attackRoll}>critical hit</span>.</Fragment>)
-		} else if (attackRoll >= toHit || attackRoll === 20) {
+			cc.logActionVs(attacker, "attacks", target, <Fragment><span title={""+attackRoll}>critical hit</span>!</Fragment>)
+		} else if (attackRoll !== 1 && attackRoll >= toHit || attackRoll === 20) {
 			cc.logActionVs(attacker, "attacks", target, <Fragment><span title={""+attackRoll+attack.signed()+" vs "+defense}>hit</span>.</Fragment>)
 			result.hit = true
 		} else {

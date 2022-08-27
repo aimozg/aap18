@@ -14,6 +14,7 @@ import {MeleeAttackAction} from "../../game/combat/actions/MeleeAttackAction";
 import {Damage, DamageType} from "../rules/Damage";
 import {coerce} from "../math/utils";
 import {SkipCombatAction} from "./SkipCombatAction";
+import {TeaseAction} from "../../game/combat/actions/TeaseAction";
 
 const logger = LogManager.loggerFor("engine.combat.CombatController")
 
@@ -140,11 +141,13 @@ export class CombatController {
 		logger.debug("performAIAction {}", actor.name)
 		// TODO select random action
 		let target = this.party.find(p => p.isAlive)
+		let options:CombatAction<any>[] = [];
 		if (target) {
-			await this.performAction(new MeleeAttackAction(actor, target))
-		} else {
-			await this.performAction(new SkipCombatAction(actor))
+			options.push(new MeleeAttackAction(actor, target));
+			options.push(new TeaseAction(actor, target));
 		}
+		if (options.length === 0) options.push(new SkipCombatAction(actor))
+		await this.performAction(this.rng.pick(options));
 		logger.debug("/performAIAction {}", actor.name)
 	}
 
@@ -250,6 +253,18 @@ export class CombatController {
 			await this.deduceHP(target, damage, source);
 		}
 	}
+	async doLustDamage(target: Creature, damage: number, source:Creature|null) {
+		logger.info("doLustDamage {} {} {}",target,damage,source)
+		if (damage < 0) damage = 0;
+		// let originalDamage = damage;
+		// TODO lust resistance
+		if (damage === 0) {
+			this.log("", <Fragment>(<span class="text-damage-none">0</span>)</Fragment>)
+		} else {
+			this.log("", <Fragment>(<span class="text-lust">{damage}</span>)</Fragment>)
+			await this.increaseLP(target, damage, source);
+		}
+	}
 	async deduceAP(creature:Creature, value:number) {
 		logger.info("deduceAP",creature,value);
 		// TODO parallelize and detach animation from model
@@ -259,6 +274,16 @@ export class CombatController {
 		logger.info("deduceHP",target,damage,source)
 		let wasAlive = target.isAlive
 		await this.animateValueChange(target, "hp", target.hp - damage)
+		if (wasAlive && !target.isAlive) {
+			// TODO consider handling death later, as an immediate follow-up event
+			await this.onDeath(target, source)
+		}
+	}
+	async increaseLP(target: Creature, change:number, source:Creature|null) {
+		logger.info("increaseLP",target,change,source)
+		// TODO do not instalose
+		let wasAlive = target.isAlive
+		await this.animateValueChange(target, "lp", target.lp + change)
 		if (wasAlive && !target.isAlive) {
 			// TODO consider handling death later, as an immediate follow-up event
 			await this.onDeath(target, source)

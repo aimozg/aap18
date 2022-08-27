@@ -9,7 +9,7 @@ import {Creature} from "../../engine/objects/Creature";
 import {Damage, DamageSpec, DamageSpecEntry} from "../../engine/rules/Damage";
 import {Game} from "../../engine/Game";
 import {SkipCombatAction} from "../../engine/combat/SkipCombatAction";
-import {Dice} from "../../engine/math/Dice";
+import {Dice, Dices} from "../../engine/math/Dice";
 
 export namespace CombatRules {
 
@@ -80,5 +80,15 @@ export namespace CombatRules {
 	export function meleeDamageVs(attacker:Creature, target:Creature):DamageSpec {
 		// TODO target-dependent effects
 		return baseMeleeDamage(attacker)
+	}
+	// TODO customize teases - diff parts, preferences, perversion, skills
+	export function teaseAttackVs(attacker:Creature, target:Creature):number {
+		return attacker.chaMod;
+	}
+	export function teaseDefenseVs(creature:Creature, attacker:Creature):number {
+		return creature.will;
+	}
+	export function teaseDamageVs(attacker:Creature, target:Creature):Dice {
+		return Dices.x1d10.withBonus(attacker.chaMod)
 	}
 }
