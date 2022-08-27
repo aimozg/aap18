@@ -17,6 +17,7 @@ declare global {
 		 * (-0.15).format('+.1f%') => "-15.0"
 		 */
 		format(spec: string): string;
+		signed(): string;
 	}
 
 	interface String {
@@ -89,6 +90,15 @@ function initExtensions() {
 		configurable: false,
 		value: function (this: number, format: string): string {
 			return formatNumber(this, format);
+		}
+	});
+
+	Object.defineProperty(Number.prototype, "signed", {
+		enumerable: false,
+		writable: false,
+		configurable: false,
+		value: function (this: number): string {
+			return (isFinite(this) && this >= 0) ? "+"+this : ""+this;
 		}
 	});
 

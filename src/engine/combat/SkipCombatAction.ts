@@ -16,6 +16,7 @@ export class SkipCombatAction extends CombatAction<void> {
 	label = "Skip";
 	tooltip = "Skip your turn"
 	async perform(cc: CombatController): Promise<void> {
+		cc.logAction(this.actor, "does nothing.", " ");
 		await cc.deduceAP(this.actor, this.actor.ap);
 		return Promise.resolve(undefined);
 	}

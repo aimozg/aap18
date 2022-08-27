@@ -1,3 +1,7 @@
 .vscroll {
   overflow-y: scroll;
 }
+
+.hashint, span[title]:not([title=""]) {
+  text-decoration: underline from-font dotted;
+}

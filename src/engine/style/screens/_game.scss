@@ -51,5 +51,6 @@ $duration: 0.5s;
   .gl-bottom {
     @include uibox.uibox;
     min-height: 1.5rem;
+    overflow-y: auto;
   }
 }

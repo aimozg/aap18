@@ -9,6 +9,7 @@ import {Creature} from "../../engine/objects/Creature";
 import {Damage, DamageSpec, DamageSpecEntry} from "../../engine/rules/Damage";
 import {Game} from "../../engine/Game";
 import {SkipCombatAction} from "../../engine/combat/SkipCombatAction";
+import {Dice} from "../../engine/math/Dice";
 
 export namespace CombatRules {
 
@@ -22,10 +23,15 @@ export namespace CombatRules {
 		return actions;
 	}
 
+	export function repeatPositive(dice:Dice, n:number):Dice {
+		if (n < 2 || dice.bonus >= 0) return dice.repeat(n);
+		return new Dice(n*dice.rolls, dice.sides, dice.bonus);
+	}
+
 	export function rollDamage(spec:DamageSpec, crit:boolean, critMultiplier:number):Damage[] {
 		let rng = Game.instance.rng
 		return spec.map(d=>({
-			damage: Math.max(1, crit && d.canCrit ? d.damage.repeat(critMultiplier).roll(rng) : d.damage.roll(rng)),
+			damage: Math.max(1, crit && d.canCrit ? repeatPositive(d.damage,critMultiplier).roll(rng) : d.damage.roll(rng)),
 			damageType: d.damageType
 		}))
 	}

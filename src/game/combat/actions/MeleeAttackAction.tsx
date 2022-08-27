@@ -3,6 +3,8 @@ import {CombatController} from "../../../engine/combat/CombatController";
 import {CombatAction} from "../../../engine/combat/CombatAction";
 import {Damage} from "../../../engine/rules/Damage";
 import {CombatRules} from "../CombatRules";
+import {h} from "preact";
+import {Fragment} from "preact/compat";
 
 export interface MeleeAttackResult {
 	hit: boolean;
@@ -51,17 +53,18 @@ export class MeleeAttackAction extends CombatAction<MeleeAttackResult> {
 		if (attackRoll === 1) {
 			// TODO critical miss effects
 			result.crit = true
-			cc.logActionVs(attacker, "attacks", target, "critical miss.")
+			cc.logActionVs(attacker, "attacks", target,
+				<Fragment><span title={""+attackRoll}>critical miss</span>.</Fragment>)
 		} else if (canCrit && attackRoll === 20) {
 			// TODO critical hit effects
 			result.hit = true
 			result.crit = true
-			cc.logActionVs(attacker, "attacks", target, "critical hit.")
+			cc.logActionVs(attacker, "attacks", target, <Fragment><span title={""+attackRoll}>critical hit</span>.</Fragment>)
 		} else if (attackRoll >= toHit || attackRoll === 20) {
-			cc.logActionVs(attacker, "attacks", target, "hit.")
+			cc.logActionVs(attacker, "attacks", target, <Fragment><span title={""+attackRoll+attack.signed()+" vs "+defense}>hit</span>.</Fragment>)
 			result.hit = true
 		} else {
-			cc.logActionVs(attacker, "attacks", target, "miss.")
+			cc.logActionVs(attacker, "attacks", target, <Fragment><span title={""+attackRoll+"+"+attack.signed()+" vs "+defense}>miss</span>.</Fragment>)
 		}
 		if (result.hit) {
 			result.damage = CombatRules.rollDamage(damageSpec, result.crit, 2)

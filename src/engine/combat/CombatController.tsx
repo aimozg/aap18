@@ -12,6 +12,7 @@ import {tween} from "shifty";
 import {CombatAction} from "./CombatAction";
 import {MeleeAttackAction} from "../../game/combat/actions/MeleeAttackAction";
 import {Damage, DamageType} from "../rules/Damage";
+import {coerce} from "../math/utils";
 
 const logger = LogManager.loggerFor("engine.combat.CombatController")
 
@@ -227,17 +228,20 @@ export class CombatController {
 	}
 	async doDamage(target: Creature, damage: number, damageType: DamageType, source: Creature|null) {
 		logger.info("doDamage {} {} {} {}",target,damage,damageType,source)
-		// TODO conditioned DR
 		if (damage < 0) damage = 0;
-		let dr = Math.min(target.dmgRedAll, damage);
-		let drText = dr > 0 ? <span class="text-positive">/{dr}</span> :
-		 	dr < 0 ? <span class="text-negative">/{dr}</span> : ""
+		let originalDamage = damage;
+		// TODO conditioned DR, damage immunity/resistance/vulnerability
+		let dr = coerce(target.dmgRedAll, 0, damage);
 		damage -= dr
 		if (damage < 0) damage = 0;
+		let hint = ""
+		if (dr > 0) {
+			hint = ""+originalDamage+"-"+dr+" DR";
+		}
 		if (damage === 0) {
-			this.log("", <Fragment>(<span class="text-damage-none">0</span>{drText})</Fragment>)
+			this.log("", <Fragment>(<span class="text-damage-none" title={hint}>0</span>)</Fragment>)
 		} else {
-			this.log("", <Fragment>(<span class={"text-damage-" + damageType.cssSuffix}>{damage} {damageType.name}</span>{drText})</Fragment>)
+			this.log("", <Fragment>(<span class={"text-damage-" + damageType.cssSuffix} title={hint}>{damage} {damageType.name}</span>)</Fragment>)
 			await this.deduceHP(target, damage, source);
 		}
 	}
