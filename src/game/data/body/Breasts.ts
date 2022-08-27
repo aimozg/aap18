@@ -88,7 +88,7 @@ export class BreastSizeTier {
 		return breasts.formatPattern(fxrng.pick(this.longDescPatterns))
 	}
 	static find(value: number): BreastSizeTier {
-		if (BreastSizeTier.All.has(value)) return BreastSizeTier.All.get(value)
+		if (BreastSizeTier.All.has(value)) return BreastSizeTier.All.get(value)!
 		return BreastSizeTier.Max
 	}
 	static list(): BreastSizeTier[] {
@@ -165,7 +165,6 @@ export namespace BreastTypes {
 		constructor() {
 			super("/normal", "normal");
 			this.texts.type = ["normal"];
-			this.texts.adj = [];
 		}
 	}
 }

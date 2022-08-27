@@ -27,10 +27,10 @@ const tmpEl = document.createElement("span")
 const entityRex = /^&(?:\w+|#x[a-fA-F\d]+|#\d+);$/
 
 export function parseXmlEntity(entity: string): string {
-	if (knownEntities.has(entity)) return knownEntities.get(entity);
+	if (knownEntities.has(entity)) return knownEntities.get(entity)!;
 	if (!entityRex.test(entity)) return entity;
 	tmpEl.innerHTML = entity;
-	let value = tmpEl.textContent;
+	let value = tmpEl.textContent!;
 	knownEntities.set(entity, value);
 	return value;
 }

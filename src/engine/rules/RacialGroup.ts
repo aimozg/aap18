@@ -12,4 +12,5 @@ export class RacialGroup implements IResource {
 	) {
 	}
 
+	static INVALID = new RacialGroup("", "INVALID")
 }

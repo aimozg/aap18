@@ -13,6 +13,7 @@ import {CombatAction} from "./CombatAction";
 import {MeleeAttackAction} from "../../game/combat/actions/MeleeAttackAction";
 import {Damage, DamageType} from "../rules/Damage";
 import {coerce} from "../math/utils";
+import {SkipCombatAction} from "./SkipCombatAction";
 
 const logger = LogManager.loggerFor("engine.combat.CombatController")
 
@@ -139,7 +140,11 @@ export class CombatController {
 		logger.debug("performAIAction {}", actor.name)
 		// TODO select random action
 		let target = this.party.find(p => p.isAlive)
-		await this.performAction(new MeleeAttackAction(actor, target))
+		if (target) {
+			await this.performAction(new MeleeAttackAction(actor, target))
+		} else {
+			await this.performAction(new SkipCombatAction(actor))
+		}
 		logger.debug("/performAIAction {}", actor.name)
 	}
 
@@ -236,7 +241,7 @@ export class CombatController {
 		if (damage < 0) damage = 0;
 		let hint = ""
 		if (dr > 0) {
-			hint = ""+originalDamage+"-"+dr+" DR";
+			hint = ""+originalDamage+" - "+dr+" DR";
 		}
 		if (damage === 0) {
 			this.log("", <Fragment>(<span class="text-damage-none" title={hint}>0</span>)</Fragment>)

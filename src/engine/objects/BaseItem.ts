@@ -29,11 +29,11 @@ export function registerItemComponent<
 	PROP_IS extends keyof Item,
 	PROP_IF extends keyof Item,
 	COMPONENT extends Item[PROP_COMP] & BaseItemComponent
-	>(propComp:PROP_COMP, propIs:PROP_IS, propIf:PROP_IF, accessor:(base:BaseItem)=>COMPONENT) {
+	>(propComp:PROP_COMP, propIs:PROP_IS, propIf:PROP_IF, accessor:(base:BaseItem)=>COMPONENT|undefined) {
 	Object.defineProperty(Item.prototype, propComp, {
 		enumerable: false,
 		configurable: false,
-		get(this: Item): COMPONENT {
+		get(this: Item): COMPONENT|undefined {
 			return accessor(this.base)
 		}
 	});
@@ -47,7 +47,7 @@ export function registerItemComponent<
 	Object.defineProperty(Item.prototype, propIf, {
 		enumerable: false,
 		configurable: false,
-		get(this: Item): Item {
+		get(this: Item): Item|null {
 			return accessor(this.base) ? this : null;
 		}
 	});

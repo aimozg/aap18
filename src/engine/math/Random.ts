@@ -174,7 +174,7 @@ export abstract class Random {
 	pick(source:ArrayLike<number>):number;
 	pick<E>(source:E[]):E;
 	pick<T extends ArrayLike<E>, E>(source:T):E {
-		if (source.length === 0) return undefined;
+		if (source.length === 0) throw new Error("Cannot pick from empty list");
 		return source[this.nextInt(source.length)];
 	}
 	either<E>(...options:E[]):E {

@@ -138,7 +138,7 @@ export class ChargenController {
 		}]
 	}
 	allowedTraits(withNone:boolean=true): ButtonMenuItem<string | null>[] {
-		let list: ButtonMenuItem<string>[] = GdStartingTraits.ALL.map(t=>({
+		let list: ButtonMenuItem<string|null>[] = GdStartingTraits.ALL.map(t=>({
 			label: t.name(null),
 			value: t.resId
 		})).sortOn("label");
@@ -179,7 +179,7 @@ export class ChargenController {
 	// Setters //
 	/////////////
 
-	setOrigin(originId: string) {
+	setOrigin(originId: string|null) {
 		this.origin = originId;
 		this.internalUpdate = true;
 		if (this.sex === 'h' && !this.futanariAllowed()) {
@@ -213,7 +213,7 @@ export class ChargenController {
 		// TODO set body
 		this.update();
 	}
-	setClass(cclass: string) {
+	setClass(cclass: string|null) {
 		this.cclass = cclass;
 		this.update();
 	}

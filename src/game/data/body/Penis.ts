@@ -60,8 +60,8 @@ export class PenisSizeTier {
 			longDesc?: string[]
 		}
 	) {
-		this.min = options.min ?? options.value;
-		this.max = options.max ?? options.value;
+		this.min = options.min ?? options.value!;
+		this.max = options.max ?? options.value!;
 		this.value = Math.floor((this.min+this.max)/2);
 		this.name = options.name;
 		this.shortPrefixes = options.shortPrefix;

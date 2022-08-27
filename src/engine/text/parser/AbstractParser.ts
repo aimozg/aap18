@@ -102,7 +102,7 @@ export abstract class AbstractParser {
 		let current: Parsed[] = result;
 		let currentTag = '';
 		new Lexer(input).eatLoop(lexer => {
-			let match: RegExpExecArray;
+			let match: RegExpExecArray|null;
 			if ((match = lexer.tryEat(LA_TEXT))) {
 				logger.trace("text '{}'", match[0]);
 				current.push({type: "text", content: match[0]});

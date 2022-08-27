@@ -208,13 +208,13 @@ export class Creature implements IGameObject {
 	get fists(): Item { return this._fists }
 	setFists(item:Item) { this._fists = item }
 
-	private _mainHandItem: Item = null;
-	get mainHandItem(): Item { return this._mainHandItem }
-	setMainHandItem(item:Item) { this._mainHandItem = item }
+	private _mainHandItem: Item|null = null;
+	get mainHandItem(): Item|null { return this._mainHandItem }
+	setMainHandItem(item:Item|null) { this._mainHandItem = item }
 
-	private _bodyArmor: Item = null;
-	get bodyArmor(): Item { return this._bodyArmor }
-	setBodyArmor(item:Item) { this._bodyArmor = item }
+	private _bodyArmor: Item|null = null;
+	get bodyArmor(): Item|null { return this._bodyArmor }
+	setBodyArmor(item:Item|null) { this._bodyArmor = item }
 
 	////////////////////////
 	// Equipment - Helpers

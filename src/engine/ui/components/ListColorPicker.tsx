@@ -18,13 +18,16 @@ export class ListColorPicker extends Component<ListColorPickerProps, ListColorPi
 		super(props);
 		this.setState({value: props.startValue})
 	}
+	index() {
+		return this.state.value ? this.props.colors.indexOf(this.state.value) : -1;
+	}
 	prev() {
-		let i = this.props.colors.indexOf(this.state.value);
+		let i = this.index();
 		if (i === -1) this.select(this.props.colors[0]);
 		else this.select(this.props.colors[(i - 1 + this.props.colors.length) % this.props.colors.length]);
 	}
 	next() {
-		let i = this.props.colors.indexOf(this.state.value);
+		let i = this.index();
 		if (i === -1) this.select(this.props.colors[0]);
 		else this.select(this.props.colors[(i + 1) % this.props.colors.length]);
 	}

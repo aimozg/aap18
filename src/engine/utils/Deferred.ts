@@ -18,8 +18,8 @@ export class Deferred<T> extends Promise<T> {
 			if (executor) executor(resolve, reject);
 		});
 		this.status = status;
-		this.resolve = resolveFn;
-		this.reject = rejectFn;
+		this.resolve = resolveFn!;
+		this.reject = rejectFn!;
 	}
 	private status: {resolved:boolean, rejected:boolean};
 	get resolved() { return this.status.resolved }

@@ -35,7 +35,7 @@ export class BattlePanel extends DomComponent {
 			<Button label={action.label}
 			        onClick={() => this.context.execAction(action)}
 			        disabled={!action.isPossible()}/>
-		), this.refActions.current)
+		), this.refActions.current!)
 	}
 }
 

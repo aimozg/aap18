@@ -9,7 +9,7 @@ export function removeChildren(parent?:Node):void {
 	while ((c = parent.firstChild)) parent.removeChild(c);
 }
 
-export function moveChildren(source:Node, dest:Node, insertAfter:Node=null):void {
+export function moveChildren(source:Node, dest:Node, insertAfter:Node|null=null):void {
 	if (!source || !dest || source === dest) return;
 	let c;
 	if (insertAfter) {

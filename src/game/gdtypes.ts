@@ -60,7 +60,7 @@ export class GameDataBuilder {
 			places: [],
 			playerOrigins: [],
 			racialGroups: [],
-			rgHumanoid: null,
+			rgHumanoid: RacialGroup.INVALID,
 			scenes: [],
 			traits: [],
 		}

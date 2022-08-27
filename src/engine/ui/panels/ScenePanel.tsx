@@ -31,8 +31,8 @@ export class ScenePanel extends DomComponent {
 
 	flush() {
 		let nextPage = <div class="scene-page -current" ref={this.lastPage}>{this.nextContent}</div>;
-		renderAppend(this.nextActions, this.refActions.current)
-		renderAppend(nextPage, this.refPages.current);
+		renderAppend(this.nextActions, this.refActions.current!)
+		renderAppend(nextPage, this.refPages.current!);
 		this.nextActions = [];
 		this.nextContent = [];
 	}
@@ -41,7 +41,7 @@ export class ScenePanel extends DomComponent {
 		if (this.lastPage.current) {
 			this.lastPage.current.classList.remove('-current')
 			this.lastPage.current.classList.add('-history')
-			removeChildren(this.refActions.current);
+			removeChildren(this.refActions.current!);
 			if (tail) renderAppend(tail, this.lastPage.current)
 		}
 	}

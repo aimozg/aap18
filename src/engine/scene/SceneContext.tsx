@@ -43,7 +43,7 @@ interface InternalChoiceData {
 	label: string;
 	value: string;
 	disabled: boolean;
-	hotkey: string;
+	hotkey: string|undefined;
 	default: boolean;
 	callback: () => void;
 }

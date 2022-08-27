@@ -22,7 +22,7 @@ export class Bar extends Component<BarProps, {}> {
 			height: props.height
 		}
 		let fgs = props.fgs ?? [props.fg];
-		let values = props.values ?? [props.value];
+		let values = props.values ?? [props.value!];
 		let classes = props.classes ?? [];
 		let min = props.min ?? 0;
 		let max = props.max ?? 1;

@@ -5,5 +5,5 @@
 import {BaseBodyArmor} from "../../../engine/objects/item/BaseBodyArmor";
 
 export namespace ArmorLib {
-	export const LeatherArmor = new BaseBodyArmor("/barm_leather", "leather armor", 0, 1);
+	export const LeatherArmor = new BaseBodyArmor("/barm_leather", "leather armor", 1, 0);
 }

@@ -54,5 +54,5 @@ export function animateTransition(element: HTMLElement, transition: TransitionAn
 	if (!element || !transition) return Promise.resolve();
 	let t = TransitionAnimations[transition]?.[type]?.(element);
 	if (!t) return Promise.resolve();
-	return tween(t)
+	return tween(t) as PromiseLike<any>
 }

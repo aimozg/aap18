@@ -67,9 +67,10 @@ export namespace CombatRules {
 		return meleeDefense(creature)
 	}
 	export function baseMeleeDamage(attacker:Creature):DamageSpec {
+		let weapon = attacker.meleeWeapon.asWeapon!;
 		let primary:DamageSpecEntry = {
-			damage: attacker.meleeWeapon.asWeapon.damage,
-			damageType: attacker.meleeWeapon.asWeapon.damageType,
+			damage: weapon.damage,
+			damageType: weapon.damageType,
 			canCrit: true
 		};
 		primary.damage = primary.damage.withBonus(attacker.strMod);

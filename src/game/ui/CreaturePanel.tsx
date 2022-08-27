@@ -171,8 +171,8 @@ export class CreaturePanel extends DomComponent {
 		//-----------//
 		// Equipment //
 		//-----------//
-		function armordesc(a:Item):string {
-			if (!a?.isArmor) return "-"
+		function armordesc(a:Item|null):string {
+			if (!a?.asArmor) return "-"
 			let def = a.asArmor.defenseBonus ? "Def "+a.asArmor.defenseBonus : ""
 			let dr = a.asArmor.drBonus ? "DR "+a.asArmor.drBonus : ""
 			if (dr && def) return def+"/"+dr
@@ -183,7 +183,7 @@ export class CreaturePanel extends DomComponent {
 		let sectionEquipment = options.equipment && <div className="grid-4 my-2">
 			<div>Weapon:</div>
 			<div className="cols-2 text-center">{c.currentWeapon.name}</div>
-			<div className="text-center">{c.currentWeapon.asWeapon.damage.toString()}</div>
+			<div className="text-center">{c.currentWeapon.asWeapon!.damage.toString()}</div>
 			<div>Armor:</div>
 			<div className="cols-2 text-center">{c.bodyArmor?.name ?? "-"}</div>
 			<div className="text-center">{armordesc(c.bodyArmor)}</div>

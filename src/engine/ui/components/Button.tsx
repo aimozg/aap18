@@ -50,7 +50,7 @@ export class Button extends Component<ButtonProps, ButtonState> {
 		this.clear();
 	}
 
-	render(props: RenderableProps<ButtonProps> | undefined, state: Readonly<ButtonState> | undefined, context: any): ComponentChild {
+	render(props: RenderableProps<ButtonProps>, state: Readonly<ButtonState>, context: any): ComponentChild {
 		return <button
 			type="button"
 			class={props.className}

@@ -70,7 +70,7 @@ export class Dice {
 let lib = new Map<string, Dice>();
 
 export function dice(spec: string): Dice {
-	if (lib.has(spec)) return lib.get(spec);
+	if (lib.has(spec)) return lib.get(spec)!;
 	let dice = new Dice(spec);
 	if (dice.bonus === 0) lib.set(spec, dice);
 	return dice;

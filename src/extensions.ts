@@ -67,6 +67,9 @@ function initExtensions() {
 				break;
 			case 'p':
 				s = x.toPrecision(+dec);
+				break;
+			default:
+				s = ""+x;
 		}
 		if (len) {
 			let nlen = +len;

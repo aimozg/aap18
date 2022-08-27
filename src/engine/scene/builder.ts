@@ -35,6 +35,8 @@ export function buildScenes(namespace:string, scenes:Record<string,SceneDef>): S
 			sceneFn = def;
 		} else if ('content' in def) {
 			sceneFn = contentToSceneFn(def.content, doNextFn(def.next))
+		} else {
+			throw new Error("SceneDef "+id+" is incomplete");
 		}
 		return new Scene(namespace+"_"+id, sceneFn);
 	})

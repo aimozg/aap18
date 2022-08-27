@@ -67,7 +67,7 @@ export abstract class BodyPartType<PART extends BodyPart<any>> {
 		if (s === 'longName1') return this.longName1(part);
 		if (s === 'longName2') return this.longName2(part);
 		if (s === 'description') return this.description(part);
-		return null
+		return s
 	}
 	formatPattern(pattern: string, part: PART): string {
 		return formatPatternNames(pattern, s => this.textReplacer(s, part))

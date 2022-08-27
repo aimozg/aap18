@@ -10,7 +10,7 @@ export class Lexer {
 	}
 	// TODO Optimization note: Don't cut string into parts, track index and use regexes' matchAt()
 	private s = this.input
-	public match:RegExpExecArray = null
+	public match:RegExpExecArray|null = null
 	get remainder():string {
 		return this.s
 	}
@@ -29,7 +29,7 @@ export class Lexer {
 		this.skip(n);
 		return part
 	}
-	tryEat(lookahead:RegExp):RegExpExecArray {
+	tryEat(lookahead:RegExp):RegExpExecArray|null {
 		lookahead.lastIndex = 0;
 		let match = lookahead.exec(this.s);
 		if (match) {

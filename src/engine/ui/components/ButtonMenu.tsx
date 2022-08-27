@@ -10,7 +10,7 @@ export interface ButtonMenuItem<V> {
 
 export interface ButtonMenuProps<V> {
 	items: ButtonMenuItem<V>[];
-	selected?: V;
+	selected?: V|null;
 	onChange?: (value: V) => void;
 	className?: string;
 }
@@ -27,7 +27,7 @@ export class ButtonMenu<V> extends Component<ButtonMenuProps<V>, ButtonMenuState
 
 	private click(e: MouseEvent, item: any) {
 		(e.target as HTMLElement).blur();
-		this.props.onChange(item);
+		this.props.onChange?.(item);
 	}
 
 	render(props: RenderableProps<ButtonMenuProps<V>>, state: Readonly<ButtonMenuState>, context: any): ComponentChild {

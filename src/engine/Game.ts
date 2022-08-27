@@ -52,7 +52,9 @@ export class Game {
 		Game.instance = this;
 		(window as any)["game"] = this;
 		this.info = options.info;
-		this.screenManager = new ScreenManager(document.querySelector(options.screenContainer));
+		let screenHolder = document.querySelector(options.screenContainer) as HTMLElement;
+		if (!screenHolder) throw new Error("Screen holder "+options.screenContainer+" not found!");
+		this.screenManager = new ScreenManager(screenHolder);
 		this.state = new StateManager();
 		this.saveManager = new SaveManager();
 		this.resourceManager = new ResourceManager(this, {

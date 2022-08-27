@@ -12,7 +12,7 @@ export class PlayerCharacter extends Character {
 
 	place: Place = Place.Limbo;
 	originId: string = "unknown";
-	get origin():GDPlayerOrigin { return Game.instance.idata.playerOrigins.find(o=>o.id === this.originId)}
+	get origin():GDPlayerOrigin { return Game.instance.idata.playerOrigins.find(o=>o.id === this.originId)!}
 	xp: number = 0;
 
 	////////////

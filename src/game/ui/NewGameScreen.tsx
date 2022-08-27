@@ -17,8 +17,8 @@ import {ChargenController} from "../chargen/ChargenController";
 
 export class NewGameScreen extends AbstractScreen {
 
-	private completeResolve: (started: PlayerCharacter) => void = null;
-	private completePromise: Promise<PlayerCharacter> = new Promise((resolve) => {
+	private completeResolve: (started: PlayerCharacter|null) => void;
+	private completePromise: Promise<PlayerCharacter|null> = new Promise((resolve) => {
 		this.completeResolve = resolve;
 	});
 	private tab: number = 0;
@@ -42,7 +42,7 @@ export class NewGameScreen extends AbstractScreen {
 		this.update();
 	}
 
-	async display(): Promise<PlayerCharacter> {
+	async display(): Promise<PlayerCharacter|null> {
 		return this.completePromise
 	}
 

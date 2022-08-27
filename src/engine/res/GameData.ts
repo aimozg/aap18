@@ -21,11 +21,13 @@ export class GameData {
 	colorCache = new Map<string,Color>()
 	colorByName(name:string, palette:string="common"):Color {
 		let ccKey = palette+"/"+name;
-		if (this.colorCache.has(ccKey)) return this.colorCache.get(ccKey);
+		if (this.colorCache.has(ccKey)) return this.colorCache.get(ccKey)!;
 		let gdcolor = this.game.idata.colors.find(c=>c.palette===palette && c.name===name)
-		if (!gdcolor && palette !== "common") {
-			gdcolor = this.game.idata.colors.find(c=>c.palette==="common" && c.name===name)
-			if (!gdcolor) throw new Error("Color not found: "+ccKey)
+		if (!gdcolor) {
+			if (palette !== "common") {
+				gdcolor = this.game.idata.colors.find(c => c.palette === "common" && c.name === name)
+			}
+			if (!gdcolor) throw new Error("Color not found: " + ccKey)
 		}
 		let color = new Color(gdcolor.name, gdcolor.rgb);
 		this.colorCache.set(ccKey,color)

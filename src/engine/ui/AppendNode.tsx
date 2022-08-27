@@ -9,8 +9,8 @@ export class AppendNode extends Component<{ child:Node }, any>{
 	private ref = createRef<HTMLDivElement>();
 
 	componentDidMount() {
-		this.ref.current.parentNode.insertBefore(this.props.child, this.ref.current.nextSibling);
-		this.ref.current.remove();
+		this.ref.current!.parentNode!.insertBefore(this.props.child, this.ref.current!.nextSibling);
+		this.ref.current!.remove();
 	}
 	shouldComponentUpdate(): boolean {
 		return false;

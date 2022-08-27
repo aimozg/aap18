@@ -83,7 +83,7 @@ export class HairLengthTier {
 		return hair.formatPattern(fxrng.pick(this.longDescPatterns))
 	}
 	static find(value: number): HairLengthTier {
-		if (HairLengthTier.All.has(value)) return HairLengthTier.All.get(value)
+		if (HairLengthTier.All.has(value)) return HairLengthTier.All.get(value)!
 		return HairLengthTier.Max
 	}
 	static list(): HairLengthTier[] {
@@ -177,7 +177,6 @@ export namespace HairTypes {
 		constructor() {
 			super("/normal", "normal");
 			this.texts.type = ["normal"];
-			this.texts.adj = [];
 		}
 	}
 }

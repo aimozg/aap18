@@ -9,7 +9,7 @@ export class Item {
 		public readonly base:BaseItem
 	) {}
 
-	public customName:string = null;
+	public customName:string|null = null;
 
 	public get name():string { return this.customName ?? this.base.name }
 }

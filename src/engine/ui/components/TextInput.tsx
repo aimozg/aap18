@@ -22,7 +22,7 @@ export class TextInput extends Component<TextInputProps, TextInputState> {
 	private onChange(e:InputEvent) {
 		this.onInput(e);
 	}
-	render(props: RenderableProps<TextInputProps> | undefined, state: Readonly<TextInputState> | undefined, context: any): ComponentChild {
+	render(props: RenderableProps<TextInputProps>, state: Readonly<TextInputState>, context: any): ComponentChild {
 		return <input
 			type="text"
 			class={props.className}
