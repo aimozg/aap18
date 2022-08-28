@@ -70,10 +70,10 @@ export class BattleContext implements GameContext {
 		return CombatRules.playerActions(this.player, this.cc);
 	}
 	async execAction(action:CombatAction<any>) {
-		this.playerCanAct = false;
 		if (action instanceof FinishCombatAction) {
 			this.onBattleFinishClick()
-		} else {
+		} else if (this.playerCanAct) {
+			this.playerCanAct = false;
 			await this.cc.performAction(action);
 			this.scheduleTick()
 		}
@@ -127,4 +127,10 @@ export class BattleContext implements GameContext {
 			this.scheduleTick()
 		}
 	}
+	onKeyboardEvent(event: KeyboardEvent): void {
+		if (this.playerCanAct || this.cc.ended) {
+			this.battlePanel.onKeyboardEvent(event);
+		}
+	}
+
 }

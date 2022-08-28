@@ -8,6 +8,7 @@ import {Deferred} from "../utils/Deferred";
 export interface GameContext {
 	ended:boolean;
 	promise:Promise<any>;
+	onKeyboardEvent?: (event:KeyboardEvent)=>void;
 }
 
 export class NullGameContext implements GameContext {

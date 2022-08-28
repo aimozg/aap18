@@ -147,6 +147,9 @@ export namespace KeyCodes {
 	export function eventToHkShort(event:KeyboardEvent):string {
 		return hkToShort(eventToHk(event));
 	}
+	export function hkLongToShort(hotkey:string):string {
+		return hkToShort(stringToHk(hotkey));
+	}
 	export function stringToHk(key:string):Hotkey {
 		let ctrl = key.startsWith(HOTKEY_PREFIX_CTRL)
 		if (ctrl) key = key.slice(HOTKEY_PREFIX_CTRL.length)

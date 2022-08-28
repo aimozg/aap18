@@ -68,7 +68,7 @@ export class ScreenManager {
 	}
 
 	handleKeyboardEvent(event:KeyboardEvent) {
-		logger.debug("handleKeyboardEvent {} {}",this.top,KeyCodes.eventToHkString(event))
+		logger.trace("handleKeyboardEvent {} {}",this.top,KeyCodes.eventToHkString(event))
 		this.top.onKeyboardEvent(event)
 	}
 

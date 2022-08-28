@@ -25,6 +25,7 @@ export class GameScreen extends AbstractScreen {
 	readonly left = createRef<HTMLDivElement>();
 	readonly right = createRef<HTMLDivElement>();
 	readonly bottom = createRef<HTMLDivElement>();
+	keyboardEventListener: ((event:KeyboardEvent)=>void)|undefined;
 
 	applyLayout(layout:GameScreenLayout) {
 		this.layout = layout;
@@ -48,4 +49,7 @@ export class GameScreen extends AbstractScreen {
 		</Fragment>
 	}
 
+	onKeyboardEvent(event: KeyboardEvent) {
+		this.keyboardEventListener?.(event);
+	}
 }

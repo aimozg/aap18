@@ -5,3 +5,12 @@
 .hashint, span[title]:not([title=""]) {
   text-decoration: underline from-font dotted;
 }
+
+.--hk {
+  color: var(--tc-hl);
+  margin-right: 0.25em;
+}
+
+:disabled .--hk, .disabled .--hk {
+  color: var(--tc-disabled);
+}

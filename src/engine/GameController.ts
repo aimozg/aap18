@@ -76,6 +76,8 @@ export class GameController {
 	showGameScreen() {
 		let context = this.state.flushGameContext();
 		logger.debug("showGameScreen {}",context)
+		let gameScreen = this.game.screenManager.gameScreen;
+		gameScreen.keyboardEventListener = context.onKeyboardEvent?.bind(context);
 		if (context instanceof NullGameContext) {
 			this.state.pushGameContext(new PlaceContext(this.player.place));
 			this.showGameScreen();
@@ -83,7 +85,7 @@ export class GameController {
 		}
 		if (context instanceof SceneContext) {
 			context.output = new TextOutput(new ScenePanel());
-			this.game.screenManager.gameScreen.applyLayout(context.layout);
+			gameScreen.applyLayout(context.layout);
 			context.play(context.sceneId).then(()=>this.showGameScreen());
 			return;
 		}
@@ -96,7 +98,7 @@ export class GameController {
 			return;
 		}
 		if (context instanceof BattleContext) {
-			this.game.screenManager.gameScreen.applyLayout(context.layout);
+			gameScreen.applyLayout(context.layout);
 			context.update();
 			return;
 		}

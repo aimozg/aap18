@@ -266,12 +266,12 @@ export class CombatController {
 		}
 	}
 	async deduceAP(creature:Creature, value:number) {
-		logger.info("deduceAP",creature,value);
+		logger.info("deduceAP {} {}",creature,value);
 		// TODO parallelize and detach animation from model
 		await this.animateValueChange(creature, "ap", creature.ap-value, AnimationTimeVeryFast)
 	}
 	async deduceHP(target: Creature, damage: number, source:Creature|null) {
-		logger.info("deduceHP",target,damage,source)
+		logger.info("deduceHP {} {} {}",target,damage,source)
 		let wasAlive = target.isAlive
 		await this.animateValueChange(target, "hp", target.hp - damage)
 		if (wasAlive && !target.isAlive) {
@@ -280,7 +280,7 @@ export class CombatController {
 		}
 	}
 	async increaseLP(target: Creature, change:number, source:Creature|null) {
-		logger.info("increaseLP",target,change,source)
+		logger.info("increaseLP {} {} {}",target,change,source)
 		// TODO do not instalose
 		let wasAlive = target.isAlive
 		await this.animateValueChange(target, "lp", target.lp + change)
@@ -309,7 +309,7 @@ export class CombatController {
 	 * Award {@param player} XP for defeating {@param victim}
 	 */
 	async awardXpFor(player: PlayerCharacter, victim:Creature) {
-		logger.info("awardXpFor {} {}", victim)
+		logger.info("awardXpFor {} {}", player, victim)
 		// TODO calculate xp from level
 		let xp = 50
 		if (xp > 0) {
