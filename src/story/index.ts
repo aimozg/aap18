@@ -7,6 +7,7 @@ import {gdRegisterPlayerBase} from "./base/base";
 
 
 export function gdRegisterStory(gd:GameDataBuilder) {
+	gd.logger.debug("gdRegisterStory");
 	gdRegisterIntro(gd);
 	gdRegisterPlayerBase(gd);
 }

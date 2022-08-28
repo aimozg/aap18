@@ -32,4 +32,6 @@ export abstract class AbstractScreen {
 
 	onRemove(): void {
 	}
+
+	onKeyboardEvent(event:KeyboardEvent):void {}
 }

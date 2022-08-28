@@ -8,6 +8,7 @@ import {EmptyScreen} from "./screens/EmptyScreen";
 import {GameScreen} from "./screens/GameScreen";
 import {LogManager} from "../logging/LogManager";
 import {animateTransition, TransitionAnimationName} from "./animations";
+import {KeyCodes} from "./KeyCodes";
 
 const logger = LogManager.loggerFor("engine.ui.ScreenManager");
 
@@ -64,6 +65,17 @@ export class ScreenManager {
 		this.removeTop(false);
 		this.addTop(screen);
 		await animateTransition(screen.container, transition, "add");
+	}
+
+	handleKeyboardEvent(event:KeyboardEvent) {
+		logger.debug("handleKeyboardEvent {} {}",this.top,KeyCodes.eventToHkString(event))
+		this.top.onKeyboardEvent(event)
+	}
+
+	setupKeyboardInput() {
+		document.addEventListener("keydown", event=>{
+			this.handleKeyboardEvent(event);
+		}, true)
 	}
 }
 

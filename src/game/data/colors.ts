@@ -4,6 +4,7 @@
 import {GameDataBuilder, GDColor} from "../gdtypes";
 
 export function gdRegisterColors(gd:GameDataBuilder) {
+	gd.logger.debug("gdRegisterColors");
 	const commonColors: GDColor[] = [
 		{name: "albino", rgb: '#f2f2e8', palette: "common"},
 		{name: "amber", rgb: '#ff6224', palette: "common"},
