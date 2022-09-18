@@ -15,6 +15,8 @@ import {Damage, DamageType} from "../rules/Damage";
 import {coerce} from "../math/utils";
 import {SkipCombatAction} from "./SkipCombatAction";
 import {TeaseAction} from "../../game/combat/actions/TeaseAction";
+import {CombatRoll, processRoll} from "./CombatRoll";
+import {CombatRules} from "../../game/combat/CombatRules";
 
 const logger = LogManager.loggerFor("engine.combat.CombatController")
 
@@ -222,6 +224,10 @@ export class CombatController {
 	////////////////////
 	// Combat actions //
 	////////////////////
+
+	async processMeleeRoll(roll:CombatRoll):Promise<CombatRoll> {
+		return processRoll(this, roll, CombatRules.MeleeAttackQueue);
+	}
 
 	async performAction<T>(action:CombatAction<T>):Promise<T> {
 		logger.info("performAction {}", action)

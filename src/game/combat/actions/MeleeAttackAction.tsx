@@ -1,18 +1,11 @@
 import {Creature} from "../../../engine/objects/Creature";
 import {CombatController} from "../../../engine/combat/CombatController";
 import {CombatAction} from "../../../engine/combat/CombatAction";
-import {Damage} from "../../../engine/rules/Damage";
-import {CombatRules} from "../CombatRules";
 import {h} from "preact";
 import {Fragment} from "preact/compat";
+import {CombatRoll} from "../../../engine/combat/CombatRoll";
 
-export interface MeleeAttackResult {
-	hit: boolean;
-	crit: boolean;
-	damage: Damage[];
-}
-
-export class MeleeAttackAction extends CombatAction<MeleeAttackResult> {
+export class MeleeAttackAction extends CombatAction<CombatRoll> {
 	constructor(
 		actor: Creature,
 		public readonly target: Creature,
@@ -30,46 +23,29 @@ export class MeleeAttackAction extends CombatAction<MeleeAttackResult> {
 	}
 	label = "Strike " + this.target.name
 	tooltip = "Strike " + this.target.name // TODO details
-	async perform(cc: CombatController): Promise<MeleeAttackResult> {
+	async perform(cc: CombatController): Promise<CombatRoll> {
+		let roll = new CombatRoll(this.actor, this.target);
+		roll.free = this.free;
 		let attacker = this.actor;
 		let target = this.target;
-		if (!this.free) {
-			// TODO melee attack AP cost
-			await cc.deduceAP(attacker, 1000)
+		roll.onHit = async (roll,cc)=>{
+			let attackRoll = roll.roll;
+			let attack = roll.bonus;
+			let defense = roll.dc;
+			// TODO animations
+			if (roll.critMiss) {
+				cc.logActionVs(attacker, "attacks", target,
+					<Fragment><span title={""+attackRoll}>critical miss</span>!</Fragment>)
+			} else if (roll.critHit) {
+				cc.logActionVs(attacker, "attacks", target, <Fragment><span title={""+attackRoll}>critical hit</span>!</Fragment>)
+			} else if (roll.hit) {
+				cc.logActionVs(attacker, "attacks", target, <Fragment><span title={""+attackRoll+attack.signed()+" vs "+defense}>hit</span>.</Fragment>)
+			} else {
+				cc.logActionVs(attacker, "attacks", target, <Fragment><span title={""+attackRoll+attack.signed()+" vs "+defense}>miss</span>.</Fragment>)
+			}
 		}
-		// TODO animations
-		// TODO abstract this out!!
-		let attack = CombatRules.meleeAttackVs(attacker, target)
-		let defense = CombatRules.meleeDefenseVs(target, attacker)
-		let toHit = defense - attack
-		let attackRoll = cc.rng.d20()
-		let damageSpec = CombatRules.meleeDamageVs(attacker, target)
-		let canCrit = damageSpec.some(d=>d.canCrit)
-		let result: MeleeAttackResult = {
-			hit: false,
-			crit: false,
-			damage: []
-		}
-		if (canCrit && attackRoll === 1) {
-			// TODO critical miss effects
-			result.crit = true
-			cc.logActionVs(attacker, "attacks", target,
-				<Fragment><span title={""+attackRoll}>critical miss</span>!</Fragment>)
-		} else if (canCrit && attackRoll === 20) {
-			// TODO critical hit effects
-			result.hit = true
-			result.crit = true
-			cc.logActionVs(attacker, "attacks", target, <Fragment><span title={""+attackRoll}>critical hit</span>!</Fragment>)
-		} else if (attackRoll !== 1 && attackRoll >= toHit || attackRoll === 20) {
-			cc.logActionVs(attacker, "attacks", target, <Fragment><span title={""+attackRoll+attack.signed()+" vs "+defense}>hit</span>.</Fragment>)
-			result.hit = true
-		} else {
-			cc.logActionVs(attacker, "attacks", target, <Fragment><span title={""+attackRoll+"+"+attack.signed()+" vs "+defense}>miss</span>.</Fragment>)
-		}
-		if (result.hit) {
-			result.damage = CombatRules.rollDamage(damageSpec, result.crit, 2)
-			await cc.doDamages(target, result.damage, attacker)
-		}
-		return result
+
+		await cc.processMeleeRoll(roll);
+		return roll
 	}
 }

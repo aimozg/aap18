@@ -12,6 +12,9 @@ import {LogLevel} from "./engine/logging/Logger";
 runGame({
 	screenContainer: "#root",
 	logLevel: LogLevel.DEBUG,
+	logLevels: {
+		"engine.combat.CombatRoll": LogLevel.TRACE
+	},
 	info: {
 		title: "Aimozg's Abandoned Project No. 18",
 		subtitle: <Fragment>
