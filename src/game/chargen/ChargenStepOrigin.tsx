@@ -1,8 +1,8 @@
 import {Fragment, h, VNode} from "preact";
 import {ButtonMenu} from "../../engine/ui/components/ButtonMenu";
 import {ChargenStep} from "./ChargenStep";
-import {simpleparse} from "../../engine/text/utils";
 import {ChargenController} from "./ChargenController";
+import {Parse} from "../../engine/text/ParseTag";
 
 export class ChargenStepOrigin extends ChargenStep {
 	label = "Origin";
@@ -36,7 +36,9 @@ export class ChargenStepOrigin extends ChargenStep {
 					            }}/>
 				</div>
 				<div class="cols-9">
-					{simpleparse(this.game.idata.playerOrigins.find(o => o.id === this.cc.origin)?.description)}
+					<Parse>
+					{this.game.idata.playerOrigins.find(o => o.id === this.cc.origin)?.description}
+					</Parse>
 				</div>
 			</div>
 		</Fragment>;

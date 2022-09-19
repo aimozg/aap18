@@ -5,10 +5,10 @@
 import {ChargenStep} from "./ChargenStep";
 import {Fragment, h, VNode} from "preact";
 import {Button} from "../../engine/ui/components/Button";
-import {simpleparse} from "../../engine/text/utils";
 import {ChargenController} from "./ChargenController";
 import {TAttribute} from "../../engine/rules/TAttribute";
 import {AttrMetadata, IAttrMetadata} from "../data/stats";
+import {Parse} from "../../engine/text/ParseTag";
 
 export class ChargenStepAttrs extends ChargenStep {
 
@@ -73,7 +73,7 @@ export class ChargenStepAttrs extends ChargenStep {
 					        onClick={() => this.cc.attrDec(meta.id)}
 					        label="-"/>
 				</div>
-				<div>({this.getAttrValueName(meta.id)}) {simpleparse(this.explainStat(meta))}</div>
+				<div>({this.getAttrValueName(meta.id)}) <Parse>{this.explainStat(meta)}</Parse></div>
 			</Fragment>)}
 			<div class="cols-4">
 				You have {this.cc.attrPoints} points to allocate.

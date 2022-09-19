@@ -4,7 +4,7 @@ import {Parser} from "../../engine/text/parser/Parser";
 import {Appearance} from "../data/text/Appearance";
 import {ChargenController} from "./ChargenController";
 import {CreaturePanel} from "../ui/CreaturePanel";
-import {simpleparse} from "../../engine/text/utils";
+import {Parse} from "../../engine/text/ParseTag";
 
 export class ChargenStepFinalize extends ChargenStep {
 
@@ -33,7 +33,7 @@ export class ChargenStepFinalize extends ChargenStep {
 					<h5>Traits</h5>
 					{pc.traits.size === 0 && "(No strating traits)"}
 					{pc.traitList().map(t=><div>
-						<b>{t.name(pc)}</b> &ndash; {simpleparse(t.description(pc))}
+						<b>{t.name(pc)}</b> &ndash; <Parse>{t.description(pc)}</Parse>
 					</div>)}
 					<h5>Appearance</h5>
 					{Appearance.characterAppearance(pc, parser)}

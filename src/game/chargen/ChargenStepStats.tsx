@@ -1,8 +1,8 @@
 import {Fragment, h, VNode} from "preact";
-import {simpleparse} from "../../engine/text/utils";
 import {Button} from "../../engine/ui/components/Button";
 import {ChargenStep} from "./ChargenStep";
 import {ChargenController} from "./ChargenController";
+import {Parse} from "../../engine/text/ParseTag";
 
 export class ChargenStepStats extends ChargenStep {
 
@@ -35,7 +35,9 @@ export class ChargenStepStats extends ChargenStep {
 						        onClick={() => this.cc.statDec(ss)}
 						        label="-"/>
 					<div style="min-width:2rem" className={"text-center"+(ss.total>ss.natural?' text-positive':ss.total<ss.natural?' text-negative':'')}>{ss.total>=0?'\xA0':''}{ss.total}</div>
-					<div>{simpleparse(ss.meta.explain(ss.total,this.player))}</div>
+					<div>
+						<Parse>ss.meta.explain(ss.total,this.player)</Parse>
+					</div>
 				</Fragment>)}
 				<div class="cols-6">
 					<i>These stats are not beneficial, you can leave them unchanged.</i>

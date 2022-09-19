@@ -2,7 +2,7 @@ import {Fragment, h, VNode} from "preact";
 import {ChargenStep} from "./ChargenStep";
 import {ChargenController} from "./ChargenController";
 import {ButtonMenu} from "../../engine/ui/components/ButtonMenu";
-import {simpleparse} from "../../engine/text/utils";
+import {Parse} from "../../engine/text/ParseTag";
 
 export class ChargenStepTraits extends ChargenStep {
 
@@ -27,7 +27,7 @@ export class ChargenStepTraits extends ChargenStep {
 					            selected={this.cc.trait}/>
 				</div>
 				<div class="cols-9">
-					{simpleparse(this.cc.traitObject?.description(this.player))}
+					<Parse>{this.cc.traitObject?.description(this.player)}</Parse>
 				</div>
 			</div>
 

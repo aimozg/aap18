@@ -1,8 +1,8 @@
 import {Fragment, h, VNode} from "preact";
 import {ChargenStep} from "./ChargenStep";
 import {ButtonMenu, ButtonMenuItem} from "../../engine/ui/components/ButtonMenu";
-import {simpleparse} from "../../engine/text/utils";
 import {ChargenController} from "./ChargenController";
+import {Parse} from "../../engine/text/ParseTag";
 
 export class ChargenStepClass extends ChargenStep {
 
@@ -37,7 +37,7 @@ export class ChargenStepClass extends ChargenStep {
 					            onChange={x=>this.cc.setClass(x)}/>
 				</div>
 				<div class="cols-9">
-					{simpleparse(this.cc.classObject?.description)}
+					<Parse>{this.cc.classObject?.description}</Parse>
 				</div>
 			</div>
 		</Fragment>;
