@@ -12,6 +12,9 @@ export class AppendNode extends Component<{ child:Node }, any>{
 		this.ref.current!.parentNode!.insertBefore(this.props.child, this.ref.current!.nextSibling);
 		this.ref.current!.remove();
 	}
+	componentWillUnmount() {
+		this.props.child.parentNode?.removeChild(this.props.child)
+	}
 	shouldComponentUpdate(): boolean {
 		return false;
 	}

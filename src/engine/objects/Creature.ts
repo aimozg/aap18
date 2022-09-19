@@ -11,6 +11,7 @@ import {RacialGroup} from "../rules/RacialGroup";
 import {Game} from "../Game";
 import {Item} from "./Item";
 import {TraitType} from "../rules/TraitType";
+import {DefaultMonsterAI, MonsterAI} from "./MonsterAI";
 
 let objectIdCounter = 0;
 
@@ -233,6 +234,8 @@ export class Creature implements IGameObject {
 	///////////////////
 	/** Action Points */
 	ap = 0;
+
+	ai: MonsterAI = new DefaultMonsterAI();
 
 	//////////////////////
 	// Combat - Helpers //

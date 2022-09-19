@@ -5,7 +5,8 @@ import {Character} from "../../engine/objects/creature/Character";
 import {RacialGroups} from "../../game/data/racialGroups";
 import {Game} from "../../engine/Game";
 
-export class TutorialImp extends Character {
+export class TutorialImp extends Character  {
+
 	constructor() {
 		super();
 

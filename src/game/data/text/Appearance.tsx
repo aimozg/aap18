@@ -23,6 +23,10 @@ export namespace Appearance {
 				{parser.print(pc.body.eyes.fullDescription())}{" "}
 				{pc.body.horns.isPresent && parser.print(pc.body.horns.fullDescription())}{" "}
 			</p>
+			<p>{/*Torso*/}
+				{parser.print(pc.body.skin.fullDescription())}{" "}
+				{pc.body.coat.isPresent && parser.print(pc.body.coat.fullDescription())}{" "}
+			</p>
 			<p>{/*Extremities*/}
 				{parser.print(pc.body.arms.fullDescription())}{" "}
 				{parser.print(pc.body.legs.fullDescription())}{" "}

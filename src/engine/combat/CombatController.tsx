@@ -10,11 +10,8 @@ import {ComponentChildren, h} from "preact";
 import {Fragment} from "preact/compat";
 import {tween} from "shifty";
 import {CombatAction} from "./CombatAction";
-import {MeleeAttackAction} from "../../game/combat/actions/MeleeAttackAction";
 import {Damage, DamageType} from "../rules/Damage";
 import {coerce} from "../math/utils";
-import {SkipCombatAction} from "./SkipCombatAction";
-import {TeaseAction} from "../../game/combat/actions/TeaseAction";
 import {CombatRoll, processRoll} from "./CombatRoll";
 import {CombatRules} from "../../game/combat/CombatRules";
 
@@ -141,15 +138,8 @@ export class CombatController {
 	}
 	async performAIAction(actor: Creature) {
 		logger.debug("performAIAction {}", actor.name)
-		// TODO select random action
-		let target = this.party.find(p => p.isAlive)
-		let options:CombatAction<any>[] = [];
-		if (target) {
-			options.push(new MeleeAttackAction(actor, target));
-			options.push(new TeaseAction(actor, target));
-		}
-		if (options.length === 0) options.push(new SkipCombatAction(actor))
-		await this.performAction(this.rng.pick(options));
+		let action = actor.ai.performAI(actor, this);
+		await this.performAction(action);
 		logger.debug("/performAIAction {}", actor.name)
 	}
 

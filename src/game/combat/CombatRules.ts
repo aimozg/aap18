@@ -41,15 +41,13 @@ export namespace CombatRules {
 	export let MeleeDefaultCalcBonus: CombatRollProcessor = {
 		priority: MELEE_PRIO_CALC_BONUS,
 		async process(cc:CombatController, roll: CombatRoll) {
-			// TODO weapon type-dependent
-			// TODO enchantments
-			roll.bonus = roll.actor.strMod;
+			roll.bonus = meleeAttackVs(roll.actor, roll.target);
 		}
 	};
 	export let MeleeDefaultCalcDc: CombatRollProcessor = {
 		priority: MELEE_PRIO_CALC_DC,
 		async process(cc:CombatController, roll: CombatRoll) {
-			roll.bonus = meleeAttackVs(roll.actor, roll.target);
+			roll.bonus = meleeDefenseVs(roll.target, roll.actor)
 		}
 	};
 	export let MeleeDefaultCalcDamage: CombatRollProcessor = {

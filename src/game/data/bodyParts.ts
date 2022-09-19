@@ -18,11 +18,14 @@ import {FacePart, FaceRef} from "./body/Face";
 import {BreastPart, BreastsRef} from "./body/Breasts";
 import {PenisPart, PenisRef} from "./body/Penis";
 import {VaginaPart, VaginaRef} from "./body/Vagina";
+import {CoatPart, CoatRef} from "./body/Coat";
+import {SkinPart, SkinRef} from "./body/Skin";
 
 declare module "../../engine/objects/creature/Character" {
 	interface CharacterBody {
 		readonly arms: ArmPart;
 		readonly breasts: BreastPart;
+		readonly coat: CoatPart;
 		readonly ears: EarPart;
 		readonly eyes: EyePart;
 		readonly face: FacePart;
@@ -30,6 +33,7 @@ declare module "../../engine/objects/creature/Character" {
 		readonly horns: HornPart;
 		readonly legs: LegPart;
 		readonly penis: PenisPart;
+		readonly skin: SkinPart;
 		readonly tail: TailPart;
 		readonly vagina: VaginaPart;
 		readonly wings: WingPart;
@@ -66,6 +70,7 @@ export function gdRegisterBodyParts(gd:GameDataBuilder) {
 	gd.logger.debug("gdRegisterBodyParts");
 	gd.addBodyPart("arms", ArmsRef);
 	gd.addBodyPart("breasts", BreastsRef);
+	gd.addBodyPart("coat", CoatRef);
 	gd.addBodyPart("ears", EarsRef);
 	gd.addBodyPart("eyes", EyesRef);
 	gd.addBodyPart("face", FaceRef);
@@ -73,6 +78,7 @@ export function gdRegisterBodyParts(gd:GameDataBuilder) {
 	gd.addBodyPart("horns", HornsRef);
 	gd.addBodyPart("legs", LegsRef);
 	gd.addBodyPart("penis", PenisRef);
+	gd.addBodyPart("skin", SkinRef);
 	gd.addBodyPart("tail", TailRef);
 	gd.addBodyPart("vagina", VaginaRef);
 	gd.addBodyPart("wings", WingsRef);
