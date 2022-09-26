@@ -11,8 +11,7 @@ import {StateManager} from "./state/StateManager";
 import {Place} from "./scene/Place";
 import {NullGameContext, PlaceContext} from "./state/GameContext";
 import {ScenePanel} from "./ui/panels/ScenePanel";
-import {BattleContext} from "./combat/BattleContext";
-import {Creature} from "./objects/Creature";
+import {BattleContext, BattleOptions, BattleSettings} from "./combat/BattleContext";
 import {Random} from "./math/Random";
 
 const logger = LogManager.loggerFor("engine.GameController");
@@ -120,8 +119,13 @@ export class GameController {
 		place.onEnter();
 	}
 
-	startBattle(enemies:Creature[]):BattleContext {
-		let ctx = new BattleContext(this.player, [this.player], enemies);
+	startBattle(options:BattleOptions):BattleContext {
+		let settings: BattleSettings = {
+			player: options.player ?? this.player,
+			party: options.party ?? [options.player ?? this.player],
+			enemies: options.enemies
+		}
+		let ctx = new BattleContext(settings);
 		this.state.pushGameContext(ctx);
 		this.showGameScreen();
 		return ctx;

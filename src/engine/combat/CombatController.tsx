@@ -49,10 +49,11 @@ export let AnimationTimeVeryFast = 125;
 export class CombatController {
 	constructor(
 		public readonly ctx: BattleContext,
-		public readonly party: Creature[],
-		public readonly enemies: Creature[]
+
 	) {}
 
+	public readonly party: Creature[] = this.ctx.options.party
+	public readonly enemies: Creature[] = this.ctx.options.enemies
 	public get rng() { return Game.instance.rng }
 	private _ended = false;
 	public get ended() { return this._ended }

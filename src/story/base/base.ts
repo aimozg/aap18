@@ -23,7 +23,7 @@ export function gdRegisterPlayerBase(gd:GameDataBuilder) {
 					async call(ctx:SceneContext) {
 						ctx.say("A monster attacks you!")
 
-						ctx.endAndBattle(new TutorialImp())
+						ctx.endAndBattle({enemies:[new TutorialImp()]})
 					},
 					disabled: !ctx.player.isAlive
 				}

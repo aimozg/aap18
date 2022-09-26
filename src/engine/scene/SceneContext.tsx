@@ -11,8 +11,7 @@ import {h} from "preact";
 import {LogManager} from "../logging/LogManager";
 import {GameController} from "../GameController";
 import {GameContext} from "../state/GameContext";
-import {Creature} from "../objects/Creature";
-import {BattleContext} from "../combat/BattleContext";
+import {BattleContext, BattleOptions} from "../combat/BattleContext";
 import {CreaturePanel} from "../../game/ui/CreaturePanel";
 import {AmbushDef, AmbushRules} from "./ambush";
 import {Random} from "../math/Random";
@@ -261,21 +260,24 @@ export class SceneContext implements GameContext {
 		})
 	}
 
-	async battleAndContinue(...enemies:Creature[]):Promise<BattleContext> {
-		logger.info("battleAndContinue {}", ...enemies);
-		let ctx = this.gc.startBattle(enemies);
+	async battleAndContinue(options:BattleOptions):Promise<BattleContext> {
+		logger.info("battleAndContinue {}", options);
+		let ctx = this.gc.startBattle(options);
 		return ctx.promise
 	}
 
-	endAndBattle(...enemies:Creature[]) {
-		logger.info("endAndBattle {}", ...enemies);
+	endAndBattle(options:BattleOptions) {
+		logger.info("endAndBattle {}", options);
+		this.promise.then(()=>{
+			this.gc.startBattle(options);
+		})
 		this.endButton({label:"FIGHT"})
 	}
 
-	endNowAndBattle(...enemies:Creature[]) {
-		logger.info("endNowAndBattle {}", ...enemies)
+	endNowAndBattle(options:BattleOptions) {
+		logger.info("endNowAndBattle {}", options)
 		this.promise.then(()=>{
-			this.gc.startBattle(enemies);
+			this.gc.startBattle(options);
 		})
 		this.endNow();
 	}

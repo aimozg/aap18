@@ -32,15 +32,25 @@ class FinishCombatAction extends CombatAction<void> {
 	}
 }
 
+export interface BattleOptions {
+	player?: PlayerCharacter;
+	party?: Creature[];
+	enemies: Creature[];
+}
+export interface BattleSettings {
+	player: PlayerCharacter;
+	party: Creature[];
+	enemies: Creature[];
+}
+
 export class BattleContext implements GameContext {
 	constructor(
-		public player: PlayerCharacter,
-		party: Creature[],
-		enemies: Creature[]
+		public options: BattleSettings
 	) {
-		this.cc = new CombatController(this, party, enemies)
+		this.cc = new CombatController(this)
 	}
 
+	public player: PlayerCharacter = this.options.player;
 	playerCanAct = false
 	readonly cc: CombatController
 	get ended(): boolean { return this._promise.completed; }

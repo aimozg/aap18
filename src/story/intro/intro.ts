@@ -72,9 +72,10 @@ export function gdRegisterIntro(gd:GameDataBuilder) {
 					disabled: { hint: "Why would you do that?" }
 				}, {
 					label: "Sneak Attack",
-					hint: "Start the combat in concealed mode",
+					hint: "Start the combat in sneak mode",
 					call(ctx) {
-						ctx.endNowAndBattle(new TutorialImp())
+						// TODO add "sneak" condition
+						ctx.endNowAndBattle({enemies:[new TutorialImp()]})
 					}
 				}, {
 					label: "Leave",

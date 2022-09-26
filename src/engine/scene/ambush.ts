@@ -65,7 +65,9 @@ export namespace AmbushRules {
 
 	export async function doAmbushFail(def: AmbushDef, ctx: SceneContext, critFail: boolean) {
 		// TODO if critFail, give monsters a boost
-		ctx.endAndBattle(...def.monsters);
+		ctx.endAndBattle({
+			enemies:def.monsters
+		});
 	}
 
 	export async function doAmbush(def: AmbushDef, ctx: SceneContext) {
