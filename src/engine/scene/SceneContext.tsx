@@ -14,12 +14,16 @@ import {GameContext} from "../state/GameContext";
 import {Creature} from "../objects/Creature";
 import {BattleContext} from "../combat/BattleContext";
 import {CreaturePanel} from "../../game/ui/CreaturePanel";
+import {AmbushDef, AmbushRules} from "./ambush";
+import {Random} from "../math/Random";
 
 export interface ChoiceOptions {
+	hint?: string;
 	default?: boolean;
 	hotkey?: string;
 	clear?: boolean;
-	disabled?: boolean;
+	disabled?: boolean|{hint:string};
+	hide?: boolean;
 	value?: any;
 }
 
@@ -35,8 +39,12 @@ export interface ChoiceGotoCall extends ChoiceOptions {
 	call: SceneFn;
 }
 
-export type ChoiceData = ChoiceGotoScene | ChoiceGotoCall;
-export type ChoiceListData = ChoiceData & ChoiceWithLabel;
+export interface ChoiceOptionsDisabled extends ChoiceOptions {
+	disabled: true|{hint:string};
+}
+
+export type ChoiceDataNoLabel = ChoiceGotoScene | ChoiceGotoCall | ChoiceOptionsDisabled;
+export type ChoiceData = ChoiceDataNoLabel & ChoiceWithLabel;
 
 interface InternalChoiceData {
 	clear: boolean;
@@ -99,6 +107,7 @@ export class SceneContext implements GameContext {
 			throw new Error(`Dead end in scene ${this.sceneId}.`)
 		}
 		this.output.appendAction(<div class="choices">{this.buttons.map(btn =>
+			// TODO button label
 			<Button label={btn.label}
 			        disabled={btn.disabled}
 			        className={"-link"+(btn.default ? " -default" : "")}
@@ -143,36 +152,46 @@ export class SceneContext implements GameContext {
 		this.output.flip();
 	}
 
-	say(text: string) {
+	say(text: string, parseTags:boolean = true) {
 		logger.trace("say {}", text)
 		this._dirty = true;
-		let parsed = this.parser.parse(text);
+		let parsed = this.parser.parse(text, parseTags);
 		this.output.print(parsed);
 	}
 
-	choicelist(...choices: ChoiceListData[]) {
+	choicelist(...choices: ChoiceData[]) {
 		logger.trace("choiceList")
 		this._dirty = true;
-		this.buttons = choices.map(c => {
+		this.buttons = choices.filter(c => !c.hide).map(c => {
 			let callback;
 			if ('scene' in c) {
 				callback = ((scene) => () => this.play(scene))(c.scene)
-			} else {
+			} else if ('call' in c) {
 				callback = () => c.call(this);
+			} else {
+				// TODO ()=>this.error
+				callback = () => {this.say("Error (no button callback)")}
+			}
+			let hint = c.hint;
+			let disabled = !!c.disabled;
+			if (typeof c.disabled === 'object') {
+				if (hint) hint += "<br>"
+				hint = c.disabled.hint
 			}
 			return {
 				clear: c.clear ?? false,
 				label: c.label,
+				hint: hint,
 				default: c.default ?? false,
 				hotkey: c.hotkey,
 				value: 'value' in c ? c.value : c.label,
-				disabled: c.disabled ?? false,
+				disabled: disabled,
 				callback: callback
 			}
 		});
 	}
 
-	choices(choices: Record<string, ChoiceData | SceneFn | string>) {
+	choices(choices: Record<string, ChoiceDataNoLabel | SceneFn | string>) {
 		this._dirty = true;
 		this.choicelist(...Object.entries(choices).map(([k, v]) => {
 			if (typeof v === 'function') {
@@ -213,11 +232,25 @@ export class SceneContext implements GameContext {
 		})
 	}
 
-	endScene({value, label = "END"}: { value?: string, label?: string } = {}) {
-		logger.info("endScene {}", value ?? '')
+	async ambush(def: AmbushDef) {
+		await AmbushRules.doAmbush(def, this)
+	}
+
+	endNow(value?:string) {
+		logger.info("endNow {}", value ?? '')
 		this._dirty = true;
 		if (this._ended) {
-			throw new Error("Duplicate endScene call");
+			throw new Error("Duplicate end call");
+		}
+		this.lastValue = value ?? this.lastValue ?? '';
+		this.finish().then()
+	}
+
+	endButton({value, label = "END"}: { value?: string, label?: string } = {}) {
+		logger.info("endButton {}", value ?? '')
+		this._dirty = true;
+		if (this._ended) {
+			throw new Error("Duplicate end call");
 		}
 		this.lastValue = value ?? this.lastValue ?? '';
 		this.choicelist({
@@ -236,9 +269,22 @@ export class SceneContext implements GameContext {
 
 	endAndBattle(...enemies:Creature[]) {
 		logger.info("endAndBattle {}", ...enemies);
-		this.endScene({label:"FIGHT"})
+		this.endButton({label:"FIGHT"})
+	}
+
+	endNowAndBattle(...enemies:Creature[]) {
+		logger.info("endNowAndBattle {}", ...enemies)
 		this.promise.then(()=>{
 			this.gc.startBattle(enemies);
 		})
+		this.endNow();
 	}
+
+	///////////////
+	// Utilities //
+	///////////////
+
+	get rng():Random { return this.gc.rng }
+
+	d20():number { return this.rng.d20() }
 }

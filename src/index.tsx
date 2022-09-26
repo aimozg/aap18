@@ -13,6 +13,7 @@ runGame({
 	screenContainer: "#root",
 	logLevel: LogLevel.DEBUG,
 	logLevels: {
+		// "engine.text.parser.AbstractParser": LogLevel.TRACE,
 		"engine.combat.CombatRoll": LogLevel.TRACE
 	},
 	info: {

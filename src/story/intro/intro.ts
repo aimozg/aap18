@@ -6,6 +6,7 @@ import {SceneContext} from "../../engine/scene/SceneContext";
 import {GameDataBuilder} from "../../game/gdtypes";
 import {MeleeWeaponLib} from "../../game/data/items/MeleeWeaponLib";
 import {ArmorLib} from "../../game/data/items/ArmorLib";
+import {TutorialImp} from "../monsters/TutorialImp";
 
 const namespace = '/000';
 
@@ -44,9 +45,47 @@ export function gdRegisterIntro(gd:GameDataBuilder) {
 
 			await ctx.flipPage("Check the ruins");
 
-			ctx.say("You cautiously approach the building. It appears to be three-story tower, destroyed many years ago. Its first floor is littered by sand, rocks, and branches. You find traces of a campfire &ndash; looks like it was used as a refuge for an occasional traveler. [pg] There is a hole in a ceiling leading to the second floor. [pg] You think you could rest here. [pg] <b>Your first task is to find a source of water and food.</b>");
+			ctx.say("You cautiously approach the building. It appears to be three-story tower, destroyed many years ago. There is some noise inside. ");
 
-			ctx.endScene();
+			ctx.say("<p class='text-help'>When you enter a room with monster(s), an Ambush skill check is rolled. If you succeed, you can choose an action against unaware enemy. If you fail, you fight. If you fail by 10 or more, you're ambushed instead! </p>")
+
+			let monster = new TutorialImp();
+			await ctx.ambush({
+				dc: 10,
+				roll: 19,
+				tags: ['monster','inside','demon','scripted'],
+				monsters: [monster],
+				fail: "Tutorial ambush failed - this should never happen. Please report a bug.",
+				critFail: "Tutoriam ambush criticall failed - this should never happen. Please report a bug.",
+				success: "You peek inside and spot a short, ugly demon crouched in the corner. It rummages the pile of stones, searching for something, with his unprotected back open for you to attack.",
+				successOptions: [{
+					label: "Talk",
+					hint: "Greet the imp and try to talk",
+					disabled: { hint: "Peace was never an option" }
+				}, {
+					label: "Seduce",
+					hint: "Try to seduce the imp with your body",
+					disabled: { hint: "Why would you do that?" }
+				}, {
+					label: "Pounce",
+					hint: "Skip the foreplay and fuck the imp",
+					disabled: { hint: "Why would you do that?" }
+				}, {
+					label: "Sneak Attack",
+					hint: "Start the combat in concealed mode",
+					call(ctx) {
+						ctx.endNowAndBattle(new TutorialImp())
+					}
+				}, {
+					label: "Leave",
+					hint: "Just leave it alone",
+					disabled: { hint: "Not in this tutorial, sorry" }
+				}]
+			});
+
+			/*ctx.say("Its first floor is littered by sand, rocks, and branches. You find traces of a campfire &ndash; looks like it was used as a refuge for an occasional traveler. [pg] There is a hole in a ceiling leading to the second floor. [pg] You think you could rest here. [pg] <b>Your first task is to find a source of water and food.</b>");
+
+			ctx.endButton();*/
 		}
 	});
 }

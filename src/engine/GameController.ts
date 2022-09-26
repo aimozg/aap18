@@ -8,11 +8,12 @@ import {SceneContext} from "./scene/SceneContext";
 import {TextOutput} from "./text/output/TextOutput";
 import {PlayerCharacter} from "./objects/creature/PlayerCharacter";
 import {StateManager} from "./state/StateManager";
-import {Place} from "./objects/Place";
+import {Place} from "./scene/Place";
 import {NullGameContext, PlaceContext} from "./state/GameContext";
 import {ScenePanel} from "./ui/panels/ScenePanel";
 import {BattleContext} from "./combat/BattleContext";
 import {Creature} from "./objects/Creature";
+import {Random} from "./math/Random";
 
 const logger = LogManager.loggerFor("engine.GameController");
 
@@ -25,6 +26,7 @@ export class GameController {
 
 	get state(): StateManager { return this.game.state }
 	get player(): PlayerCharacter { return this.state.player }
+	get rng(): Random { return this.game.rng }
 
 	async loadAutosave():Promise<void> {
 		logger.info("loadAutosave");

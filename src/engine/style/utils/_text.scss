@@ -9,7 +9,7 @@
 }
 .text-p {
   display: block;
-  margin: 0 0.5em;
+  margin: 0.5em 0;
   text-indent: 1em;
 }
 .text-div {
@@ -40,6 +40,22 @@
 }
 .text-lust {
   color: var(--tc-lust);
+}
+.text-roll-skill {
+  /* font-family: var(--theme-ctrl-font-face); */
+}
+.text-roll-success {
+  color: var(--tc-plus);
+}
+.text-roll-fail {
+  color: var(--tc-minus);
+}
+.text-roll-critfail {
+  font-weight: bold;
+  color: var(--tc-minus);
+}
+.text-help {
+  font-style: italic;
 }
 
 @each $align in left, right, center, justify {

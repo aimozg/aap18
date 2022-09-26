@@ -7,7 +7,7 @@ import {CharacterClass} from "../rules/classes/CharacterClass";
 import Symbols from "../symbols";
 import {RacialGroup} from "../rules/RacialGroup";
 import {Scene} from "../scene/Scene";
-import {Place} from "../objects/Place";
+import {Place} from "../scene/Place";
 import {Color, colorSortKey} from "../objects/Color";
 import {Game} from "../Game";
 import {TraitType} from "../rules/TraitType";

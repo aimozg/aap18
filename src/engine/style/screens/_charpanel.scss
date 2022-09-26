@@ -1,3 +1,5 @@
+@use "../utils/uibox";
+
 .bar.bar-xp {
   min-height: 6px;
   .bar-value {
@@ -31,7 +33,7 @@
 }
 
 .creature-panel {
-  padding: 0.25rem;
+  @include uibox.uibox;
   &.-dead {
     opacity: 0.8;
     background: var(--tc-disabled);

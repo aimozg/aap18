@@ -17,7 +17,7 @@ export function gdRegisterPlayerBase(gd:GameDataBuilder) {
 
 					ctx.gc.recoverPlayer();
 
-					ctx.endScene()
+					ctx.endButton()
 				},
 				"Explore": {
 					async call(ctx:SceneContext) {

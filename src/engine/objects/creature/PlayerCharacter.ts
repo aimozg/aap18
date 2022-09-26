@@ -2,10 +2,10 @@
  * Created by aimozg on 10.07.2022.
  */
 import {Character} from "./Character";
-import {Place} from "../Place";
 import {MaxLevel, XpPerLevel} from "../../../game/xp";
 import {GDPlayerOrigin} from "../../../game/gdtypes";
 import {Game} from "../../Game";
+import {Place} from "../../scene/Place";
 
 export class PlayerCharacter extends Character {
 	readonly objectType: string = "PlayerCharacter";

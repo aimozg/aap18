@@ -2,7 +2,7 @@
  * Created by aimozg on 19.07.2022.
  */
 
-import {Place} from "../objects/Place";
+import {Place} from "../scene/Place";
 import {Deferred} from "../utils/Deferred";
 
 export interface GameContext {

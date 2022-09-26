@@ -38,6 +38,31 @@ const LA_HTMLTAGSTART = /^< *([\w\d:-]+) *((?: *[\w\d:_-]+(?: *=(?:"[^"]*"|'[^']
 /** Group 1 : tag name */
 const LA_HTMLTAGEND = /^<\/ *([\w\d:-]+) *>/;
 
+function parseHtmlAttrs(attrString:string):Record<string,string> {
+	// whitespace
+	const ALA_WS = /^\s+/;
+	// attribute with double-quoted value
+	const ALA_ATTR_DQ_VALUE = /^([\w_@$:-]+)="([^"]*)"/;
+	const ALA_ATTR_SQ_VALUE = /^([\w_@$:-]+)='([^']*)'/;
+	const ALA_ATTR_NQ_VALUE = /^([\w_@$:-]+)=([^ &>]*)/;
+	const ALA_ATTR_NO_VALUE = /^([\w_@$:-]+)(?= |$)/;
+	let attrs:Record<string, string> = {}
+	new Lexer(attrString).eatLoop(lexer=>{
+		let match: RegExpExecArray|null;
+		if ((match = lexer.tryEat(ALA_WS))) {
+			// do nothing
+		} else if ((match = lexer.tryEat(ALA_ATTR_DQ_VALUE))
+			|| (match = lexer.tryEat(ALA_ATTR_SQ_VALUE))
+			|| (match = lexer.tryEat(ALA_ATTR_NQ_VALUE))
+			|| (match = lexer.tryEat(ALA_ATTR_NO_VALUE))) {
+			attrs[match[1]] = match[2];
+		} else {
+			logger.warn("Bad HTML attribute {}",attrString)
+			lexer.halt()
+		}
+	})
+	return attrs;
+}
 
 export abstract class AbstractParser {
 
@@ -46,7 +71,7 @@ export abstract class AbstractParser {
 	protected abstract doEvaluateTag(tag: string, tagArgs: string): Parsed|string;
 	protected evaluateHtmlTag(
 		tag:string,
-		attrs:string,
+		attrs:Record<string,string>,
 		single:boolean,
 		current:Parsed[],
 		push:(tag:string,list:Parsed[])=>void
@@ -56,9 +81,11 @@ export abstract class AbstractParser {
 		} else if (tag === 'br' && single) {
 			current.push({type:'br'})
 		} else if (this.allowedHtmlTags.has(tag)) {
+			let cls = "text-"+tag;
+			if (attrs['class']) cls += " "+attrs['class'];
 			let block: ParsedStyledText = {
 				type: "styledText",
-				className: "text-" + tag,
+				className: cls,
 				content: []
 			}
 			current.push(block);
@@ -94,8 +121,8 @@ export abstract class AbstractParser {
 		return content;
 	}
 
-	parse(input: string): Parsed[] {
-		logger.trace("parse", input);
+	parse(input: string, parseTags:boolean=true): Parsed[] {
+		logger.trace("parse", input, parseTags);
 		const result: Parsed[] = [];
 		const stack: {tag:string,list:Parsed[]}[] = [{tag:'',list:result}];
 		// noinspection JSMismatchedCollectionQueryUpdate
@@ -116,13 +143,17 @@ export abstract class AbstractParser {
 				logger.trace("escaped '{}'", match[0][1]);
 				current.push({type: "text", content: match[0][1]});
 			} else if ((match = lexer.tryEat(LA_SIMPLETAG))) {
-				let [_, tag, args] = match;
-				logger.trace("simpletag '{}' '{}'", tag, args);
-				try {
-					current.push(this.evaluateTag(tag, args));
-				} catch (e) {
-					logger.warn(e);
-					current.push({type: "error", content: e});
+				if (!parseTags) {
+					current.push({type: "text", content: match[0]});
+				} else {
+					let [_, tag, args] = match;
+					logger.trace("simpletag '{}' '{}'", tag, args);
+					try {
+						current.push(this.evaluateTag(tag, args));
+					} catch (e) {
+						logger.warn(e);
+						current.push({type: "error", content: e});
+					}
 				}
 			} else if ((match = lexer.tryEat(LA_FALSETAG))) {
 				logger.trace("falsetag '{}'", match[0]);
@@ -135,7 +166,7 @@ export abstract class AbstractParser {
 				let [_, tag, attrs, ending] = match;
 				tag = tag.toLowerCase();
 				logger.trace("htmlstart '{}' '{}' '{}'", tag, attrs, ending);
-				this.evaluateHtmlTag(tag, attrs, !!ending, current, (tag, list)=>{
+				this.evaluateHtmlTag(tag, parseHtmlAttrs(attrs), !!ending, current, (tag, list)=>{
 					current = list;
 					currentTag = tag;
 					stack.push({tag,list});
