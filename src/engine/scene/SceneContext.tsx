@@ -15,13 +15,19 @@ import {BattleContext, BattleOptions} from "../combat/BattleContext";
 import {CreaturePanel} from "../../game/ui/CreaturePanel";
 import {AmbushDef, AmbushRules} from "./ambush";
 import {Random} from "../math/Random";
+import {KeyCodes} from "../ui/KeyCodes";
 
 export interface ChoiceOptions {
+	/** Button text */
+	label?: string;
+	/** Displayed on hover */
+	tooltip?: string;
+	/** Displayed on the side */
 	hint?: string;
 	default?: boolean;
 	hotkey?: string;
 	clear?: boolean;
-	disabled?: boolean|{hint:string};
+	disabled?: boolean | { hint?: string, tooltip?: string };
 	hide?: boolean;
 	value?: any;
 }
@@ -39,7 +45,7 @@ export interface ChoiceGotoCall extends ChoiceOptions {
 }
 
 export interface ChoiceOptionsDisabled extends ChoiceOptions {
-	disabled: true|{hint:string};
+	disabled: true | { hint?: string; tooltip?: string };
 }
 
 export type ChoiceDataNoLabel = ChoiceGotoScene | ChoiceGotoCall | ChoiceOptionsDisabled;
@@ -48,9 +54,11 @@ export type ChoiceData = ChoiceDataNoLabel & ChoiceWithLabel;
 interface InternalChoiceData {
 	clear: boolean;
 	label: string;
+	hint?: string;
+	tooltip?: string;
 	value: string;
 	disabled: boolean;
-	hotkey: string|undefined;
+	hotkey: string | undefined;
 	default: boolean;
 	callback: () => void;
 }
@@ -70,11 +78,12 @@ export class SceneContext implements GameContext {
 	readonly characterPanel = new CreaturePanel();
 
 	private _ended = false;
-	private buttons: InternalChoiceData[] = [];
+	private nextButtons: InternalChoiceData[] = [];
+	private currentButtons: InternalChoiceData[] = [];
 	private _promise = new Deferred<string>();
 	private _dirty = true;
 
-	get promise():Promise<string> { return this._promise }
+	get promise(): Promise<string> { return this._promise }
 	readonly game: Game = Game.instance;
 	readonly state: StateManager = Game.instance.state;
 	get player(): PlayerCharacter { return Game.instance.state.player }
@@ -88,12 +97,14 @@ export class SceneContext implements GameContext {
 	}
 
 	private async beginScreen(append: boolean) {
+		logger.debug("beginScreen in {}", this.sceneId)
 		if (!append) this.clear();
-		this.buttons.splice(0);
+		this.nextButtons = [];
+		this.currentButtons = []
 		this.characterPanel.update(this.player)
 	}
 	private async flush() {
-		logger.debug("flush in {}",this.sceneId);
+		logger.debug("flush in {}", this.sceneId);
 		if (this._ended) {
 			this._promise.tryResolve(String(this.lastValue ?? ''));
 			return;
@@ -101,19 +112,23 @@ export class SceneContext implements GameContext {
 		if (!this._dirty) return;
 		this.characterPanel.update(this.player);
 		this._dirty = false;
-		if (this.buttons.length === 0) {
+		if (this.nextButtons.length === 0) {
 			// TODO rescue
 			throw new Error(`Dead end in scene ${this.sceneId}.`)
 		}
-		this.output.appendAction(<div class="choices">{this.buttons.map(btn =>
-			// TODO button label
-			<Button label={btn.label}
-			        disabled={btn.disabled}
-			        className={"-link"+(btn.default ? " -default" : "")}
-			        onClick={() => this.buttonClick(btn)}
-			/>)
-		}</div>)
-		this.buttons.splice(0);
+		// TODO tooltip
+		this.output.appendAction(<div class="choices">{this.nextButtons.map(btn =>
+			<div class="choice">
+				<Button label={btn.label}
+				        disabled={btn.disabled}
+				        hotkey={btn.hotkey}
+				        className={"-link" + (btn.default ? " -default" : "")}
+				        onClick={() => this.buttonClick(btn)}/>
+				{btn.hint && <span className="choice-hint">{btn.hint}</span>}
+			</div>)
+		}</div>);
+		this.currentButtons = this.nextButtons;
+		this.nextButtons = [];
 		this.output.flush();
 	}
 	private async buttonClick(c: InternalChoiceData) {
@@ -125,7 +140,7 @@ export class SceneContext implements GameContext {
 			this.output.flip(c.label);
 		}
 		await c.callback();
-		setTimeout(()=>this.flush(), 0);
+		setTimeout(() => this.flush(), 0);
 	}
 	private async finish() {
 		this._dirty = true;
@@ -151,7 +166,7 @@ export class SceneContext implements GameContext {
 		this.output.flip();
 	}
 
-	say(text: string, parseTags:boolean = true) {
+	say(text: string, parseTags: boolean = true) {
 		logger.trace("say {}", text)
 		this._dirty = true;
 		let parsed = this.parser.parse(text, parseTags);
@@ -161,7 +176,8 @@ export class SceneContext implements GameContext {
 	choicelist(...choices: ChoiceData[]) {
 		logger.trace("choiceList")
 		this._dirty = true;
-		this.buttons = choices.filter(c => !c.hide).map(c => {
+
+		this.nextButtons = choices.filter(c => !c.hide).map((c,i) => {
 			let callback;
 			if ('scene' in c) {
 				callback = ((scene) => () => this.play(scene))(c.scene)
@@ -172,29 +188,42 @@ export class SceneContext implements GameContext {
 				callback = () => {this.say("Error (no button callback)")}
 			}
 			let hint = c.hint;
+			let tooltip = c.tooltip;
 			let disabled = !!c.disabled;
 			if (typeof c.disabled === 'object') {
-				if (hint) hint += "<br>"
-				hint = c.disabled.hint
+				if (c.disabled.hint !== undefined) hint = c.disabled.hint
+				if (c.disabled.tooltip !== undefined) {
+					tooltip = tooltip ? (tooltip + "<br>") : "";
+					tooltip += c.disabled.tooltip
+				}
 			}
 			return {
 				clear: c.clear ?? false,
 				label: c.label,
-				hint: hint,
+				hint,
+				tooltip,
 				default: c.default ?? false,
-				hotkey: c.hotkey,
+				hotkey: c.hotkey ?? KeyCodes.DefaultHotkeys[i],
 				value: 'value' in c ? c.value : c.label,
-				disabled: disabled,
-				callback: callback
+				disabled,
+				callback
 			}
 		});
+	}
+	onKeyboardEvent(event: KeyboardEvent): void {
+		let hk = KeyCodes.eventToHkString(event);
+		let btn = this.currentButtons.find(b=>!b.disabled && b.hotkey === hk);
+		if (btn) {
+			event.preventDefault();
+			this.buttonClick(btn).then();
+		}
 	}
 
 	choices(choices: Record<string, ChoiceDataNoLabel | SceneFn | string>) {
 		this._dirty = true;
 		this.choicelist(...Object.entries(choices).map(([k, v]) => {
 			if (typeof v === 'function') {
-				return {label:k, call: v}
+				return {label: k, call: v}
 			} else if (typeof v === 'string') {
 				return {label: k, scene: v}
 			} else {
@@ -235,7 +264,7 @@ export class SceneContext implements GameContext {
 		await AmbushRules.doAmbush(def, this)
 	}
 
-	endNow(value?:string) {
+	endNow(value?: string) {
 		logger.info("endNow {}", value ?? '')
 		this._dirty = true;
 		if (this._ended) {
@@ -254,29 +283,29 @@ export class SceneContext implements GameContext {
 		this.lastValue = value ?? this.lastValue ?? '';
 		this.choicelist({
 			label: label,
-			call: ()=>{
+			call: () => {
 				this.finish().then();
 			}
 		})
 	}
 
-	async battleAndContinue(options:BattleOptions):Promise<BattleContext> {
+	async battleAndContinue(options: BattleOptions): Promise<BattleContext> {
 		logger.info("battleAndContinue {}", options);
 		let ctx = this.gc.startBattle(options);
 		return ctx.promise
 	}
 
-	endAndBattle(options:BattleOptions) {
+	endAndBattle(options: BattleOptions) {
 		logger.info("endAndBattle {}", options);
-		this.promise.then(()=>{
+		this.promise.then(() => {
 			this.gc.startBattle(options);
 		})
-		this.endButton({label:"FIGHT"})
+		this.endButton({label: "FIGHT"})
 	}
 
-	endNowAndBattle(options:BattleOptions) {
+	endNowAndBattle(options: BattleOptions) {
 		logger.info("endNowAndBattle {}", options)
-		this.promise.then(()=>{
+		this.promise.then(() => {
 			this.gc.startBattle(options);
 		})
 		this.endNow();
@@ -286,7 +315,7 @@ export class SceneContext implements GameContext {
 	// Utilities //
 	///////////////
 
-	get rng():Random { return this.gc.rng }
+	get rng(): Random { return this.gc.rng }
 
-	d20():number { return this.rng.d20() }
+	d20(): number { return this.rng.d20() }
 }

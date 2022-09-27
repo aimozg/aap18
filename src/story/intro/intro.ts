@@ -47,7 +47,7 @@ export function gdRegisterIntro(gd:GameDataBuilder) {
 
 			ctx.say("You cautiously approach the building. It appears to be three-story tower, destroyed many years ago. There is some noise inside. ");
 
-			ctx.say("<p class='text-help'>When you enter a room with monster(s), an Ambush skill check is rolled. If you succeed, you can choose an action against unaware enemy. If you fail, you fight. If you fail by 10 or more, you're ambushed instead! </p>")
+			ctx.say("<p class='help-block'>When you enter a room with monster(s), an Ambush skill check is rolled. If you succeed, you can choose an action against an unaware enemy. If you fail, you fight. If you fail by 10 or more, you're ambushed instead! </p>")
 
 			let monster = new TutorialImp();
 			await ctx.ambush({
@@ -60,26 +60,26 @@ export function gdRegisterIntro(gd:GameDataBuilder) {
 				success: "You peek inside and spot a short, ugly demon crouched in the corner. It rummages the pile of stones, searching for something, with his unprotected back open for you to attack.",
 				successOptions: [{
 					label: "Talk",
-					hint: "Greet the imp and try to talk",
+					tooltip: "Greet the imp and try to talk",
 					disabled: { hint: "Peace was never an option" }
 				}, {
 					label: "Seduce",
-					hint: "Try to seduce the imp with your body",
+					tooltip: "Try to seduce the imp with your body",
 					disabled: { hint: "Why would you do that?" }
 				}, {
-					label: "Pounce",
-					hint: "Skip the foreplay and fuck the imp",
+					label: "Rape",
+					tooltip: "Skip the foreplay and fuck the imp",
 					disabled: { hint: "Why would you do that?" }
 				}, {
 					label: "Sneak Attack",
-					hint: "Start the combat in sneak mode",
+					tooltip: "Start the combat in sneak mode",
 					call(ctx) {
 						// TODO add "sneak" condition
 						ctx.endNowAndBattle({enemies:[new TutorialImp()]})
 					}
 				}, {
 					label: "Leave",
-					hint: "Just leave it alone",
+					tooltip: "Just leave it alone",
 					disabled: { hint: "Not in this tutorial, sorry" }
 				}]
 			});

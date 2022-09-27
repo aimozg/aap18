@@ -5,7 +5,7 @@
 import {CharacterBody} from "./Character";
 import {Color} from "../Color";
 import fxrng from "../../math/fxrng";
-import {formatPatternNames} from "../../utils/string";
+import {substitutePattern} from "../../utils/string";
 
 export class BodyMaterial {
 	constructor(
@@ -70,7 +70,7 @@ export class BodyMaterial {
 		))
 	}
 	protected formatPattern(pattern:string):string {
-		return formatPatternNames(pattern,s => this.textReplacer(s))
+		return substitutePattern(pattern, s => this.textReplacer(s))
 			.replace(/  +/g,' ')
 			.trim()
 	}

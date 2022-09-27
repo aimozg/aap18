@@ -24,17 +24,6 @@
     color: var(--tc-disabled);
   }
 
-  &.-default {
-    border-color: var(--theme-ctrl-default);
-    &:not(.-link) {
-      color: var(--tc-bold);
-    }
-    &.-link {
-      text-decoration: underline;
-    }
-    font-weight: bold;
-  }
-
   &.-shadowed {
     border-color: var(--tc-shadowed);
     color: var(--tc-shadowed);

@@ -21,9 +21,10 @@ export function gdRegisterPlayerBase(gd:GameDataBuilder) {
 				},
 				"Explore": {
 					async call(ctx:SceneContext) {
-						ctx.say("A monster attacks you!")
-
-						ctx.endAndBattle({enemies:[new TutorialImp()]})
+						await ctx.ambush({
+							monsters: [new TutorialImp()],
+							threatName: "a stray imp"
+						});
 					},
 					disabled: !ctx.player.isAlive
 				}

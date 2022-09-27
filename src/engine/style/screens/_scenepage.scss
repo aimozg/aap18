@@ -1,3 +1,9 @@
+@use "../utils/uibox";
+
+.scene-panel {
+  @include uibox.uibox;
+  flex-grow: 1;
+}
 .scene-page {
   margin: 1rem 0;
   &.-history {

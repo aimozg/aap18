@@ -1,3 +1,9 @@
+@use "../utils/uibox";
+
+.combat-panel {
+  flex-grow: 1;
+  @include uibox.uibox;
+}
 .game-layout.-combat .gl-center {
   flex-basis: 50%;
 }

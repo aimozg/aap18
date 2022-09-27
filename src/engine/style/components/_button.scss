@@ -8,6 +8,19 @@
   &.-link {
     text-align: left;
   }
+  &.-default {
+    border-color: var(--theme-ctrl-default);
+    &:not(.-link) {
+      color: var(--tc-bold);
+    }
+    &.-link {
+      text-decoration: underline;
+      .--hk {
+        text-decoration: none;
+      }
+    }
+    font-weight: bold;
+  }
 
   &:not(:disabled):hover {
     cursor: pointer;

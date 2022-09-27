@@ -58,6 +58,21 @@
   font-style: italic;
 }
 
+.help-block {
+  display: block;
+  font-style: italic;
+  padding: 0.5em;
+  border: 1px solid var(--theme-ctrl-fg);
+  background: var(--theme-ctrl-bg);
+  color: var(--tc-hl);
+}
+
+.choice-hint {
+  font-style: italic;
+  display: inline-block;
+  margin-left: 0.5em;
+}
+
 @each $align in left, right, center, justify {
   .text-#{$align} {
     text-align: $align;

@@ -5,6 +5,7 @@
 import {Creature} from "../objects/Creature";
 import {ChoiceData, SceneContext} from "./SceneContext";
 import {SceneFn} from "./Scene";
+import {substitutePattern} from "../utils/string";
 
 export interface EAmbushTags {
 	// Target types
@@ -39,28 +40,130 @@ export interface AmbushDef {
 	tags?: AmbushTag[];
 	/** Creatures to be ambushed */
 	monsters: Creature[];
+
+	// For default texts&events:
+
+	/** Threat name (ex. "a stray demon") to be used in auto-generated texts*/
+	threatName?: string;
+
+	// For custom texts/events:
+
 	/** Text to display (or scene to play) if ambush roll is failed.  */
-	fail: string|SceneFn;
+	fail?: string|SceneFn;
 	/** Text to display (or scene to play) if ambush roll is critically failed. */
-	critFail: string|SceneFn;
+	critFail?: string|SceneFn;
 	/** Text to display (or scene to play) if ambush roll is succeeded. */
-	success: string|SceneFn;
+	success?: string|SceneFn;
 	// TODO default SuccessOptions
 	/** Options given to player if ambush roll succeeds */
-	successOptions: ChoiceData[];
+	successOptions?: ChoiceData[];
 }
 
 export type AmbushResultType = 'success'|'fail'|'critFail';
 
 export namespace AmbushRules {
 
+	export function getAreaName(def:AmbushDef, ctx:SceneContext):string {
+		// TODO use def tags or ctx player location
+		return "wilderness"
+	}
+	export function getThreatName(def:AmbushDef, ctx:SceneContext):string {
+		if (def.threatName !== undefined) {
+			return def.threatName;
+		}
+		if (def.monsters.length === 0) {
+			// TODO ctx.error()
+			return "<p class='text-error'>ERROR Cannot generate Ambush-Success text for no monsters</p>"
+		}
+		if (def.monsters.length === 1) {
+			return def.monsters[0].name;
+		}
+		// TODO if monsters have same name, use "<N> <namePlural>" (5 imps)
+		// TODO use numberOfThings
+		return "" + def.monsters.length + " monsters";
+	}
+
+	export function defaultSuccessText(def: AmbushDef, ctx:SceneContext):string {
+		return substitutePattern(
+			"You notice {threat}, unaware of your presence.", {
+				area: getAreaName(def, ctx),
+				threat: getThreatName(def, ctx)
+			}
+		)
+	}
+	export function defaultFailText(def: AmbushDef, ctx:SceneContext):string {
+		return substitutePattern(
+			"You encunter {threat}. It's a fight!", {
+				area: getAreaName(def, ctx),
+				threat: getThreatName(def, ctx)
+			}
+		)
+	}
+	export function defaultCritFailText(def: AmbushDef, ctx:SceneContext):string {
+		return substitutePattern(
+			"Suddenly, a {threat} ambushes you!", {
+				area: getAreaName(def, ctx),
+				threat: getThreatName(def, ctx)
+			}
+		)
+	}
+	export function defaultSuccessOptions(def: AmbushDef, ctx:SceneContext):ChoiceData[] {
+		let cd: ChoiceData[] = [];
+		let threatName = getThreatName(def, ctx)
+		// TODO add talk option if present in def
+		/*
+		cd.push({
+			label: "Talk",
+			hint: substitutePattern("Greet {threat} and try to talk")
+			call: def.talkScene
+		});
+		 */
+		cd.push({
+			label: "Seduce",
+			tooltip: substitutePattern("Try to seduce {threat} with your body",{threat:threatName}),
+			disabled: { hint: "Not implemented yet "},
+			call: (ctx)=>defaultSuccessSeduce(def,ctx)
+		});
+		cd.push({
+			label: "Rape",
+			tooltip: substitutePattern("Skip the foreplay and fuck {threat}",{threat:threatName}),
+			disabled: { hint: "Not implemented yet "},
+			call: (ctx)=>defaultSuccessRape(def,ctx)
+		});
+		cd.push({
+			label: "Sneak Attack",
+			tooltip: "Start the combat in sneak mode",
+			call: (ctx)=>defaultSuccessSneakAttack(def,ctx)
+		});
+		cd.push({
+			label: "Leave",
+			tooltip: substitutePattern("Leave {threat} alone",{threat:threatName}),
+			call: (ctx)=>defaultSuccessLeave(def,ctx)
+		});
+		return cd;
+	}
+	export async function defaultSuccessSeduce(def: AmbushDef, ctx:SceneContext) {
+
+	}
+	export async function defaultSuccessRape(def: AmbushDef, ctx:SceneContext) {
+
+	}
+	export async function defaultSuccessSneakAttack(def: AmbushDef, ctx:SceneContext) {
+		// TODO add "sneak" condition
+		ctx.endNowAndBattle({enemies:def.monsters})
+	}
+	export async function defaultSuccessLeave(def: AmbushDef, ctx:SceneContext) {
+		ctx.endNow()
+	}
+
 	export function calcAmbushDc(def:AmbushDef) {
 		// TODO use monsters, tags, player skill
-		return 10;
+		return 15;
 	}
 
 	export async function doAmbushSuccess(def: AmbushDef, ctx: SceneContext) {
-		ctx.choicelist(...def.successOptions);
+		let successOptions = def.successOptions ?? defaultSuccessOptions(def, ctx);
+		ctx.choicelist(...successOptions);
 	}
 
 	export async function doAmbushFail(def: AmbushDef, ctx: SceneContext, critFail: boolean) {
@@ -83,15 +186,15 @@ export namespace AmbushRules {
 		if (diff >= 0) {
 			resultType = "success"
 			if (!def.silent) ctx.say(`<p class='text-roll-skill text-roll-success'>\\[${rollText}: Success\\]</p>`)
-			result = def.success;
+			result = def.success ?? defaultSuccessText(def, ctx);
 		} else if (diff > -10) {
 			resultType = "fail"
 			if (!def.silent) ctx.say(`<p class='text-roll-skill text-roll-fail'>\\[${rollText}: Failure\\]</p>`)
-			result = def.fail;
+			result = def.fail ?? defaultFailText(def, ctx);
 		} else {
 			resultType = "critFail"
 			if (!def.silent) ctx.say(`<p class='text-roll-skill text-roll-critfail'>\\[${rollText}: Critical Failure\\]</p>`)
-			result = def.fail;
+			result = def.fail ?? defaultCritFailText(def, ctx);
 		}
 
 		if (typeof result === "function") {

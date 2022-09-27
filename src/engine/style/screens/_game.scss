@@ -12,7 +12,6 @@ $duration: 0.5s;
     flex-grow: 1;
   }
   .gl-top {
-    @include uibox.uibox;
     min-height: 1.5rem;
   }
   .gl-midrow {
@@ -21,7 +20,6 @@ $duration: 0.5s;
     overflow: hidden auto;
   }
   .gl-left, .gl-right {
-    @include uibox.uibox;
     flex-grow: 0;
     flex-shrink: 0;
     box-sizing: border-box;
@@ -45,11 +43,11 @@ $duration: 0.5s;
     flex-grow: 1;
   }
   .gl-center {
-    @include uibox.uibox;
     flex-grow: 1;
+    display: flex;
+    flex-direction: column;
   }
   .gl-bottom {
-    @include uibox.uibox;
     min-height: 1.5rem;
     overflow-y: auto;
   }

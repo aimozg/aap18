@@ -38,7 +38,7 @@ export function parseXmlEntity(entity: string): string {
 /**
  * Replaces in {@param pattern} `"{part}"` with parts from {@param substitutions}
  */
-export function formatPatternNames(
+export function substitutePattern(
 	pattern: string,
 	substitutions: ((s: string) => string)
 		| Record<string, string | (() => string)>

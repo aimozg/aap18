@@ -4,7 +4,7 @@
 
 import {Character, CharacterBody} from "./Character";
 import fxrng from "../../math/fxrng";
-import {formatPatternNames} from "../../utils/string";
+import {substitutePattern} from "../../utils/string";
 import {BodyMaterialType} from "./BodyMaterial";
 
 export const DefaultBodyPartTexts = {
@@ -70,7 +70,7 @@ export abstract class BodyPartType<PART extends BodyPart<any>> {
 		return s
 	}
 	formatPattern(pattern: string, part: PART): string {
-		return formatPatternNames(pattern, s => this.textReplacer(s, part))
+		return substitutePattern(pattern, s => this.textReplacer(s, part))
 			.replace(/  +/g,' ')
 			.trim();
 	}

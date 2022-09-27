@@ -125,6 +125,29 @@ export namespace KeyCodes {
 	export const HOTKEY_PREFIX_SHIFT = "Shift+"
 	export const HOTKEY_PREFIX_ALT = "Alt+"
 
+	export let DefaultHotkeys = [
+		DIGIT1,
+		DIGIT2,
+		DIGIT3,
+		DIGIT4,
+		DIGIT5,
+		DIGIT6,
+		DIGIT7,
+		DIGIT8,
+		DIGIT9,
+		DIGIT0,
+		HOTKEY_PREFIX_SHIFT+DIGIT1,
+		HOTKEY_PREFIX_SHIFT+DIGIT2,
+		HOTKEY_PREFIX_SHIFT+DIGIT3,
+		HOTKEY_PREFIX_SHIFT+DIGIT4,
+		HOTKEY_PREFIX_SHIFT+DIGIT5,
+		HOTKEY_PREFIX_SHIFT+DIGIT6,
+		HOTKEY_PREFIX_SHIFT+DIGIT7,
+		HOTKEY_PREFIX_SHIFT+DIGIT8,
+		HOTKEY_PREFIX_SHIFT+DIGIT9,
+		HOTKEY_PREFIX_SHIFT+DIGIT0,
+	];
+
 	export function eventToHk(event:KeyboardEvent):Hotkey {
 		let key = event.code;
 		return {

@@ -49,46 +49,7 @@ let GenericScenes = buildScenes("/generic", {
 		ctx.ambush({
 			dc: 15,
 			tags: ['monster','outside','wilderness','humanoid'],
-			monsters: [monster],
-			fail: "You bump into a goblin!",
-			critFail: "You're ambushed by a goblin!",
-			success: "You spot a goblin. She doesn't notice you and you consider your options",
-			successOptions: [{
-				label: "Talk",
-				hint: "Attempt peaceful negotiations",
-				call: (ctx) => {
-
-				}
-			}, {
-				label: "Seduce",
-				hint: "Try to seduce the goblin with your body",
-				call: (ctx) => {
-					ctx.say("You flash the goblin.")
-					let result = ctx.seduceRoll({target: monster})
-					if (result.success) {
-
-					} else {
-
-					}
-				}
-			}, {
-				label: "Pounce",
-				hint: "Skip the foreplay and jump the goblin",
-				call: (ctx) => {
-
-				}
-			}, {
-				label: "Sneak Attack",
-				call: (ctx) => {
-
-				}
-			}, {
-				label: "Leave",
-				hint: "Just leave it alone",
-				call: (ctx) => {
-					ctx.endNow()
-				}
-			}]
+			monsters: [monster]
 		});
 
 	},
