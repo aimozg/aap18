@@ -75,6 +75,13 @@ export class GameController {
 	 * Depending on game mode & state, display current screen
 	 */
 	showGameScreen() {
+		if (this.queuedSGS) return;
+		this.queuedSGS = true;
+		setTimeout(()=>this.showGameScreen0());
+	}
+	private queuedSGS = false;
+	showGameScreen0() {
+		this.queuedSGS = false;
 		let context = this.state.flushGameContext();
 		logger.debug("showGameScreen {}",context)
 		let gameScreen = this.game.screenManager.gameScreen;
@@ -95,7 +102,7 @@ export class GameController {
 				// TODO rescue?
 				throw new Error("Player stuck in limbo")
 			}
-			context.place.display().then().then(()=>this.showGameScreen());
+			context.place.display().then(()=>this.showGameScreen());
 			return;
 		}
 		if (context instanceof BattleContext) {

@@ -1,11 +1,11 @@
 ### src/engine
 
-Engine internals and game rules.
+Engine internals and fundamental game rules.
 
 ### src/game
 
-Races, items, traits and other "game database"-like content.
+Races, body parts, items, classes, traits and other "game database"-like content.
 
 ### src/story
 
-Scenes, locations, NPCs.
+Scenes, locations, quests, NPCs.

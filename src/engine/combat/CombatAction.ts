@@ -14,11 +14,11 @@ export abstract class CombatAction<RESULT> {
 	}
 
 	abstract perform(cc: CombatController): Promise<RESULT>
-	protected abstract checkIsPossible(): boolean
-	private _isPossible: boolean|null = null
+	protected abstract disabledReason(): string;
+	private _disabledReason: string|null = null;
 	isPossible(): boolean {
-		this._isPossible ??= this.checkIsPossible()
-		return this._isPossible
+		this._disabledReason ??= this.disabledReason();
+		return !this._disabledReason;
 	}
 	abstract label: string
 	abstract tooltip: string

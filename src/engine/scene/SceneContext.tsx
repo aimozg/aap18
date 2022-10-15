@@ -289,8 +289,8 @@ export class SceneContext implements GameContext {
 		})
 	}
 
-	async battleAndContinue(options: BattleOptions): Promise<BattleContext> {
-		logger.info("battleAndContinue {}", options);
+	async startBattleAndContinue(options: BattleOptions): Promise<BattleContext> {
+		logger.info("startBattleAndContinue {}", options);
 		let ctx = this.gc.startBattle(options);
 		return ctx.promise
 	}

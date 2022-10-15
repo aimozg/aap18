@@ -1,9 +1,9 @@
-import {Creature} from "../../../engine/objects/Creature";
-import {CombatController} from "../../../engine/combat/CombatController";
-import {CombatAction} from "../../../engine/combat/CombatAction";
+import {Creature} from "../objects/Creature";
+import {CombatController} from "./CombatController";
+import {CombatAction} from "./CombatAction";
 import {h} from "preact";
 import {Fragment} from "preact/compat";
-import {CombatRoll} from "../../../engine/combat/CombatRoll";
+import {CombatRoll} from "./CombatRoll";
 
 export class MeleeAttackAction extends CombatAction<CombatRoll> {
 	constructor(
@@ -17,9 +17,9 @@ export class MeleeAttackAction extends CombatAction<CombatRoll> {
 	toString(): string {
 		return "[MeleeAttackAction " + this.actor.name + " " + this.target.name + (this.free ? " (free)" : "") + "]"
 	}
-	protected checkIsPossible(): boolean {
+	protected disabledReason(): string {
 		// TODO impossible if actor has condition, or target is invulnerable/dead
-		return true;
+		return "";
 	}
 	label = "Strike " + this.target.name
 	tooltip = "Strike " + this.target.name // TODO details

@@ -22,8 +22,9 @@ class FinishCombatAction extends CombatAction<void> {
 	constructor(public ctx:BattleContext) {
 		super(ctx.player);
 	}
-	protected checkIsPossible(): boolean {
-		return this.ctx.cc.ended;
+	protected disabledReason(): string {
+		if (!this.ctx.cc.ended) return "Combat not ended"
+		return "";
 	}
 	label: string = "Finish";
 	tooltip: string = "Finish battle";

@@ -3,7 +3,7 @@
  */
 import {CombatAction} from "../../engine/combat/CombatAction";
 import {CombatController} from "../../engine/combat/CombatController";
-import {MeleeAttackAction} from "./actions/MeleeAttackAction";
+import {MeleeAttackAction} from "../../engine/combat/MeleeAttackAction";
 import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
 import {Creature} from "../../engine/objects/Creature";
 import {Damage, DamageSpec, DamageSpecEntry} from "../../engine/rules/Damage";

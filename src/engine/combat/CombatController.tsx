@@ -139,7 +139,7 @@ export class CombatController {
 	}
 	async performAIAction(actor: Creature) {
 		logger.debug("performAIAction {}", actor.name)
-		let action = actor.ai.performAI(actor, this);
+		let action = actor.ai.performAI(this);
 		await this.performAction(action);
 		logger.debug("/performAIAction {}", actor.name)
 	}
@@ -266,6 +266,11 @@ export class CombatController {
 		logger.info("deduceAP {} {}",creature,value);
 		// TODO parallelize and detach animation from model
 		await this.animateValueChange(creature, "ap", creature.ap-value, AnimationTimeVeryFast)
+	}
+	async deduceEP(creature:Creature, value:number) {
+		logger.info("deduceEP {} {}",creature,value);
+		// TODO parallelize and detach animation from model
+		await this.animateValueChange(creature, "ep", creature.ep-value, AnimationTimeVeryFast)
 	}
 	async deduceHP(target: Creature, damage: number, source:Creature|null) {
 		logger.info("deduceHP {} {} {}",target,damage,source)

@@ -1,7 +1,6 @@
 /*
  * Created by aimozg on 10.07.2022.
  */
-import {IGameObject} from "../GameObject";
 import {TAttribute, TAttributes} from "../rules/TAttribute";
 import {defaultGender, SEX_NONE, TGender, TSex} from "../rules/gender";
 import {IPronouns, Pronouns} from "../../game/data/text/gender";
@@ -12,6 +11,7 @@ import {Game} from "../Game";
 import {Item} from "./Item";
 import {TraitType} from "../rules/TraitType";
 import {DefaultMonsterAI, MonsterAI} from "./MonsterAI";
+import {AbstractCombatAbility} from "../combat/AbstractCombatAbility";
 
 let objectIdCounter = 0;
 
@@ -31,9 +31,7 @@ export class CreatureTexts {
 	}
 }
 
-export class Creature implements IGameObject {
-	objectId: string = String(objectIdCounter++);
-	readonly objectType: string = "Creature";
+export class Creature {
 
 	//////////////////////
 	// Body Stats - Data
@@ -72,6 +70,7 @@ export class Creature implements IGameObject {
 		this.updateStats();
 		return this._hpMax;
 	}
+	get hpRatio():number { return this.hp/this.hpMax }
 	baseHpPerLevel: number = 10;
 
 	private _ep:number = 1;
@@ -235,7 +234,10 @@ export class Creature implements IGameObject {
 	/** Action Points */
 	ap = 0;
 
-	ai: MonsterAI = new DefaultMonsterAI();
+	ai: MonsterAI = new DefaultMonsterAI(this);
+
+	// TODO make these computable
+	abilities: AbstractCombatAbility[] = [];
 
 	//////////////////////
 	// Combat - Helpers //

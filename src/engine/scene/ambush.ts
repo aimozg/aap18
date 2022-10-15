@@ -61,6 +61,12 @@ export interface AmbushDef {
 
 export type AmbushResultType = 'success'|'fail'|'critFail';
 
+export interface AmbushResult {
+	type: AmbushResultType;
+	battle: boolean;
+	victory?: boolean;
+}
+
 export namespace AmbushRules {
 
 	export function getAreaName(def:AmbushDef, ctx:SceneContext):string {
@@ -143,10 +149,10 @@ export namespace AmbushRules {
 		return cd;
 	}
 	export async function defaultSuccessSeduce(def: AmbushDef, ctx:SceneContext) {
-
+		throw new Error("defaultSuccessSeduce not implemented")
 	}
 	export async function defaultSuccessRape(def: AmbushDef, ctx:SceneContext) {
-
+		throw new Error("defaultSuccessRape not implemented")
 	}
 	export async function defaultSuccessSneakAttack(def: AmbushDef, ctx:SceneContext) {
 		// TODO add "sneak" condition

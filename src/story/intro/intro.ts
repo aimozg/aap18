@@ -47,7 +47,7 @@ export function gdRegisterIntro(gd:GameDataBuilder) {
 
 			ctx.say("You cautiously approach the building. It appears to be three-story tower, destroyed many years ago. There is some noise inside. ");
 
-			ctx.say("<p class='help-block'>When you enter a room with monster(s), an Ambush skill check is rolled. If you succeed, you can choose an action against an unaware enemy. If you fail, you fight. If you fail by 10 or more, you're ambushed instead! </p>")
+			ctx.say("<p class='help-block'>When you enter a room with monster(s), an Ambush skill check is rolled. If you succeed, you can choose an action against an unaware enemy. If you fail, you fight. If you fail by 10 or more, you're the one ambushed! </p>")
 
 			let monster = new TutorialImp();
 			await ctx.ambush({

@@ -1,7 +1,7 @@
-import {CombatAction} from "../../../engine/combat/CombatAction";
-import {Creature} from "../../../engine/objects/Creature";
-import {CombatController} from "../../../engine/combat/CombatController";
-import {CombatRules} from "../CombatRules";
+import {CombatAction} from "./CombatAction";
+import {Creature} from "../objects/Creature";
+import {CombatController} from "./CombatController";
+import {CombatRules} from "../../game/combat/CombatRules";
 import {Fragment} from "preact/compat";
 import {h} from "preact";
 
@@ -21,9 +21,9 @@ export class TeaseAction extends CombatAction<TeaseResult> {
 	toString(): string {
 		return "[TeaseAction "+this.actor.name+" "+this.target.name+" "+(this.free?" (free)":"")+"]"
 	}
-	protected checkIsPossible(): boolean {
+	protected disabledReason(): string {
 		// TODO impossible if actor has condition, or target is invulnerable/dead
-		return true;
+		return "";
 	}
 	label = "Tease "+this.target.name
 	tooltip = "Attempt to seduce "+this.target.name+" with your body"

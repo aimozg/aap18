@@ -10,8 +10,8 @@ export class SkipCombatAction extends CombatAction<void> {
 	constructor(actor: Creature) {
 		super(actor);
 	}
-	protected checkIsPossible(): boolean {
-		return true;
+	protected disabledReason(): string {
+		return "";
 	}
 	label = "Skip";
 	tooltip = "Skip your turn"
