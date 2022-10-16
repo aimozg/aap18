@@ -49,8 +49,9 @@ export let AnimationTimeVeryFast = 125;
 export class CombatController {
 	constructor(
 		public readonly ctx: BattleContext,
-
-	) {}
+	) {
+		CombatRules.postSetup();
+	}
 
 	public readonly party: Creature[] = this.ctx.options.party
 	public readonly enemies: Creature[] = this.ctx.options.enemies

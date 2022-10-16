@@ -47,7 +47,7 @@ export namespace CombatRules {
 	export let MeleeDefaultCalcDc: CombatRollProcessor = {
 		priority: MELEE_PRIO_CALC_DC,
 		async process(cc:CombatController, roll: CombatRoll) {
-			roll.bonus = meleeDefenseVs(roll.target, roll.actor)
+			roll.dc = meleeDefenseVs(roll.target, roll.actor)
 		}
 	};
 	export let MeleeDefaultCalcDamage: CombatRollProcessor = {
@@ -67,13 +67,9 @@ export namespace CombatRules {
 	export let MeleeDefaultRoll: CombatRollProcessor = {
 		priority: MELEE_PRIO_ROLL,
 		async process(cc:CombatController, roll: CombatRoll) {
-			roll.roll = cc.rng.d20();
-		}
-	}
-	export let MeleeDefaultHitCallback: CombatRollProcessor = {
-		priority: MELEE_PRIO_HIT,
-		async process(cc:CombatController, roll: CombatRoll): Promise<void> {
-			return roll.onHit?.(roll, cc)
+			if (roll.roll === 0) {
+				roll.roll = cc.rng.d20();
+			}
 		}
 	}
 	export let MeleeDefaultHitCheck: CombatRollProcessor = {
@@ -82,12 +78,18 @@ export namespace CombatRules {
 			if (roll.roll === 1 && roll.canCritMiss) {
 				roll.hit = false;
 				roll.critMiss = true;
-			} else if (roll.roll === 20 && roll.canCritMiss) {
+			} else if (roll.roll === 20 && roll.canCritHit) {
 				roll.hit = true;
 				roll.critHit = true;
 			} else {
 				roll.hit = roll.roll + roll.bonus >= roll.dc;
 			}
+		}
+	}
+	export let MeleeDefaultHitCallback: CombatRollProcessor = {
+		priority: MELEE_PRIO_HIT,
+		async process(cc:CombatController, roll: CombatRoll): Promise<void> {
+			return roll.onHit?.(roll, cc)
 		}
 	}
 	export let MeleeDefaultRollDamage: CombatRollProcessor = {
@@ -154,16 +156,19 @@ export namespace CombatRules {
 		return meleeAttack(attacker)
 	}
 
-	/**
-	 * Melee defense rating
-	 */
-	export function meleeDefense(creature:Creature):number {
+	export function defense(creature:Creature):number {
 		let value = 5
 		value += creature.dexMod
 		value += creature.bodyArmor?.asArmor?.defenseBonus ?? 0
 		// TODO armor
 		// TODO enchantments
 		return value
+	}
+	/**
+	 * Melee defense rating
+	 */
+	export function meleeDefense(creature:Creature):number {
+		return defense(creature)
 	}
 	export function meleeDefenseVs(creature:Creature, attacker:Creature):number {
 		// TODO target-dependent effects

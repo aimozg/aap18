@@ -6,8 +6,17 @@ import {Creature} from "../objects/Creature";
 import {Damage, DamageSpec} from "../rules/Damage";
 import {CombatController} from "./CombatController";
 import {LogManager} from "../logging/LogManager";
+import {UseAbilityAction} from "./UseAbilityAction";
 
 export class CombatRoll {
+	constructor(
+		public actor: Creature,
+		// TODO target area or group
+		public target: Creature
+	) {}
+
+	ability: UseAbilityAction|null = null;
+
 	/**
 	 * This action costs AP
 	 */
@@ -66,12 +75,6 @@ export class CombatRoll {
 	dc: number = 0;
 
 	onHit: ((roll:CombatRoll, cc:CombatController)=>Promise<void>)|null = null;
-
-	constructor(
-		public actor: Creature,
-		// TODO target area or group
-		public target: Creature
-	) {}
 
 	toString():string {
 		let s = "CombatRoll["
