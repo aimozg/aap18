@@ -11,6 +11,8 @@ import {Game} from "../../engine/Game";
 import {SkipCombatAction} from "../../engine/combat/actions/SkipCombatAction";
 import {Dice, Dices} from "../../engine/math/Dice";
 import {CombatRoll, CombatRollProcessor} from "../../engine/combat/CombatRoll";
+import {Direction} from "../../engine/utils/gridutils";
+import {StepAction} from "../../engine/combat/actions/StepAction";
 
 export namespace CombatRules {
 
@@ -125,6 +127,9 @@ export namespace CombatRules {
 		actions.push(new SkipCombatAction(player));
 		// TODO targets
 		actions.push(new MeleeAttackAction(player, cc.enemies[0]))
+		for (let dir of Direction.Steps) {
+			actions.push(new StepAction(player, dir.add(player.gobj!!)))
+		}
 		// TODO tease
 		// TODO abilities
 		return actions;

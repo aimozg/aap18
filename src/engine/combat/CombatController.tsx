@@ -57,7 +57,7 @@ export class CombatController {
 			let pos = this.grid.randomEmptyCell(this.rng);
 			if (!pos) throw new Error(`Nowhere to place ${creature.name}!`)
 
-			let goCreature = new GOCreature(pos[0], pos[1], creature);
+			let goCreature = new GOCreature(pos.x, pos.y, creature);
 			creature.gobj = goCreature;
 			this.grid.addObject(goCreature)
 		}

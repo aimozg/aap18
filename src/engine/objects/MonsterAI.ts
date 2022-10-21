@@ -10,6 +10,8 @@ import {TeaseAction} from "../combat/actions/TeaseAction";
 import {SkipCombatAction} from "../combat/actions/SkipCombatAction";
 import {UseAbilityAction} from "../combat/actions/UseAbilityAction";
 import {AbilityTargetType} from "../combat/AbstractCombatAbility";
+import {StepAction} from "../combat/actions/StepAction";
+import {Direction} from "../utils/gridutils";
 
 export abstract class MonsterAI {
 	constructor(readonly actor:Creature) {}
@@ -36,7 +38,12 @@ export class DefaultMonsterAI extends MonsterAI {
 		let options:CombatAction<any>[] = [];
 
 		if (target) {
-			options.push(new MeleeAttackAction(actor, target));
+			if (cc.adjacent(actor, target)) {
+				options.push(new MeleeAttackAction(actor, target));
+			} else {
+				let dir = Direction.to(actor.gobj!!, target.gobj!!);
+				options.push(new StepAction(actor, dir.add(actor.gobj!!)));
+			}
 			options.push(new TeaseAction(actor, target));
 		}
 

@@ -28,7 +28,7 @@ export class BattlePanel extends DomComponent {
 				<div className="combat-main d-flex flex-grow-1 jc-stretch">
 					<canvas className="flex-grow-1" ref={refMain}/>
 				</div>
-				<div className="combat-actions d-flex gap-1" ref={refActions}>
+				<div className="combat-actions d-flex flex-wrap gap-1" ref={refActions}>
 				</div>
 			</div>
 		);
