@@ -15,7 +15,7 @@ export abstract class MonsterAI {
 	constructor(readonly actor:Creature) {}
 	abstract choices(cc:CombatController): CombatAction<any>[];
 	filterChoices(cc:CombatController, choices:CombatAction<any>[]):CombatAction<any>[] {
-		return choices.filter(c => c.isPossible());
+		return choices.filter(c => c.isPossible(cc));
 	}
 	selectAction(cc:CombatController, choices:CombatAction<any>[]):CombatAction<any> {
 		if (choices.length === 0) return new SkipCombatAction(this.actor);

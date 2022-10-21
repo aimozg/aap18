@@ -10,7 +10,7 @@ export class SkipCombatAction extends CombatAction<void> {
 	constructor(actor: Creature) {
 		super(actor);
 	}
-	protected disabledReason(): string {
+	protected disabledReason(cc: CombatController): string {
 		return "";
 	}
 	label = "Skip";

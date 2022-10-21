@@ -22,10 +22,10 @@ export class GlyphCanvas {
 	constructor(private readonly c2d: CanvasRenderingContext2D,
 	            public sizing:GlyphCanvasSizing) {}
 	// TODO move to config
-	font = "20px monospace"
+	font = "36px monospace"
 	// Cell size in pixel
-	cellWidth = 20
-	cellHeight = 20
+	cellWidth = 36
+	cellHeight = 36
 	// Text offset
 	x0 = 4
 	y0 = -4

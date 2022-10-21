@@ -21,7 +21,7 @@ export class TeaseAction extends CombatAction<TeaseResult> {
 	toString(): string {
 		return "[TeaseAction "+this.actor.name+" "+this.target.name+" "+(this.free?" (free)":"")+"]"
 	}
-	protected disabledReason(): string {
+	protected disabledReason(cc: CombatController): string {
 		// TODO impossible if actor has condition, or target is invulnerable/dead
 		return "";
 	}

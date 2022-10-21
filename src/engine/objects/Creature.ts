@@ -12,6 +12,7 @@ import {Item} from "./Item";
 import {TraitType} from "../rules/TraitType";
 import {DefaultMonsterAI, MonsterAI} from "./MonsterAI";
 import {AbstractCombatAbility} from "../combat/AbstractCombatAbility";
+import {GOCreature} from "../combat/BattleGrid";
 
 let objectIdCounter = 0;
 
@@ -233,7 +234,7 @@ export class Creature {
 	///////////////////
 	/** Action Points */
 	ap = 0;
-
+	gobj: GOCreature|null = null;
 	ai: MonsterAI = new DefaultMonsterAI(this);
 
 	// TODO make these computable

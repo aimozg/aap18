@@ -26,7 +26,7 @@ export class UseAbilityAction extends CombatAction<void>{
 		this.energyCost = ability.energyCost(this);
 		this.apCost = ability.apCost(this);
 	}
-	protected disabledReason(): string {
+	protected disabledReason(cc: CombatController): string {
 		return this.ability.disabledReason(this);
 	}
 	readonly label: string;

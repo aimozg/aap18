@@ -9,6 +9,7 @@ import {GlyphData, GlyphSource} from "../ui/components/GlyphCanvas";
 import {PlayerCharacter} from "../objects/creature/PlayerCharacter";
 import {Random} from "../math/Random";
 
+export type GridPos = {x:number,y:number}
 export abstract class GridObject {
 	protected constructor(public x:number, public y:number) {
 		this.glyph = {ch:'?',fg:tinycolor("#ff00ff")};
@@ -17,7 +18,9 @@ export abstract class GridObject {
 	public update():void{}
 	public grid:BattleGrid|null = null;
 	public glyph:GlyphData;
+	public get pos():GridPos { return {x:this.x, y:this.y} }
 }
+
 export class GOCreature extends GridObject{
 	constructor(x: number, y: number, public readonly creature: Creature) {
 		super(x, y);
@@ -34,7 +37,6 @@ export class GOCreature extends GridObject{
 		}
 	}
 }
-
 export interface TileType extends GlyphData {
 	id:string;
 	name:string;
@@ -44,6 +46,7 @@ export interface TileType extends GlyphData {
 	walkable:boolean;
 	solid:boolean;
 }
+
 export namespace TileType {
 	export const FLOOR:TileType = {
 		id: ".",
@@ -54,7 +57,6 @@ export namespace TileType {
 		solid: false
 	}
 }
-
 export interface GridCellData {
 	visible: boolean;
 	tile: TileType;
@@ -170,5 +172,17 @@ export class BattleGrid implements GlyphSource {
 		object.x = newX;
 		object.y = newY;
 		this.addObject(object);
+	}
+
+	distance(go1: GridObject|GridCell|GridPos, go2: GridObject|GridCell|GridPos): number {
+		let gp1:GridPos = (go1 instanceof GridObject) ? go1.pos : go1;
+		let gp2:GridPos = (go2 instanceof GridObject) ? go2.pos : go2;
+		let dx = Math.abs(gp1.x - gp2.x);
+		let dy = Math.abs(gp2.y - gp2.y);
+		return Math.max(dx,dy) + Math.min(dx,dy)/2; // "Angband metric"
+	}
+	adjacent(go1: GridObject|GridCell|GridPos, go2: GridObject|GridCell|GridPos, allowDiagonal:boolean=true) {
+		let d = this.distance(go1, go2);
+		return d < (allowDiagonal ? 1.5 : 1.0);
 	}
 }

@@ -14,10 +14,10 @@ export abstract class CombatAction<RESULT> {
 	}
 
 	abstract perform(cc: CombatController): Promise<RESULT>
-	protected abstract disabledReason(): string;
+	protected abstract disabledReason(cc: CombatController): string;
 	private _disabledReason: string|null = null;
-	isPossible(): boolean {
-		this._disabledReason ??= this.disabledReason();
+	isPossible(cc: CombatController): boolean {
+		this._disabledReason ??= this.disabledReason(cc);
 		return !this._disabledReason;
 	}
 	abstract label: string

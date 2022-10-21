@@ -49,7 +49,7 @@ export class BattlePanel extends DomComponent {
 	update(actions: CombatAction<any>[]) {
 		this.buttons = actions.map((action,index)=>({
 			label: action.label,
-			disabled: !action.isPossible(),
+			disabled: !action.isPossible(this.context.cc),
 			hotkey: this.hotkey(action,index),
 			callback: ()=>this.context.execAction(action)
 		}));

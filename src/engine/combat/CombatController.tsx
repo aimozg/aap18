@@ -54,9 +54,12 @@ export class CombatController {
 		CombatRules.postSetup();
 		this.grid = new BattleGrid(ctx.options.width, ctx.options.height);
 		for (let creature of [...this.party, ...this.enemies]) {
-			let newPos = this.grid.randomEmptyCell(this.rng);
-			if (!newPos) throw new Error(`Nowhere to place ${creature.name}!`)
-			this.grid.addObject(new GOCreature(0, 0, creature), newPos)
+			let pos = this.grid.randomEmptyCell(this.rng);
+			if (!pos) throw new Error(`Nowhere to place ${creature.name}!`)
+
+			let goCreature = new GOCreature(pos[0], pos[1], creature);
+			creature.gobj = goCreature;
+			this.grid.addObject(goCreature)
 		}
 		// TODO for tiles and layout, use options-provided static map or generated
 	}
@@ -220,6 +223,14 @@ export class CombatController {
 		logger.debug("cleanupAfterCombat {}", c);
 		// TODO clean combat buffs
 		c.ap = 0;
+		c.gobj = null;
+	}
+
+	adjacent(c1: Creature, c2:Creature) {
+		let go1 = c1.gobj;
+		let go2 = c2.gobj;
+		if (!go1 || !go2) return false;
+		return this.grid.adjacent(go1, go2);
 	}
 
 	////////////////////

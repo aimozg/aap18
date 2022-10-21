@@ -23,7 +23,7 @@ class FinishCombatAction extends CombatAction<void> {
 	constructor(public ctx:BattleContext) {
 		super(ctx.player);
 	}
-	protected disabledReason(): string {
+	protected disabledReason(cc: CombatController): string {
 		if (!this.ctx.cc.ended) return "Combat not ended"
 		return "";
 	}

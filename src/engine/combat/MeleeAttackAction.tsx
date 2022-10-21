@@ -17,8 +17,9 @@ export class MeleeAttackAction extends CombatAction<CombatRoll> {
 	toString(): string {
 		return "[MeleeAttackAction " + this.actor.name + " " + this.target.name + (this.free ? " (free)" : "") + "]"
 	}
-	protected disabledReason(): string {
+	protected disabledReason(cc: CombatController): string {
 		// TODO impossible if actor has condition, or target is invulnerable/dead
+		if (!cc.adjacent(this.actor, this.target)) return "Too far";
 		return "";
 	}
 	label = "Strike " + this.target.name
