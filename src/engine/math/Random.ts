@@ -137,6 +137,7 @@ export abstract class Random {
 	d2(rolls: number = 1): number { return this.dice(rolls, 2); }
 	d3(rolls: number = 1): number { return this.dice(rolls, 3); }
 	d4(rolls: number = 1): number { return this.dice(rolls, 4); }
+	d5(rolls: number = 1): number { return this.dice(rolls, 5); }
 	d6(rolls: number = 1): number { return this.dice(rolls, 6); }
 	d8(rolls: number = 1): number { return this.dice(rolls, 8); }
 	d10(rolls: number = 1): number { return this.dice(rolls, 10); }
