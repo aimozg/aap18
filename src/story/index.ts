@@ -1,7 +1,7 @@
 /*
  * Created by aimozg on 17.07.2022.
  */
-import {GameDataBuilder} from "../game/gdtypes";
+import {GameDataBuilder} from "../game/GameDataBuilder";
 import {gdRegisterIntro} from "./intro/intro";
 import {gdRegisterPlayerBase} from "./base/base";
 

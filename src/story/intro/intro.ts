@@ -3,7 +3,7 @@
  */
 
 import {SceneContext} from "../../engine/scene/SceneContext";
-import {GameDataBuilder} from "../../game/gdtypes";
+import {GameDataBuilder} from "../../game/GameDataBuilder";
 import {MeleeWeaponLib} from "../../game/data/items/MeleeWeaponLib";
 import {ArmorLib} from "../../game/data/items/ArmorLib";
 import {TutorialImp} from "../monsters/TutorialImp";

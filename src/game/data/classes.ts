@@ -2,7 +2,7 @@
  * Created by aimozg on 04.07.2022.
  */
 import {ClassWarrior} from "./classes/ClassWarrior";
-import {GameDataBuilder} from "../gdtypes";
+import {GameDataBuilder} from "../GameDataBuilder";
 
 export function gdRegisterClasses(gd:GameDataBuilder) {
 	gd.logger.debug("gdRegisterClasses");

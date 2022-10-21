@@ -1,7 +1,7 @@
 /*
  * Created by aimozg on 03.07.2022.
  */
-import {ImportedGameData} from "../../game/gdtypes";
+import {ImportedGameData} from "../../game/GameDataBuilder";
 import {Game} from "../Game";
 
 /**

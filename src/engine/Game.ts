@@ -8,7 +8,7 @@ import {ResourceManager} from "./res/ResourceManager";
 import {MainMenuScreen} from "./ui/screens/MainMenuScreen";
 import {GameController} from "./GameController";
 import {VNode} from "preact";
-import {ImportedGameData} from "../game/gdtypes";
+import {ImportedGameData} from "../game/GameDataBuilder";
 import {LogLevel} from "./logging/Logger";
 import {LogManager} from "./logging/LogManager";
 import {Random} from "./math/Random";

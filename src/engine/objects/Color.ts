@@ -3,6 +3,8 @@
  */
 import * as tinycolor from "tinycolor2";
 
+export type RGBColor = tinycolor.Instance;
+
 export class Color {
 	constructor(
 		public readonly name: string,

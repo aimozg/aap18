@@ -1,7 +1,7 @@
 /*
  * Created by aimozg on 05.07.2022.
  */
-import {GameDataBuilder, GDColor} from "../gdtypes";
+import {GameDataBuilder, GDColor} from "../GameDataBuilder";
 
 export function gdRegisterColors(gd:GameDataBuilder) {
 	gd.logger.debug("gdRegisterColors");

@@ -2,7 +2,7 @@
  * Created by aimozg on 13.07.2022.
  */
 import {RacialGroup} from "../../engine/rules/RacialGroup";
-import {GameDataBuilder} from "../gdtypes";
+import {GameDataBuilder} from "../GameDataBuilder";
 
 export const RGID_ABOMINATION = 'abomination';
 export const RGID_ANGEL = 'angel';

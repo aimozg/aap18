@@ -27,6 +27,7 @@ export interface ImportedGameData {
 	racialGroups: RacialGroup[];
 	rgHumanoid: RacialGroup;
 	scenes: Scene[][];
+	tiles: GDTileType[];
 	traits: TraitType[];
 }
 
@@ -47,6 +48,16 @@ export interface GDColor {
 	palette?: string;
 }
 
+export interface GDTileType {
+	id:string;
+	name:string;
+	ch?:string;
+	fg?:string;
+	bg?:string;
+	walkable?:boolean;
+	solid?:boolean;
+}
+
 export class GameDataBuilder {
 	readonly logger = LogManager.loggerFor("GameDataBuilder")
 	readonly data: ImportedGameData
@@ -62,28 +73,11 @@ export class GameDataBuilder {
 			racialGroups: [],
 			rgHumanoid: RacialGroup.INVALID,
 			scenes: [],
+			tiles: [],
 			traits: [],
 		}
 	}
 
-	addClasses(...classes: CharacterClass[]): void {
-		this.data.classes.push(...classes);
-	}
-	addColors(colors:GDColor[]):void {
-		this.data.colors.push(...colors);
-	}
-	addPlaces(...places: Place[]): void {
-		this.data.places.push(...places);
-	}
-	addPlayerOrigins(...origins: GDPlayerOrigin[]): void {
-		this.data.playerOrigins.push(...origins);
-	}
-	addRacialGroups(...groups: RacialGroup[]): void {
-		this.data.racialGroups.push(...groups);
-	}
-	addScenes(scenes: Scene[]): void {
-		this.data.scenes.push(scenes);
-	}
 	// this magic translates to:
 	// propname is key of CharacterBody
 	// and ref is body part reference to body part that's also CharacterBody[propname]
@@ -157,6 +151,27 @@ export class GameDataBuilder {
 				return this.materials[index].colorName
 			}
 		});
+	}
+	addClasses(...classes: CharacterClass[]): void {
+		this.data.classes.push(...classes);
+	}
+	addColors(colors:GDColor[]):void {
+		this.data.colors.push(...colors);
+	}
+	addPlaces(...places: Place[]): void {
+		this.data.places.push(...places);
+	}
+	addPlayerOrigins(...origins: GDPlayerOrigin[]): void {
+		this.data.playerOrigins.push(...origins);
+	}
+	addRacialGroups(...groups: RacialGroup[]): void {
+		this.data.racialGroups.push(...groups);
+	}
+	addScenes(scenes: Scene[]): void {
+		this.data.scenes.push(scenes);
+	}
+	addTiles(tiles:GDTileType[]):void {
+		this.data.tiles.push(...tiles);
 	}
 	addTrait(trait:TraitType):void {
 		this.data.traits.push(trait);

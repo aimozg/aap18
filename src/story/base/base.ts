@@ -1,7 +1,7 @@
 /*
  * Created by aimozg on 18.07.2022.
  */
-import {GameDataBuilder} from "../../game/gdtypes";
+import {GameDataBuilder} from "../../game/GameDataBuilder";
 import {SceneContext} from "../../engine/scene/SceneContext";
 import {TutorialImp} from "../monsters/TutorialImp";
 

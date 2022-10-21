@@ -2,7 +2,7 @@
  * Created by aimozg on 22.07.2022.
  */
 
-import {GameDataBuilder} from "../gdtypes";
+import {GameDataBuilder} from "../GameDataBuilder";
 import {EarPart, EarsRef} from "./body/Ears";
 import {EyePart, EyesRef} from "./body/Eyes";
 import {TailPart, TailRef} from "./body/Tail";

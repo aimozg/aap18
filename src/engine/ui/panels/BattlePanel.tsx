@@ -7,6 +7,7 @@ import {BattleContext} from "../../combat/BattleContext";
 import {Button} from "../components/Button";
 import {CombatAction} from "../../combat/CombatAction";
 import {KeyCodes} from "../KeyCodes";
+import {GlyphCanvas} from "../components/GlyphCanvas";
 
 export interface BattleActionButton {
 	disabled?: boolean;
@@ -18,18 +19,26 @@ export interface BattleActionButton {
 export class BattlePanel extends DomComponent {
 	private readonly refMain
 	private readonly refActions
+	private canvas:GlyphCanvas
 	constructor(public context: BattleContext) {
-		let refMain = createRef<HTMLDivElement>()
+		let refMain = createRef<HTMLCanvasElement>()
 		let refActions = createRef<HTMLDivElement>()
 		super(
 			<div className="combat-panel d-flex flex-column">
-				<div className="combat-main flex-grow-1" ref={refMain}></div>
+				<div className="combat-main d-flex flex-grow-1 jc-stretch">
+					<canvas className="flex-grow-1" ref={refMain}/>
+				</div>
 				<div className="combat-actions d-flex gap-1" ref={refActions}>
 				</div>
 			</div>
 		);
 		this.refMain = refMain;
 		this.refActions = refActions;
+		this.canvas = new GlyphCanvas(refMain.current!!.getContext("2d")!!, "fit")
+	}
+	init() {
+		this.canvas.windowWidth = this.context.grid.width;
+		this.canvas.windowHeight = this.context.grid.height;
 	}
 
 	private hotkey(action:CombatAction<any>, index:number):string|undefined {
@@ -44,6 +53,7 @@ export class BattlePanel extends DomComponent {
 			hotkey: this.hotkey(action,index),
 			callback: ()=>this.context.execAction(action)
 		}));
+		this.canvas.render(this.context.grid);
 		render(this.buttons.map(btn =>
 			<Button label={btn.label}
 			        hotkey={btn.hotkey}

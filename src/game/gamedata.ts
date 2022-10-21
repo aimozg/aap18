@@ -2,7 +2,7 @@
  * Created by aimozg on 04.07.2022.
  */
 
-import {GameDataBuilder, ImportedGameData} from "./gdtypes";
+import {GameDataBuilder, ImportedGameData} from "./GameDataBuilder";
 import {gdRegisterClasses} from "./data/classes";
 import {gdRegisterOrigins} from "./data/origins";
 import {gdRegisterRacialGroups} from "./data/racialGroups";
@@ -10,6 +10,7 @@ import {gdRegisterStory} from "../story";
 import {gdRegisterBodyParts} from "./data/bodyParts";
 import {gdRegisterColors} from "./data/colors";
 import {gdRegisterTraits} from "./data/traits";
+import {gdRegisterTiles} from "./data/tiles";
 
 export async function loadGameData():Promise<ImportedGameData> {
 	let startingSceneId = '/000_intro';
@@ -24,6 +25,7 @@ export async function loadGameData():Promise<ImportedGameData> {
 	gdRegisterOrigins(gd);
 	gdRegisterRacialGroups(gd);
 	gdRegisterStory(gd);
+	gdRegisterTiles(gd);
 	gdRegisterTraits(gd);
 
 	return gd.data;

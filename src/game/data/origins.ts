@@ -1,7 +1,7 @@
 /*
  * Created by aimozg on 04.07.2022.
  */
-import {GameDataBuilder} from "../gdtypes";
+import {GameDataBuilder} from "../GameDataBuilder";
 
 export function gdRegisterOrigins(gd: GameDataBuilder) {
 	gd.logger.debug("gdRegisterOrigins");

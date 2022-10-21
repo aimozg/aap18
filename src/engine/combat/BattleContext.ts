@@ -15,6 +15,7 @@ import {Game} from "../Game";
 import {CombatAction} from "./CombatAction";
 import {PlayerCharacter} from "../objects/creature/PlayerCharacter";
 import {CombatRules} from "../../game/combat/CombatRules";
+import {BattleGrid} from "./BattleGrid";
 
 export let MillisPerRound = 1000;
 
@@ -37,11 +38,17 @@ export interface BattleOptions {
 	player?: PlayerCharacter;
 	party?: Creature[];
 	enemies: Creature[];
+
+	width?: number;
+	height?: number;
 }
 export interface BattleSettings {
 	player: PlayerCharacter;
 	party: Creature[];
 	enemies: Creature[];
+
+	width: number;
+	height: number;
 }
 
 export class BattleContext implements GameContext {
@@ -49,8 +56,10 @@ export class BattleContext implements GameContext {
 		public options: BattleSettings
 	) {
 		this.cc = new CombatController(this)
+		this.battlePanel.init();
 	}
 
+	public get grid(): BattleGrid { return this.cc.grid };
 	public player: PlayerCharacter = this.options.player;
 	playerCanAct = false
 	readonly cc: CombatController

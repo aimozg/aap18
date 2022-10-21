@@ -130,7 +130,10 @@ export class GameController {
 		let settings: BattleSettings = {
 			player: options.player ?? this.player,
 			party: options.party ?? [options.player ?? this.player],
-			enemies: options.enemies
+			enemies: options.enemies,
+
+			width: options.width ?? 8,
+			height: options.height ?? 8,
 		}
 		let ctx = new BattleContext(settings);
 		this.state.pushGameContext(ctx);

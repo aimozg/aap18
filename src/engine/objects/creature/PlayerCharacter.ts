@@ -3,7 +3,7 @@
  */
 import {Character} from "./Character";
 import {MaxLevel, XpPerLevel} from "../../../game/xp";
-import {GDPlayerOrigin} from "../../../game/gdtypes";
+import {GDPlayerOrigin} from "../../../game/GameDataBuilder";
 import {Game} from "../../Game";
 import {Place} from "../../scene/Place";
 
