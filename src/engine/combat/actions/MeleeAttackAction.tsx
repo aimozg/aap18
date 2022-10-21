@@ -1,9 +1,9 @@
-import {Creature} from "../objects/Creature";
-import {CombatController} from "./CombatController";
-import {CombatAction} from "./CombatAction";
+import {Creature} from "../../objects/Creature";
+import {CombatController} from "../CombatController";
+import {CombatAction} from "../CombatAction";
 import {h} from "preact";
 import {Fragment} from "preact/compat";
-import {CombatRoll} from "./CombatRoll";
+import {CombatRoll} from "../CombatRoll";
 
 export class MeleeAttackAction extends CombatAction<CombatRoll> {
 	constructor(

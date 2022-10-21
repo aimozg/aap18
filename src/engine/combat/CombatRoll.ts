@@ -6,7 +6,7 @@ import {Creature} from "../objects/Creature";
 import {Damage, DamageSpec} from "../rules/Damage";
 import {CombatController} from "./CombatController";
 import {LogManager} from "../logging/LogManager";
-import {UseAbilityAction} from "./UseAbilityAction";
+import {UseAbilityAction} from "./actions/UseAbilityAction";
 
 export class CombatRoll {
 	constructor(

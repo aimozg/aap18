@@ -2,10 +2,10 @@
  * Created by aimozg on 13.10.2022.
  */
 
-import {CombatAction} from "./CombatAction";
-import {Creature} from "../objects/Creature";
-import {AbilityTargetType, AbstractCombatAbility} from "./AbstractCombatAbility";
-import {CombatController} from "./CombatController";
+import {CombatAction} from "../CombatAction";
+import {Creature} from "../../objects/Creature";
+import {AbilityTargetType, AbstractCombatAbility} from "../AbstractCombatAbility";
+import {CombatController} from "../CombatController";
 
 export class UseAbilityAction extends CombatAction<void>{
 

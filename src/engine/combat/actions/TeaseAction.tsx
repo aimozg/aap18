@@ -1,7 +1,7 @@
-import {CombatAction} from "./CombatAction";
-import {Creature} from "../objects/Creature";
-import {CombatController} from "./CombatController";
-import {CombatRules} from "../../game/combat/CombatRules";
+import {CombatAction} from "../CombatAction";
+import {Creature} from "../../objects/Creature";
+import {CombatController} from "../CombatController";
+import {CombatRules} from "../../../game/combat/CombatRules";
 import {Fragment} from "preact/compat";
 import {h} from "preact";
 

@@ -2,7 +2,7 @@
  * Created by aimozg on 13.10.2022.
  */
 
-import {AbilityTarget, UseAbilityAction} from "./UseAbilityAction";
+import {AbilityTarget, UseAbilityAction} from "./actions/UseAbilityAction";
 import {CombatController} from "./CombatController";
 
 export abstract class AbstractCombatAbility {

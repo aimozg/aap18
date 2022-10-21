@@ -3,12 +3,12 @@
  */
 import {CombatAction} from "../../engine/combat/CombatAction";
 import {CombatController} from "../../engine/combat/CombatController";
-import {MeleeAttackAction} from "../../engine/combat/MeleeAttackAction";
+import {MeleeAttackAction} from "../../engine/combat/actions/MeleeAttackAction";
 import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
 import {Creature} from "../../engine/objects/Creature";
 import {Damage, DamageSpec, DamageSpecEntry} from "../../engine/rules/Damage";
 import {Game} from "../../engine/Game";
-import {SkipCombatAction} from "../../engine/combat/SkipCombatAction";
+import {SkipCombatAction} from "../../engine/combat/actions/SkipCombatAction";
 import {Dice, Dices} from "../../engine/math/Dice";
 import {CombatRoll, CombatRollProcessor} from "../../engine/combat/CombatRoll";
 

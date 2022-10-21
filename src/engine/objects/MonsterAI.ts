@@ -5,10 +5,10 @@
 import {CombatController} from "../combat/CombatController";
 import {Creature} from "./Creature";
 import {CombatAction} from "../combat/CombatAction";
-import {MeleeAttackAction} from "../combat/MeleeAttackAction";
-import {TeaseAction} from "../combat/TeaseAction";
-import {SkipCombatAction} from "../combat/SkipCombatAction";
-import {UseAbilityAction} from "../combat/UseAbilityAction";
+import {MeleeAttackAction} from "../combat/actions/MeleeAttackAction";
+import {TeaseAction} from "../combat/actions/TeaseAction";
+import {SkipCombatAction} from "../combat/actions/SkipCombatAction";
+import {UseAbilityAction} from "../combat/actions/UseAbilityAction";
 import {AbilityTargetType} from "../combat/AbstractCombatAbility";
 
 export abstract class MonsterAI {

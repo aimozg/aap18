@@ -5,7 +5,7 @@ import {Character} from "../../engine/objects/creature/Character";
 import {RacialGroups} from "../../game/data/racialGroups";
 import {Game} from "../../engine/Game";
 import {AbilityTag, AbilityTargetType, AbstractCombatAbility} from "../../engine/combat/AbstractCombatAbility";
-import {UseAbilityAction} from "../../engine/combat/UseAbilityAction";
+import {UseAbilityAction} from "../../engine/combat/actions/UseAbilityAction";
 import {CombatController} from "../../engine/combat/CombatController";
 import {DamageTypes} from "../../engine/rules/DamageType";
 
