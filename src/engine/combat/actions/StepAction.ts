@@ -35,7 +35,7 @@ export class StepAction extends CombatAction<StepActionResult> {
 		await cc.deduceAP(this.actor, apcost);
 		// TODO AOO, generic intercept
 		// TODO animate movement
-		cc.grid.setPos(this.actor.gobj!!, this.target.x, this.target.y)
+		cc.grid.setPos(this.actor.gobj!!, this.target)
 		return {success:true,intercepted:false}
 	}
 

@@ -75,7 +75,29 @@ export function gdRegisterIntro(gd:GameDataBuilder) {
 					tooltip: "Start the combat in sneak mode",
 					call(ctx) {
 						// TODO add "sneak" condition
-						ctx.endNowAndBattle({enemies:[new TutorialImp()]})
+						ctx.endNowAndBattle({
+							enemies:[new TutorialImp()],
+							map: {
+								cells: [
+									" ###### ",
+									"##%...##",
+									"#%%1...#",
+									"#%%.....",
+									"#.....2.",
+									"#......#",
+									"##....##",
+									" ###### ",
+								],
+								mappings: {
+									' ': { tile: '/wall', visible: false },
+									'#': { tile: '/wall' },
+									'.': { tile: '/floor' },
+									'%': { tile: '/rubble' },
+									'1': { tile: '/floor', spawn:'enemy'},
+									'2': { tile: '/floor', spawn:'party'},
+								}
+							}
+						})
 					}
 				}, {
 					label: "Leave",

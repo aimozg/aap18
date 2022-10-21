@@ -14,7 +14,7 @@ import {Damage, DamageType} from "../rules/Damage";
 import {coerce} from "../math/utils";
 import {CombatRoll, processRoll} from "./CombatRoll";
 import {CombatRules} from "../../game/combat/CombatRules";
-import {BattleGrid, GOCreature} from "./BattleGrid";
+import {BattleGrid} from "./BattleGrid";
 
 const logger = LogManager.loggerFor("engine.combat.CombatController")
 
@@ -52,14 +52,12 @@ export class CombatController {
 		public readonly ctx: BattleContext,
 	) {
 		CombatRules.postSetup();
-		this.grid = new BattleGrid(ctx.options.width, ctx.options.height);
+		this.grid = ctx.options.grid;
 		for (let creature of [...this.party, ...this.enemies]) {
+			if (creature.gobj?.grid === this.grid) continue;
 			let pos = this.grid.randomEmptyCell(this.rng);
 			if (!pos) throw new Error(`Nowhere to place ${creature.name}!`)
-
-			let goCreature = new GOCreature(pos.x, pos.y, creature);
-			creature.gobj = goCreature;
-			this.grid.addObject(goCreature)
+			this.grid.placeCreature(creature, pos);
 		}
 		// TODO for tiles and layout, use options-provided static map or generated
 	}

@@ -9,6 +9,8 @@ import {GlyphData, GlyphSource} from "../ui/components/GlyphCanvas";
 import {PlayerCharacter} from "../objects/creature/PlayerCharacter";
 import {Random} from "../math/Random";
 import {GridPos} from "../utils/gridutils";
+import {IResource} from "../IResource";
+import Symbols from "../symbols";
 
 export abstract class GridObject {
 	protected constructor(public x:number, public y:number) {
@@ -37,25 +39,29 @@ export class GOCreature extends GridObject{
 		}
 	}
 }
-export interface TileType extends GlyphData {
-	id:string;
-	name:string;
-	ch: string;
-	fg: RGBColor;
-	bg?: RGBColor;
-	walkable:boolean;
-	solid:boolean;
+export class TileType implements GlyphData, IResource {
+	constructor(
+		public resId: string,
+		public name: string,
+		public ch: string,
+		public fg: RGBColor,
+		public bg: RGBColor|null,
+		public walkable: boolean,
+		public solid: boolean
+	) {
+	}
+	get resType() { return Symbols.ResTypeTile }
 }
 
 export namespace TileType {
-	export const FLOOR:TileType = {
-		id: ".",
-		name: "floor",
-		ch: ".",
-		fg: tinycolor("#cccccc"),
-		walkable: true,
-		solid: false
-	}
+	export const FLOOR:TileType = new TileType(
+		"/floor",
+		"floor",
+		".",
+		tinycolor("#cccccc"),
+		null,
+		true,
+		false);
 }
 export interface GridCellData {
 	visible: boolean;
@@ -149,11 +155,17 @@ export class BattleGrid implements GlyphSource {
 		let idx = rng.pick(emptyCells);
 		return {x:this.i2x(idx), y:this.i2y(idx)};
 	}
-	public addObject(object:GridObject, newPos:[number,number]|null = null) {
+	public placeCreature(creature:Creature, xy:GridPos):GOCreature {
+		if (creature.gobj !== null) throw new Error(`Creature ${creature} already placed`);
+		let gobj = creature.gobj = new GOCreature(xy.x, xy.y, creature);
+		this.addObject(gobj);
+		return gobj;
+	}
+	public addObject(object:GridObject, newXY?:GridPos) {
 		if (object.grid !== null)  throw new Error(`Invalid add(${object}), already placed`)
-		if (newPos) {
-			object.x = newPos[0];
-			object.y = newPos[1];
+		if (newXY) {
+			object.x = newXY.x;
+			object.y = newXY.y;
 		}
 		let objects = this.data(object).objects;
 		if (objects.includes(object)) throw new Error(`Duplicate add(${object})`)
@@ -168,10 +180,10 @@ export class BattleGrid implements GlyphSource {
 		objects.splice(i, 1);
 		object.grid = null;
 	}
-	public setPos(object:GridObject, newX:number, newY:number) {
+	public setPos(object:GridObject, xy:GridPos) {
 		this.removeObject(object);
-		object.x = newX;
-		object.y = newY;
+		object.x = xy.x;
+		object.y = xy.y;
 		this.addObject(object);
 	}
 
@@ -184,6 +196,6 @@ export class BattleGrid implements GlyphSource {
 	}
 	adjacent(go1: GridObject|GridCell|GridPos, go2: GridObject|GridCell|GridPos, allowDiagonal:boolean=true) {
 		let d = this.distance(go1, go2);
-		return d < (allowDiagonal ? 1.5 : 1.0);
+		return d <= (allowDiagonal ? 1.5 : 1.0);
 	}
 }

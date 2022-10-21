@@ -7,7 +7,7 @@ import {RGBColor} from "../../objects/Color";
 export interface GlyphData {
 	ch: string;
 	fg: RGBColor;
-	bg?: RGBColor;
+	bg?: RGBColor|null;
 }
 
 export interface GlyphSource {

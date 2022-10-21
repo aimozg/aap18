@@ -181,6 +181,10 @@ export abstract class Random {
 	either<E>(...options:E[]):E {
 		return this.pick(options);
 	}
+	pickOrNull<E>(source: E[]):E|null {
+		if (source.length === 0) return null;
+		return this.pick(source);
+	}
 }
 export interface WritableArrayLike<T> {
 	readonly length: number;

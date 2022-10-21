@@ -11,6 +11,7 @@ import {Place} from "../scene/Place";
 import {Color, colorSortKey} from "../objects/Color";
 import {Game} from "../Game";
 import {TraitType} from "../rules/TraitType";
+import {TileType} from "../combat/BattleGrid";
 
 export class GameData {
 	constructor(public readonly game:Game) {}
@@ -48,6 +49,21 @@ export class GameData {
 		return typeof scene === 'string' ? this.scenes.get(scene) : scene
 	}
 	sceneOrNull(id: string): Scene|null { return this.scenes.getOrNull(id) }
+
+	readonly tiles = new ResLib<TileType>(Symbols.ResTypeTile, "Tile");
+	private tilesByChar: Record<string,TileType>|null = null;
+	tile(id: string): TileType { return this.tiles.get(id) }
+	tileByChar(char: string): TileType {
+		if (!this.tilesByChar) {
+			this.tilesByChar = {};
+			for (let tt of this.tiles.values()) {
+				this.tilesByChar[tt.ch] ??= tt;
+			}
+		}
+		let tt = this.tilesByChar[char];
+		if (!tt) throw new Error(`Unknown tile '${char}'`)
+		return tt;
+	}
 
 	readonly traits = new ResLib<TraitType>(Symbols.ResTypeTrait, "Trait");
 	trait(id: string): TraitType {

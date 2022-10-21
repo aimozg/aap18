@@ -3,6 +3,8 @@
  */
 import {ImportedGameData} from "../../game/GameDataBuilder";
 import {Game} from "../Game";
+import {TileType} from "../combat/BattleGrid";
+import * as tinycolor from "tinycolor2";
 
 /**
  * Loads images and other resources required by game
@@ -30,6 +32,12 @@ export class ResourceManager {
 		data.racialGroups.registerMany(idata.racialGroups)
 		data.scenes.clear();
 		for (let list of idata.scenes) data.scenes.registerMany(list);
+		data.tiles.clear();
+		data.tiles.register(TileType.FLOOR);
+		for (let gdtt of idata.tiles) {
+			let tt:TileType = new TileType(gdtt.id, gdtt.name, gdtt.ch, tinycolor(gdtt.fg ?? '#cccccc'), null, !!gdtt.walkable && !gdtt.solid, !!gdtt.solid)
+			data.tiles.register(tt)
+		}
 		data.traits.clear();
 		data.traits.registerMany(idata.traits)
 	}

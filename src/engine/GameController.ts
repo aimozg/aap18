@@ -13,6 +13,8 @@ import {NullGameContext, PlaceContext} from "./state/GameContext";
 import {ScenePanel} from "./ui/panels/ScenePanel";
 import {BattleContext, BattleOptions, BattleSettings} from "./combat/BattleContext";
 import {Random} from "./math/Random";
+import {BattleGrid} from "./combat/BattleGrid";
+import {GridPos} from "./utils/gridutils";
 
 const logger = LogManager.loggerFor("engine.GameController");
 
@@ -127,13 +129,53 @@ export class GameController {
 	}
 
 	startBattle(options:BattleOptions):BattleContext {
+		let party = options.party ?? [options.player ?? this.player];
+		let enemies = options.enemies;
+
+		// Load map from provided options, or generate one
+		let cells = options.map?.cells;
+		let height = cells?.length ?? 8;
+		let width = cells?.[0]?.length ?? 8;
+		let grid: BattleGrid = new BattleGrid(width, height);
+		if (cells) {
+			let partySpawnPoints:GridPos[] = [];
+			let enemySpawnPoints:GridPos[] = [];
+			let mappings = options.map?.mappings;
+			for (let y = 0; y < grid.height; y++) {
+				for (let x = 0; x < grid.width; x++) {
+					let data = grid.data({x,y});
+					let code = cells[y][x];
+					if (mappings) {
+						let mapping = mappings[code];
+						if (!mapping) throw new Error(`No mapping for code '${code}'`);
+						data.tile = this.game.data.tile(mapping.tile);
+						if (mapping.spawn === "enemy") enemySpawnPoints.push({x,y});
+						else if (mapping.spawn === "party") partySpawnPoints.push({x,y});
+						if (mapping.visible !== undefined) data.visible = mapping.visible;
+					} else {
+						data.tile = this.game.data.tileByChar(code);
+					}
+				}
+			}
+			for (let c of party) {
+				let pos = this.rng.pickOrNull(partySpawnPoints);
+				if (!pos) break;
+				grid.placeCreature(c, pos);
+			}
+			for (let c of enemies) {
+				let pos = this.rng.pickOrNull(enemySpawnPoints);
+				if (!pos) break;
+				grid.placeCreature(c, pos);
+			}
+		} else {
+			// TODO generate random grid here
+		}
+
 		let settings: BattleSettings = {
 			player: options.player ?? this.player,
-			party: options.party ?? [options.player ?? this.player],
-			enemies: options.enemies,
-
-			width: options.width ?? 8,
-			height: options.height ?? 8,
+			party: party,
+			enemies: enemies,
+			grid
 		}
 		let ctx = new BattleContext(settings);
 		this.state.pushGameContext(ctx);

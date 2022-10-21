@@ -51,7 +51,7 @@ export interface GDColor {
 export interface GDTileType {
 	id:string;
 	name:string;
-	ch?:string;
+	ch:string;
 	fg?:string;
 	bg?:string;
 	walkable?:boolean;

@@ -6,11 +6,14 @@ import {GameDataBuilder} from "../GameDataBuilder";
 
 export function gdRegisterTiles(gd:GameDataBuilder) {
 	gd.addTiles([{
-		id: '#',
+		ch: '#',
+		id: '/wall',
 		name: 'wall',
 		solid: true
 	}, {
-		id: '.',
-		name: 'floor'
+		ch: '%',
+		id: '/rubble',
+		name: 'rubble',
+		walkable: false
 	}])
 }

@@ -34,21 +34,28 @@ class FinishCombatAction extends CombatAction<void> {
 	}
 }
 
+export interface BattleMapMapping {
+	tile: string;
+	spawn?: "party"|"enemy";
+	visible?: boolean;
+}
+export interface BattleMapOptions {
+	cells: string[];
+	mappings?: Record<string,BattleMapMapping>;
+}
 export interface BattleOptions {
 	player?: PlayerCharacter;
 	party?: Creature[];
 	enemies: Creature[];
 
-	width?: number;
-	height?: number;
+	map?: BattleMapOptions;
 }
 export interface BattleSettings {
 	player: PlayerCharacter;
 	party: Creature[];
 	enemies: Creature[];
 
-	width: number;
-	height: number;
+	grid: BattleGrid;
 }
 
 export class BattleContext implements GameContext {
