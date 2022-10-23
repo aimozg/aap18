@@ -17,7 +17,7 @@ import {HumanEyeColorNames, HumanHairColorNames, HumanSkinColorNames} from "../d
 import {Game} from "../../engine/Game";
 import {IStatMetadata, StatMetadata} from "../data/stats";
 import {CharacterClass} from "../../engine/rules/classes/CharacterClass";
-import {PenisSizeTier} from "../data/body/Penis";
+import {PenisSizeTier, PenisSizeTiers} from "../data/body/Penis";
 import {GdStartingTraits} from "../data/traits/starting";
 import {TraitType} from "../../engine/rules/TraitType";
 
@@ -89,24 +89,30 @@ export class ChargenController {
 		// TODO race-dependent
 		return Game.instance.data.colorsByNames(HumanSkinColorNames, "skin");
 	}
+	minBreastSize():number {
+		return this.sex === 'm' ? BreastSizeTiers.FLAT.value : ChargenRules.breastsMinFemale;
+	}
+	maxBreastSize():number {
+		return this.sex === 'm' ? ChargenRules.breastsMaxMale : ChargenRules.breastsMaxFemale;
+	}
 	allowedBreastSizes(): ButtonMenuItem<number>[] {
-		let min: number, max: number;
-		if (this.sex === 'm') {
-			min = BreastSizeTiers.FLAT.value;
-			max = ChargenRules.breastsMaxMale;
-		} else {
-			min = ChargenRules.breastsMinFemale;
-			max = ChargenRules.breastsMaxFemale;
-		}
+		let min = this.minBreastSize();
+		let max = this.maxBreastSize();
 		return BreastSizeTier.list().map(bst => ({
 			label: bst.name,
 			value: bst.value,
 			disabled: bst.value < min || bst.value > max
 		}))
 	}
+	minPenisSize():number {
+		return this.body.penis.isPresent ? ChargenRules.penisMin : PenisSizeTiers.NONE.value;
+	}
+	maxPenisSize():number {
+		return this.body.penis.isPresent ? ChargenRules.penisMax : PenisSizeTiers.NONE.value;
+	}
 	allowedPenisSizes(): ButtonMenuItem<number>[] {
-		let min = ChargenRules.penisMin;
-		let max = ChargenRules.penisMax;
+		let min = this.minPenisSize();
+		let max = this.maxPenisSize();
 		return PenisSizeTier.list().map(pst => ({
 			label: pst.name,
 			value:pst.value,

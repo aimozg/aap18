@@ -127,7 +127,7 @@ function namegenMarkov(gender:TGender, flavor:string, rng:Random):string {
 			if (i < minlength) continue;
 			else if (i === length - 1 && rng.nextBoolean()) continue; // can stop one letter short
 			else continue;
-		} else if (i >= length && next !== '$') {
+		} else if (i >= length && next !== '$' && nvy > 0) {
 			// no end after reaching required length
 			if (i === length) {
 				if (rng.nextBoolean()) continue; // can stop one letter extra

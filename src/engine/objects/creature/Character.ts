@@ -60,6 +60,7 @@ export class CharacterBody {
 	}
 
 	copyFrom(src:CharacterBody) {
+		this._height = src._height;
 		for (let i = 0; i < this.parts.length; i++) this.parts[i].copyFrom(src.parts[i]);
 		for (let i = 0; i < this.materials.length; i++) this.materials[i].copyFrom(src.materials[i]);
 	}

@@ -67,9 +67,6 @@ export class ChargenStepAppearance extends ChargenStep {
 					{/*TODO configurables:
 					 - hair style
 					 - other body materials (if present)
-					 - height
-					 - dick size
-					 - breast size
 					 - thickness & tone
 					*/}
 					<p>
@@ -104,18 +101,20 @@ export class ChargenStepAppearance extends ChargenStep {
 						                 startValue={body.skinColor1}
 						                 onChange={color => this.setSkinColor(color)}/>
 					</p>
-					<p>
+					{this.cc.maxBreastSize() > this.cc.minBreastSize() && <p>
 						<label>Breast size</label>
 						<div class="d-flex flex-wrap gap-1">
-							<ButtonMenu items={this.cc.allowedBreastSizes()} onChange={size => this.setBreastSize(size)} selected={body.breasts.size}/>
+							<ButtonMenu items={this.cc.allowedBreastSizes()} onChange={size => this.setBreastSize(size)}
+							            selected={body.breasts.size}/>
 						</div>
-					</p>
-					<p>
+					</p>}
+					{this.cc.body.penis.isPresent && <p>
 						<label>Penis size</label>{/*TODO or number slider?*/}
 						<div class="d-flex flex-wrap gap-1">
-							<ButtonMenu items={this.cc.allowedPenisSizes()} onChange={size => this.setPenisSize(size)} selected={body.penis.size}/>
+							<ButtonMenu items={this.cc.allowedPenisSizes()} onChange={size => this.setPenisSize(size)}
+							            selected={body.penis.size}/>
 						</div>
-					</p>
+					</p>}
 				</div>
 				<div className="cols-5">
 					{Appearance.characterAppearance(this.player, parser)}

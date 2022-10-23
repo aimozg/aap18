@@ -14,8 +14,8 @@ export const ChargenRules = {
 	minCor: 0,
 	maxCor: 10,
 
-	breastsMaxMale: BreastSizeTiers.A_CUP.value,
-	breastsMinFemale: BreastSizeTiers.A_CUP.value,
+	breastsMaxMale: BreastSizeTiers.FLAT.value,
+	breastsMinFemale: BreastSizeTiers.FLAT.value,
 	breastsMaxFemale: BreastSizeTiers.H_CUP.value,
 	penisMin: PenisSizeTiers.T1_VERY_SMALL.min,
 	penisMax: PenisSizeTiers.T6_VERY_BIG.max,
