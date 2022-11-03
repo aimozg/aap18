@@ -8,4 +8,4 @@ Races, body parts, items, classes, traits and other "game database"-like content
 
 ### src/story
 
-Scenes, locations, quests, NPCs.
+Scenes, locations, monsters, quests, NPCs.

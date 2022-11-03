@@ -3,7 +3,7 @@
  */
 import {GameDataBuilder} from "../../game/GameDataBuilder";
 import {SceneContext} from "../../engine/scene/SceneContext";
-import {TutorialImp} from "../monsters/TutorialImp";
+import {Imp} from "../monsters/Imp";
 
 export function gdRegisterPlayerBase(gd:GameDataBuilder) {
 	gd.logger.debug("gdRegisterPlayerBase")
@@ -22,7 +22,7 @@ export function gdRegisterPlayerBase(gd:GameDataBuilder) {
 				"Explore": {
 					async call(ctx:SceneContext) {
 						await ctx.ambush({
-							monsters: [new TutorialImp()],
+							monsters: [new Imp()],
 							threatName: "a stray imp"
 						});
 					},
