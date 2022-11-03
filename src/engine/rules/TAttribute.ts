@@ -6,10 +6,10 @@ export enum TAttribute {
 	STR = 0,
 	DEX = 1,
 	CON = 2,
-	PER = 3,
-	INT = 4,
-	WIS = 5,
-	CHA = 6,
-	MAF = 7,
+	SPE = 3,
+	PER = 4,
+	INT = 5,
+	WIS = 6,
+	CHA = 7,
 }
 export const TAttributes:TAttribute[] = [0,1,2,3,4,5,6,7];

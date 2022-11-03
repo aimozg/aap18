@@ -6,6 +6,7 @@ import {CombatAction} from "../CombatAction";
 import {Creature} from "../../objects/Creature";
 import {CombatController} from "../CombatController";
 import {Direction, GridPos} from "../../utils/gridutils";
+import {CombatRules} from "../../../game/combat/CombatRules";
 
 export interface StepActionResult {
 	success: boolean;
@@ -31,7 +32,8 @@ export class StepAction extends CombatAction<StepActionResult> {
 	}
 	async perform(cc: CombatController): Promise<StepActionResult> {
 		// TODO ap cost
-		const apcost = 500
+		let apcost = 500
+		apcost *= CombatRules.speedApFactorMove(this.actor.spe);
 		await cc.deduceAP(this.actor, apcost);
 		// TODO AOO, generic intercept
 		// TODO animate movement

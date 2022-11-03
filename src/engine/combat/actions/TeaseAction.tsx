@@ -32,7 +32,9 @@ export class TeaseAction extends CombatAction<TeaseResult> {
 		let target = this.target;
 		if (!this.free) {
 			// TODO tease AP cost
-			await cc.deduceAP(attacker, 1000)
+			let ap = 1000;
+			ap *= CombatRules.speedApFactor(attacker.spe);
+			await cc.deduceAP(attacker, ap)
 		}
 		// TODO animations
 		// TODO preference&perversion-based results

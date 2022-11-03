@@ -120,19 +120,19 @@ export class CreaturePanel extends DomComponent {
 			<div className="text-s">STR</div>
 			<div className="text-s">DEX</div>
 			<div className="text-s">CON</div>
+			<div className="text-s">SPE</div>
 			<div className="text-s">PER</div>
 			<div className="text-s">INT</div>
 			<div className="text-s">WIS</div>
 			<div className="text-s">CHA</div>
-			<div className="text-s">MAF</div>
 			<div>{c.str}</div>
 			<div>{c.dex}</div>
 			<div>{c.con}</div>
+			<div>{c.spe}</div>
 			<div>{c.per}</div>
 			<div>{c.int}</div>
 			<div>{c.wis}</div>
 			<div>{c.cha}</div>
-			<div>{c.maf}</div>
 		</div>
 		//--------------//
 		// Combat stats //

@@ -4,6 +4,7 @@
 
 import {TAttribute} from "../../engine/rules/TAttribute";
 import {Creature} from "../../engine/objects/Creature";
+import {CombatRules} from "../combat/CombatRules";
 
 export interface IAttrMetadata {
 	id: TAttribute;
@@ -32,6 +33,12 @@ export const AttrMetadata: IAttrMetadata[] = [
 		explain: (mod) =>
 			`${mod.format('+d')} HP and energy per level, ${mod.format('+d')} fortitude.`
 	}, {
+		id: TAttribute.SPE,
+		name: 'Speed',
+		description: 'Decreases actions\' AP cost.',
+		explain: (mod,value) =>
+			`${(CombatRules.speedApFactor(value)-1).format('+d%')}% action AP cost, ${(CombatRules.speedApFactorMove(value)-1).format('+d%')}% move AP cost.`
+	}, {
 		id: TAttribute.PER,
 		name: 'Perception',
 		description: 'Increases accuracy with ranged weapons and many spot skills.',
@@ -55,12 +62,6 @@ export const AttrMetadata: IAttrMetadata[] = [
 		description: 'Increases persuasion, seduction, and follower limit.',
 		explain: (mod) =>
 			`${mod.format('+d')} to something seduction-related`
-	}, {
-		id: TAttribute.MAF,
-		name: 'Magic Affinity',
-		description: 'Increases spell efficiency.',
-		explain: (mod) =>
-			`${mod.format('+d')} to something magic-related`
 	}
 ];
 

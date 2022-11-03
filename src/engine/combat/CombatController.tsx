@@ -282,6 +282,7 @@ export class CombatController {
 		}
 	}
 	async deduceAP(creature:Creature, value:number) {
+		value |= 0;
 		logger.info("deduceAP {} {}",creature,value);
 		// TODO parallelize and detach animation from model
 		await this.animateValueChange(creature, "ap", creature.ap-value, AnimationTimeVeryFast)

@@ -149,6 +149,11 @@ export class Creature {
 	/** Constitution modifier */
 	get conMod(): number { return this.attrMod(TAttribute.CON) }
 
+	/** Speed */
+	get spe(): number { return this.attr(TAttribute.SPE) }
+	/** Perception modifier */
+	get speMod(): number { return this.attrMod(TAttribute.SPE) }
+
 	/** Perception */
 	get per(): number { return this.attr(TAttribute.PER) }
 	/** Perception modifier */
@@ -168,11 +173,6 @@ export class Creature {
 	get cha(): number { return this.attr(TAttribute.CHA) }
 	/** Charisma modifier */
 	get chaMod(): number { return this.attrMod(TAttribute.CHA) }
-
-	/** Magic Affinity */
-	get maf(): number { return this.attr(TAttribute.MAF) }
-	/** Magic Affinity modifier */
-	get mafMod(): number { return this.attrMod(TAttribute.MAF) }
 
 	//---------------//
 	// Derived Stats //

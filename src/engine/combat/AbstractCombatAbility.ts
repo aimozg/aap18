@@ -4,6 +4,7 @@
 
 import {AbilityTarget, UseAbilityAction} from "./actions/UseAbilityAction";
 import {CombatController} from "./CombatController";
+import {CombatRules} from "../../game/combat/CombatRules";
 
 export abstract class AbstractCombatAbility {
 	abstract readonly name:string;
@@ -12,7 +13,7 @@ export abstract class AbstractCombatAbility {
 	hasTag(tag:AbilityTag):boolean { return this.tags.includes(tag); }
 
 	energyCost(action:UseAbilityAction):number { return 0 }
-	apCost(action:UseAbilityAction):number { return 1000 }
+	apCost(action:UseAbilityAction):number { return 1000*CombatRules.speedApFactor(action.actor.spe) }
 	disabledReason(action: UseAbilityAction):string {
 		if (action.energyCost > action.actor.ep) return "Not enough energy";
 		return ""

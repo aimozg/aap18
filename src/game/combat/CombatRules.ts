@@ -20,6 +20,10 @@ export namespace CombatRules {
 		MeleeAttackQueue.sortOn("priority")
 	}
 
+	// TODO This is overcomplicated. Alternative:
+	//  - hooks in fixed places: "onStrike", "onHit", "onDamage"
+	//  - conditional buffs: getAC(tags:["melee", "enemyTypeDemon"])
+
 	export const MELEE_PRIO_CALC_AP = 100;
 	export const MELEE_PRIO_CALC_BONUS = 200;
 	export const MELEE_PRIO_CALC_DC = 300;
@@ -37,7 +41,10 @@ export namespace CombatRules {
 		priority: MELEE_PRIO_CALC_AP,
 		async process(cc:CombatController, roll: CombatRoll) {
 			// TODO melee attack AP cost
-			if (!roll.free) roll.ap = 1000;
+			if (!roll.free) {
+				roll.ap = 1000;
+				roll.ap *= speedApFactor(roll.actor.spe);
+			}
 		}
 	};
 	export let MeleeDefaultCalcBonus: CombatRollProcessor = {
@@ -146,6 +153,14 @@ export namespace CombatRules {
 			damage: Math.max(1, crit && d.canCrit ? repeatPositive(d.damage,critMultiplier).roll(rng) : d.damage.roll(rng)),
 			damageType: d.damageType
 		}))
+	}
+
+	export function speedApFactor(speed:number):number {
+		return 20/(15+speed);
+	}
+
+	export function speedApFactorMove(speed:number):number {
+		return 10/(5+speed);
 	}
 
 	// TODO move to extension functions
