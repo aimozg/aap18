@@ -20,21 +20,21 @@ const logger = LogManager.loggerFor("engine.Game");
 export class Game {
 	static instance: Game;
 
-	info: GameInfo;
+	readonly info: GameInfo;
 	idata: ImportedGameData;
 
 	// Managers
-	screenManager: ScreenManager;
-	state: StateManager;
-	saveManager: SaveManager;
-	resourceManager: ResourceManager;
+	readonly screenManager: ScreenManager;
+	readonly state: StateManager;
+	readonly saveManager: SaveManager;
+	readonly resourceManager: ResourceManager;
 
 	// Controllers and globals
-	gameController: GameController;
-	rng: Random = XorWowRandom.create();
+	readonly gameController: GameController;
+	readonly rng: Random = XorWowRandom.create();
 
 	// Resources
-	data: GameData = new GameData(this);
+	readonly data: GameData = new GameData(this);
 
 	constructor(
 		options: GameOptions

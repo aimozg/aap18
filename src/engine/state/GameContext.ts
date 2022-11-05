@@ -2,7 +2,6 @@
  * Created by aimozg on 19.07.2022.
  */
 
-import {Place} from "../scene/Place";
 import {Deferred} from "../utils/Deferred";
 
 export interface GameContext {
@@ -17,8 +16,3 @@ export class NullGameContext implements GameContext {
 	toString() { return "NulLGameContext"}
 }
 
-export class PlaceContext implements GameContext {
-	promise = new Deferred();
-	get ended():boolean { return this.promise.completed }
-	constructor(public place:Place) {}
-}

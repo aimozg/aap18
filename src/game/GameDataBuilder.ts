@@ -5,7 +5,7 @@
 import {CharacterClass} from "../engine/rules/classes/CharacterClass";
 import {RacialGroup} from "../engine/rules/RacialGroup";
 import {Scene} from "../engine/scene/Scene";
-import {Place, PlaceDef} from "../engine/scene/Place";
+import {Place, PlaceDef} from "../engine/place/Place";
 import {buildScenes, SceneDef} from "../engine/scene/builder";
 import {LogManager} from "../engine/logging/LogManager";
 import {BodyPart, BodyPartReference, BodyPartType} from "../engine/objects/creature/BodyPart";

@@ -49,66 +49,69 @@ export function gdRegisterIntro(gd:GameDataBuilder) {
 
 			ctx.say("<p class='help-block'>When you enter a room with monster(s), an Ambush skill check is rolled. If you succeed, you can choose an action against an unaware enemy. If you fail, you fight. If you fail by 10 or more, you're the one ambushed! </p>")
 
-			let monster = new TutorialImp();
-			await ctx.ambush({
-				dc: 10,
-				roll: 19,
-				tags: ['monster','inside','demon','scripted'],
-				monsters: [monster],
-				fail: "Tutorial ambush failed - this should never happen. Please report a bug.",
-				critFail: "Tutoriam ambush criticall failed - this should never happen. Please report a bug.",
-				success: "You peek inside and spot a short, ugly demon crouched in the corner. It rummages the pile of stones, searching for something, with his unprotected back open for you to attack.",
-				successOptions: [{
-					label: "Talk",
-					tooltip: "Greet the imp and try to talk",
-					disabled: { hint: "Peace was never an option" }
-				}, {
-					label: "Seduce",
-					tooltip: "Try to seduce the imp with your body",
-					disabled: { hint: "Why would you do that?" }
-				}, {
-					label: "Rape",
-					tooltip: "Skip the foreplay and fuck the imp",
-					disabled: { hint: "Why would you do that?" }
-				}, {
-					label: "Sneak Attack",
-					tooltip: "Start the combat in sneak mode",
-					call(ctx) {
-						// TODO add "sneak" condition
-						ctx.endNowAndBattle({
-							enemies:[new TutorialImp()],
-							map: {
-								cells: [
-									" ###### ",
-									"##%...##",
-									"#%%1...#",
-									"#%%.....",
-									"#.....2.",
-									"#......#",
-									"##....##",
-									" ###### ",
-								],
-								mappings: {
-									' ': { tile: '/wall', visible: false },
-									'#': { tile: '/wall' },
-									'.': { tile: '/floor' },
-									'%': { tile: '/rubble' },
-									'1': { tile: '/floor', spawn:'enemy'},
-									'2': { tile: '/floor', spawn:'party'},
+			let tutorialCombat = false;
+			if (tutorialCombat) {
+				let monster = new TutorialImp();
+				await ctx.ambush({
+					dc: 10,
+					roll: 19,
+					tags: ['monster', 'inside', 'demon', 'scripted'],
+					monsters: [monster],
+					fail: "Tutorial ambush failed - this should never happen. Please report a bug.",
+					critFail: "Tutoriam ambush criticall failed - this should never happen. Please report a bug.",
+					success: "You peek inside and spot a short, ugly demon crouched in the corner. It rummages the pile of stones, searching for something, with his unprotected back open for you to attack.",
+					successOptions: [{
+						label: "Talk",
+						tooltip: "Greet the imp and try to talk",
+						disabled: {hint: "Peace was never an option"}
+					}, {
+						label: "Seduce",
+						tooltip: "Try to seduce the imp with your body",
+						disabled: {hint: "Why would you do that?"}
+					}, {
+						label: "Rape",
+						tooltip: "Skip the foreplay and fuck the imp",
+						disabled: {hint: "Why would you do that?"}
+					}, {
+						label: "Sneak Attack",
+						tooltip: "Start the combat in sneak mode",
+						call(ctx) {
+							// TODO add "sneak" condition
+							ctx.endNowAndBattle({
+								enemies: [new TutorialImp()],
+								map: {
+									cells: [
+										" ###### ",
+										"##%...##",
+										"#%%1...#",
+										"#%%.....",
+										"#.....2.",
+										"#......#",
+										"##....##",
+										" ###### ",
+									],
+									mappings: {
+										' ': {tile: '/wall', visible: false},
+										'#': {tile: '/wall'},
+										'.': {tile: '/floor'},
+										'%': {tile: '/rubble'},
+										'1': {tile: '/floor', spawn: 'enemy'},
+										'2': {tile: '/floor', spawn: 'party'},
+									}
 								}
-							}
-						})
-					}
-				}, {
-					label: "Leave",
-					tooltip: "Just leave it alone",
-					disabled: { hint: "Not in this tutorial, sorry" }
-				}]
-			});
+							})
+						}
+					}, {
+						label: "Leave",
+						tooltip: "Just leave it alone",
+						disabled: {hint: "Not in this tutorial, sorry"}
+					}]
+				});
+			} else {
+				ctx.say("Its first floor is littered by sand, rocks, and branches. You find traces of a campfire &ndash; looks like it was used as a refuge for an occasional traveler. [pg] There is a hole in a ceiling leading to the second floor. [pg] You think you could rest here. [pg] <b>Your first task is to find a source of water and food.</b>");
 
-			/*ctx.say("Its first floor is littered by sand, rocks, and branches. You find traces of a campfire &ndash; looks like it was used as a refuge for an occasional traveler. [pg] There is a hole in a ceiling leading to the second floor. [pg] You think you could rest here. [pg] <b>Your first task is to find a source of water and food.</b>");
-
-			ctx.endButton();*/
+				ctx.endButton();
+			}
 		}
 	});
 }

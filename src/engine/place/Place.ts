@@ -7,6 +7,7 @@ import Symbols from "../symbols";
 import {GameController} from "../GameController";
 import {Game} from "../Game";
 import {h, VNode} from "preact";
+import {Scene} from "../scene/Scene";
 
 export interface PlaceDef {
 	id: string;
@@ -17,6 +18,9 @@ export interface PlaceDef {
 	onEnter?: (gc: GameController) => void;
 	onLeave?: (gc: GameController) => void;
 	onTime?: (gc: GameController) => void;
+	canRest?: boolean | ((gc:GameController) => boolean);
+	canManageInventory?: boolean | ((gc:GameController) => boolean);
+	canLevelUp?: boolean | ((gc:GameController) => boolean);
 }
 
 export interface PlaceProps {
@@ -27,6 +31,9 @@ export interface PlaceProps {
 	description(): string;
 	sidebarDescription(): string | VNode;
 	scene(): string;
+	canRest(): boolean;
+	canManageInventory(): boolean;
+	canLevelUp(): boolean;
 }
 
 export class Place implements IResource {
@@ -41,9 +48,11 @@ export class Place implements IResource {
 	onEnter(): void { this.props.onEnter() }
 	onLeave(): void { this.props.onLeave() }
 	onTime(): void { this.props.onTime() }
-	display(): Promise<any> {
-		return Game.instance.gameController.playScene(this.props.scene());
-	}
+	canRest():boolean { return this.props.canRest() }
+	canManageInventory():boolean { return this.props.canManageInventory() }
+	canLevelUp():boolean { return this.props.canLevelUp() }
+	get sceneId(): string { return this.props.scene(); }
+	get scene(): Scene { return Game.instance.data.scene(this.props.scene()); }
 
 	static Limbo = new Place("/Limbo", {
 		displayName: () => "Limbo",
@@ -52,12 +61,20 @@ export class Place implements IResource {
 		onEnter() {},
 		onLeave() {},
 		onTime() {},
-		scene: () => ""
+		scene: () => "",
+		canRest: () => true,
+		canManageInventory: () => true,
+		canLevelUp: () => true
 	})
 
 	static build(def: PlaceDef): Place {
 		function wrapValue<T>(value: T | ((gc: GameController) => T)): () => T {
 			if (typeof value === 'function') return () => (value as (gc: GameController) => T)(Game.instance.gameController)
+			return () => value;
+		}
+		function wrapValueDef<T>(value: T | undefined | ((gc: GameController) => T), defaultValue:T): () => T {
+			if (typeof value === 'function') return () => (value as (gc: GameController) => T)(Game.instance.gameController)
+			if (value === undefined) return () => defaultValue;
 			return () => value;
 		}
 
@@ -69,11 +86,14 @@ export class Place implements IResource {
 		let props: PlaceProps = {
 			displayName: wrapValue(def.name),
 			description: wrapValue(def.description),
-			sidebarDescription: def.sidebar ? wrapValue(def.sidebar) : wrapValue(h("h1", null, def.name)),
+			sidebarDescription: wrapValueDef(def.sidebar, h("h1", null, def.name)),
 			scene: wrapValue(def.scene),
 			onEnter: wrapFn(def.onEnter),
 			onLeave: wrapFn(def.onLeave),
-			onTime: wrapFn(def.onTime)
+			onTime: wrapFn(def.onTime),
+			canRest: wrapValueDef(def.canRest, true),
+			canManageInventory: wrapValueDef(def.canManageInventory, true),
+			canLevelUp: wrapValueDef(def.canLevelUp, true)
 		}
 
 		return new Place(def.id, props);

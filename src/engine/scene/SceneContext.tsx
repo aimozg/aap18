@@ -51,13 +51,14 @@ export interface ChoiceOptionsDisabled extends ChoiceOptions {
 export type ChoiceDataNoLabel = ChoiceGotoScene | ChoiceGotoCall | ChoiceOptionsDisabled;
 export type ChoiceData = ChoiceDataNoLabel & ChoiceWithLabel;
 
-interface InternalChoiceData {
+export interface InternalChoiceData {
 	clear: boolean;
 	label: string;
 	hint?: string;
 	tooltip?: string;
 	value: string;
 	disabled: boolean;
+	/** Prefixed key code */
 	hotkey: string | undefined;
 	default: boolean;
 	callback: () => void;
@@ -67,9 +68,10 @@ const logger = LogManager.loggerFor("engine.scene.SceneContext");
 
 export class SceneContext implements GameContext {
 	constructor(
-		public sceneId: string,
+		sceneId: string,
 		public output: TextOutput
 	) {
+		this._scene = this.game.data.scene(sceneId);
 	}
 	toString() { return `SceneContext(${this.sceneId})`}
 
@@ -77,6 +79,9 @@ export class SceneContext implements GameContext {
 	readonly parser: Parser = new Parser();
 	readonly characterPanel = new CreaturePanel();
 
+	public get sceneId():string { return this.scene.resId }
+	private _scene:Scene;
+	public get scene():Scene { return this._scene }
 	private _ended = false;
 	private nextButtons: InternalChoiceData[] = [];
 	private currentButtons: InternalChoiceData[] = [];
@@ -103,7 +108,7 @@ export class SceneContext implements GameContext {
 		this.currentButtons = []
 		this.characterPanel.update(this.player)
 	}
-	private async flush() {
+	protected async flush() {
 		logger.debug("flush in {}", this.sceneId);
 		if (this._ended) {
 			this._promise.tryResolve(String(this.lastValue ?? ''));
@@ -131,7 +136,7 @@ export class SceneContext implements GameContext {
 		this.nextButtons = [];
 		this.output.flush();
 	}
-	private async buttonClick(c: InternalChoiceData) {
+	protected async buttonClick(c: InternalChoiceData) {
 		logger.debug("buttonClick {}", c.value);
 		this._dirty = true;
 		if (c.clear) {
@@ -148,13 +153,15 @@ export class SceneContext implements GameContext {
 		await this.flush();
 	}
 	async play(scene: string | Scene, append: boolean = false): Promise<string> {
+		logger.debug("play {}", scene);
+		this._scene = this.game.data.scene(scene);
+		return this.playCurrentScene(append);
+	}
+	async playCurrentScene(append:boolean = false): Promise<string> {
 		this._dirty = true;
-		scene = this.game.data.scene(scene);
-		logger.debug("play {}", scene.resId);
 
-		this.sceneId = scene.resId;
 		await this.beginScreen(append);
-		await scene.execute(this);
+		await this.scene.execute(this);
 		await this.flush();
 
 		return this.promise;

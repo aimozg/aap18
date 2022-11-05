@@ -12,13 +12,16 @@ export function gdRegisterPlayerBase(gd:GameDataBuilder) {
 			ctx.say("A ruined tower you use as your base.")
 
 			ctx.choices({
-				async "Rest"(ctx:SceneContext) {
-					ctx.say("You rest...")
+				/*
+				"Rest": {
+					async call (ctx:SceneContext) {
+						ctx.say("You rest...")
 
-					ctx.gc.recoverPlayer();
+						ctx.gc.recoverPlayer();
 
-					ctx.endButton()
-				},
+						ctx.endButton()
+					}
+				},*/
 				"Explore": {
 					async call(ctx:SceneContext) {
 						await ctx.ambush({
@@ -33,7 +36,7 @@ export function gdRegisterPlayerBase(gd:GameDataBuilder) {
 	});
 	gd.buildPlace({
 		id: "/base",
-		name: "Base",
+		name: "Camp",
 		description: "A ruined tower you use as your base.",
 		scene: "/001_base"
 	})

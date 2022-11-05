@@ -8,13 +8,14 @@ import {SceneContext} from "./scene/SceneContext";
 import {TextOutput} from "./text/output/TextOutput";
 import {PlayerCharacter} from "./objects/creature/PlayerCharacter";
 import {StateManager} from "./state/StateManager";
-import {Place} from "./scene/Place";
-import {NullGameContext, PlaceContext} from "./state/GameContext";
+import {Place} from "./place/Place";
+import {NullGameContext} from "./state/GameContext";
 import {ScenePanel} from "./ui/panels/ScenePanel";
 import {BattleContext, BattleOptions, BattleSettings} from "./combat/BattleContext";
 import {Random} from "./math/Random";
 import {BattleGrid} from "./combat/BattleGrid";
 import {GridPos} from "./utils/gridutils";
+import {PlaceContext} from "./place/PlaceContext";
 
 const logger = LogManager.loggerFor("engine.GameController");
 
@@ -96,7 +97,7 @@ export class GameController {
 		if (context instanceof SceneContext) {
 			context.output = new TextOutput(new ScenePanel());
 			gameScreen.applyLayout(context.layout);
-			context.play(context.sceneId).then(()=>this.showGameScreen());
+			context.playCurrentScene().then(()=>this.showGameScreen());
 			return;
 		}
 		if (context instanceof PlaceContext) {
@@ -104,7 +105,8 @@ export class GameController {
 				// TODO rescue?
 				throw new Error("Player stuck in limbo")
 			}
-			context.place.display().then(()=>this.showGameScreen());
+			gameScreen.applyLayout(context.layout);
+			context.display().then(()=>this.showGameScreen());
 			return;
 		}
 		if (context instanceof BattleContext) {

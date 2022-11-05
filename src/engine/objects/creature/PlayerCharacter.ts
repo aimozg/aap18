@@ -5,7 +5,7 @@ import {Character} from "./Character";
 import {MaxLevel, XpPerLevel} from "../../../game/xp";
 import {GDPlayerOrigin} from "../../../game/GameDataBuilder";
 import {Game} from "../../Game";
-import {Place} from "../../scene/Place";
+import {Place} from "../../place/Place";
 
 export class PlayerCharacter extends Character {
 	readonly objectType: string = "PlayerCharacter";
@@ -21,6 +21,10 @@ export class PlayerCharacter extends Character {
 	nextLevelXp(): number {
 		if (this.level >= MaxLevel) return Infinity;
 		return XpPerLevel[this.level];
+	}
+
+	canLevelUp():boolean {
+		return this.xp >= this.nextLevelXp();
 	}
 
 	constructor() {super();}

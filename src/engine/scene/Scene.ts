@@ -18,5 +18,9 @@ export class Scene implements IResource {
 	async execute(context:SceneContext) {
 		await this.sceneFn(context);
 	}
+
+	toString():string {
+		return `[Scene ${this.resId}]`
+	}
 }
 
