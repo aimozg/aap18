@@ -10,124 +10,19 @@ import {Damage, DamageSpec, DamageSpecEntry} from "../../engine/rules/Damage";
 import {Game} from "../../engine/Game";
 import {SkipCombatAction} from "../../engine/combat/actions/SkipCombatAction";
 import {Dice, Dices} from "../../engine/math/Dice";
-import {CombatRoll, CombatRollProcessor} from "../../engine/combat/CombatRoll";
+import {CombatRoll} from "../../engine/combat/CombatRoll";
 import {Direction} from "../../engine/utils/gridutils";
 import {StepAction} from "../../engine/combat/actions/StepAction";
 
 export namespace CombatRules {
 
-	export function postSetup() {
-		MeleeAttackQueue.sortOn("priority")
-	}
+	export function postSetup() {}
 
-	// TODO This is overcomplicated. Alternative:
-	//  - hooks in fixed places: "onStrike", "onHit", "onDamage"
-	//  - conditional buffs: getAC(tags:["melee", "enemyTypeDemon"])
-
-	export const MELEE_PRIO_CALC_AP = 100;
-	export const MELEE_PRIO_CALC_BONUS = 200;
-	export const MELEE_PRIO_CALC_DC = 300;
-	export const MELEE_PRIO_CALC_DAMAGE = 400;
-	export const MELEE_PRIO_STRIKE = 500;
-	export const MELEE_PRIO_DEDUCE_AP = 600;
-	export const MELEE_PRIO_ROLL = 700;
-	export const MELEE_PRIO_HIT_CHECK = 800;
-	export const MELEE_PRIO_HIT = 1000;
-	export const MELEE_PRIO_ROLL_DAMAGE = 1100;
-	export const MELEE_PRIO_DEAL_DAMAGE = 1200;
-	export const MELEE_PRIO_POST_HIT = 1500;
-
-	export let MeleeDefaultCalcAp: CombatRollProcessor = {
-		priority: MELEE_PRIO_CALC_AP,
-		async process(cc:CombatController, roll: CombatRoll) {
-			// TODO melee attack AP cost
-			if (!roll.free) {
-				roll.ap = 1000;
-				roll.ap *= speedApFactor(roll.actor.spe);
-			}
-		}
-	};
-	export let MeleeDefaultCalcBonus: CombatRollProcessor = {
-		priority: MELEE_PRIO_CALC_BONUS,
-		async process(cc:CombatController, roll: CombatRoll) {
-			roll.bonus = meleeAttackVs(roll.actor, roll.target);
-		}
-	};
-	export let MeleeDefaultCalcDc: CombatRollProcessor = {
-		priority: MELEE_PRIO_CALC_DC,
-		async process(cc:CombatController, roll: CombatRoll) {
-			roll.dc = meleeDefenseVs(roll.target, roll.actor)
-		}
-	};
-	export let MeleeDefaultCalcDamage: CombatRollProcessor = {
-		priority: MELEE_PRIO_CALC_DAMAGE,
-		async process(cc:CombatController, roll: CombatRoll) {
-			roll.damageSpec = meleeDamageVs(roll.actor, roll.target);
-		}
-	};
-	export let MeleeDefaultDeduceAp: CombatRollProcessor = {
-		priority: MELEE_PRIO_DEDUCE_AP,
-		async process(cc:CombatController, roll: CombatRoll) {
-			if (!roll.free && roll.ap > 0) {
-				await cc.deduceAP(roll.actor, roll.ap)
-			}
-		}
-	};
-	export let MeleeDefaultRoll: CombatRollProcessor = {
-		priority: MELEE_PRIO_ROLL,
-		async process(cc:CombatController, roll: CombatRoll) {
-			if (roll.roll === 0) {
-				roll.roll = cc.rng.d20();
-			}
-		}
+	export function meleeAttackApCost(roll:CombatRoll):number {
+		let cost = 1000;
+		cost *= speedApFactor(roll.actor.spe);
+		return Math.round(cost);
 	}
-	export let MeleeDefaultHitCheck: CombatRollProcessor = {
-		priority: MELEE_PRIO_HIT_CHECK,
-		async process(cc:CombatController, roll: CombatRoll) {
-			if (roll.roll === 1 && roll.canCritMiss) {
-				roll.hit = false;
-				roll.critMiss = true;
-			} else if (roll.roll === 20 && roll.canCritHit) {
-				roll.hit = true;
-				roll.critHit = true;
-			} else {
-				roll.hit = roll.roll + roll.bonus >= roll.dc;
-			}
-		}
-	}
-	export let MeleeDefaultHitCallback: CombatRollProcessor = {
-		priority: MELEE_PRIO_HIT,
-		async process(cc:CombatController, roll: CombatRoll): Promise<void> {
-			return roll.onHit?.(roll, cc)
-		}
-	}
-	export let MeleeDefaultRollDamage: CombatRollProcessor = {
-		priority: MELEE_PRIO_ROLL_DAMAGE,
-		async process(cc:CombatController, roll: CombatRoll) {
-			if (!roll.hit) return;
-			roll.damage = rollDamage(roll.damageSpec, roll.critHit, 2);
-		}
-	}
-	export let MeleeDefaultDealDamage: CombatRollProcessor = {
-		priority: MELEE_PRIO_DEAL_DAMAGE,
-		async process(cc:CombatController, roll: CombatRoll) {
-			if (!roll.hit) return;
-			await cc.doDamages(roll.target, roll.damage, roll.actor);
-		}
-	}
-
-	export let MeleeAttackQueue: CombatRollProcessor[] = [
-		MeleeDefaultCalcAp,
-		MeleeDefaultCalcBonus,
-		MeleeDefaultCalcDc,
-		MeleeDefaultCalcDamage,
-		MeleeDefaultDeduceAp,
-		MeleeDefaultRoll,
-		MeleeDefaultHitCheck,
-		MeleeDefaultHitCallback,
-		MeleeDefaultRollDamage,
-		MeleeDefaultDealDamage,
-	];
 
 	export function playerActions(player:PlayerCharacter, cc:CombatController):CombatAction<any>[] {
 		let actions:CombatAction<any>[] = [];

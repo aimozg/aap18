@@ -12,7 +12,7 @@ import {tween} from "shifty";
 import {CombatAction} from "./CombatAction";
 import {Damage, DamageType} from "../rules/Damage";
 import {coerce} from "../math/utils";
-import {CombatRoll, processRoll} from "./CombatRoll";
+import {CombatRoll} from "./CombatRoll";
 import {CombatRules} from "../../game/combat/CombatRules";
 import {BattleGrid} from "./BattleGrid";
 
@@ -235,8 +235,41 @@ export class CombatController {
 	// Combat actions //
 	////////////////////
 
+	// TODO move (partially) to CombatRoll.process()
 	async processMeleeRoll(roll:CombatRoll):Promise<CombatRoll> {
-		return processRoll(this, roll, CombatRules.MeleeAttackQueue);
+		// Calculate params
+		if (!roll.free) roll.ap = CombatRules.meleeAttackApCost(roll);
+		roll.bonus = CombatRules.meleeAttackVs(roll.actor, roll.target);
+		roll.dc = CombatRules.meleeDefenseVs(roll.target, roll.actor);
+		roll.damageSpec = CombatRules.meleeDamageVs(roll.actor, roll.target);
+		// Strike
+		// TODO onStrike callback
+		if (roll.ap > 0) {
+			await this.deduceAP(roll.actor, roll.ap);
+		}
+		if (roll.roll === 0) {
+			roll.roll = this.rng.d20();
+		}
+		if (roll.roll === 1 && roll.canCritMiss) {
+			roll.hit = false;
+			roll.critMiss = true;
+		} else if (roll.roll === 20 && roll.canCritHit) {
+			roll.hit = true;
+			roll.critHit = true;
+		} else {
+			roll.hit = roll.roll + roll.bonus >= roll.dc;
+		}
+		// Hit
+		if (roll.hit) {
+			roll.damage = CombatRules.rollDamage(roll.damageSpec, roll.critHit, 2);
+			await roll.onHit?.(roll, this);
+			if (roll.hit && !roll.cancelled) {
+				await this.doDamages(roll.target, roll.damage, roll.actor);
+			}
+		} else {
+			// TODO onMiss callback
+		}
+		return roll;
 	}
 
 	async performAction<T>(action:CombatAction<T>):Promise<T> {

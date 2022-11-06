@@ -9,6 +9,11 @@ import {LogManager} from "../logging/LogManager";
 import {UseAbilityAction} from "./actions/UseAbilityAction";
 
 export class CombatRoll {
+
+	// TODO This is overcomplicated. Alternative:
+	//  - hooks in fixed places: "onStrike", "onHit", "onDamage"
+	//  - conditional buffs: getAC(tags:["melee", "enemyTypeDemon"])
+
 	constructor(
 		public actor: Creature,
 		// TODO target area or group
@@ -104,20 +109,5 @@ export class CombatRoll {
 	}
 }
 
-export interface CombatRollProcessor {
-	priority: number;
-	process(cc:CombatController, roll:CombatRoll):Promise<void>;
-}
-
 const logger = LogManager.loggerFor("engine.combat.CombatRoll")
 
-export async function processRoll(cc: CombatController, roll:CombatRoll, queue:CombatRollProcessor[]) {
-	logger.debug("processRoll {}", roll)
-	for (let p of queue) {
-		if (roll.cancelled) break;
-		logger.trace("processRoll {} {}", p.priority, roll)
-		await p.process(cc, roll)
-	}
-	logger.debug("processRoll => {}", roll)
-	return roll;
-}
