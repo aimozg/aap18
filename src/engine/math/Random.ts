@@ -186,6 +186,34 @@ export abstract class Random {
 		if (source.length === 0) return null;
 		return this.pick(source);
 	}
+	pickWeighted<E>(source:E[], weightFn:(e:E)=>number):E {
+		let e = this.pickWeightedOrNull(source, weightFn);
+		if (e === null) throw new Error("Cannot pick from empty list");
+		return e;
+	}
+	pickWeightedOrNull<E>(source:E[], weightFn:(e:E)=>number):E|null {
+		if (source.length === 0) return null;
+		let sum = 0;
+		for (let e of source) {
+			let w = weightFn(e);
+			if (w >= Infinity) return e;
+			if (w <= 0) continue;
+			if (isNaN(w)) throw new Error("Invalid weighted random element");
+			sum += w;
+		}
+		if (source.length === 0) return null;
+		let x = this.nextFloat(sum);
+		for (let e of source) {
+			let w = weightFn(e);
+			if (w >= Infinity) return e;
+			if (w <= 0) continue;
+			if (isNaN(w)) throw new Error("Invalid weighted random element");
+			x -= w;
+			if (x <= 0) return e;
+		}
+		// should never happen
+		return source[source.length-1];
+	}
 }
 export interface WritableArrayLike<T> {
 	readonly length: number;

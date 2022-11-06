@@ -117,10 +117,7 @@ export class SceneContext implements GameContext {
 		if (!this._dirty) return;
 		this.characterPanel.update(this.player);
 		this._dirty = false;
-		if (this.nextButtons.length === 0) {
-			// TODO rescue
-			throw new Error(`Dead end in scene ${this.sceneId}.`)
-		}
+		this.checkDeadEnd();
 		// TODO tooltip
 		this.output.appendAction(<div class="choices">{this.nextButtons.map(btn =>
 			<div class="choice">
@@ -136,6 +133,14 @@ export class SceneContext implements GameContext {
 		this.nextButtons = [];
 		this.output.flush();
 	}
+
+	protected checkDeadEnd() {
+		if (this.nextButtons.length === 0) {
+			// TODO rescue
+			throw new Error(`Dead end in scene ${this.sceneId}.`)
+		}
+	}
+
 	protected async buttonClick(c: InternalChoiceData) {
 		logger.debug("buttonClick {}", c.value);
 		this._dirty = true;

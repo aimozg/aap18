@@ -10,9 +10,8 @@ export function gdRegisterPlayerBase(gd:GameDataBuilder) {
 	gd.buildScenes("/001", {
 		base(ctx:SceneContext) {
 			ctx.say("A ruined tower you use as your base.")
-
+			/*
 			ctx.choices({
-				/*
 				"Rest": {
 					async call (ctx:SceneContext) {
 						ctx.say("You rest...")
@@ -21,7 +20,7 @@ export function gdRegisterPlayerBase(gd:GameDataBuilder) {
 
 						ctx.endButton()
 					}
-				},*/
+				},
 				"Explore": {
 					async call(ctx:SceneContext) {
 						await ctx.ambush({
@@ -32,12 +31,23 @@ export function gdRegisterPlayerBase(gd:GameDataBuilder) {
 					disabled: !ctx.player.isAlive
 				}
 			})
+			*/
 		}
 	});
 	gd.buildPlace({
 		id: "/base",
 		name: "Camp",
 		description: "A ruined tower you use as your base.",
-		scene: "/001_base"
+		scene: "/001_base",
+		encounters: [{
+			name: "imp",
+			scene: async (ctx) => {
+				await ctx.ambush({
+					monsters: [new Imp()],
+					threatName: "a stray imp"
+				});
+			},
+			when: gc => gc.player.isAlive
+		}]
 	})
 }

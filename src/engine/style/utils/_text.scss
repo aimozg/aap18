@@ -26,6 +26,11 @@
   vertical-align: super;
   font-size: smaller;
 }
+@each $sz in small, smaller, x-small, big, bigger, x-big {
+  .text-#{$sz} {
+    font-size: $sz;
+  }
+}
 
 .text-error {
   background: #111;
