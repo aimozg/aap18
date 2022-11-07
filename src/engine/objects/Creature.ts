@@ -204,6 +204,13 @@ export class Creature {
 	//------------------//
 	// Equipment - Data //
 	//------------------//
+	private _money: number = 0;
+	get money():number { return this._money }
+	set money(value:number) {
+		if (!isFinite(value)) throw new Error("Attempt to set money to "+value);
+		this._money = value|0;
+	}
+
 	// TODO externalize
 	private _fists: Item = NaturalWeaponLib.NaturalFists.spawn();
 	get fists(): Item { return this._fists }

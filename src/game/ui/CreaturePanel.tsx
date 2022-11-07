@@ -30,6 +30,8 @@ export interface CreaturePanelOptions {
 	otherStats: boolean;
 
 	equipment: boolean;
+
+	money:boolean;
 }
 
 export class CreaturePanel extends DomComponent {
@@ -57,7 +59,9 @@ export class CreaturePanel extends DomComponent {
 
 		otherStats: true,
 
-		equipment: true
+		equipment: true,
+
+		money: true,
 	}
 	update(c: Creature | null) {
 		if (!c) {
@@ -181,13 +185,24 @@ export class CreaturePanel extends DomComponent {
 			return "-"
 		}
 		let sectionEquipment = options.equipment && <div className="grid-4 my-2">
-			<div>Weapon:</div>
+			<div className="text-right">Weapon:</div>
 			<div className="cols-2 text-center">{c.currentWeapon.name}</div>
 			<div className="text-center">{c.currentWeapon.asWeapon!.damage.toString()}</div>
-			<div>Armor:</div>
+			<div className="text-right">Armor:</div>
 			<div className="cols-2 text-center">{c.bodyArmor?.name ?? "-"}</div>
 			<div className="text-center">{armordesc(c.bodyArmor)}</div>
 		</div>
+		//------//
+		// Misc //
+		//------//
+		let sectionMisc = <div className="grid-4 my-2">
+			{options.money && <Fragment>
+				<div className="text-right">Money:</div>
+				<div className="text-right text-money cols-2">{c.money.format(",d")}</div>
+				<div></div>
+			</Fragment>}
+		</div>
+
 		render(<Fragment>
 			{sectionName}
 			{sectionTitle}
@@ -197,6 +212,7 @@ export class CreaturePanel extends DomComponent {
 			{sectionCombatStats}
 			{sectionOtherStats}
 			{sectionEquipment}
+			{sectionMisc}
 		</Fragment>, this.node)
 	}
 }

@@ -49,7 +49,7 @@ export function gdRegisterIntro(gd:GameDataBuilder) {
 
 			ctx.say("<p class='help-block'>When you enter a room with monster(s), an Ambush skill check is rolled. If you succeed, you can choose an action against an unaware enemy. If you fail, you fight. If you fail by 10 or more, you're the one ambushed! </p>")
 
-			let tutorialCombat = false;
+			let tutorialCombat = true;
 			if (tutorialCombat) {
 				let monster = new TutorialImp();
 				await ctx.ambush({

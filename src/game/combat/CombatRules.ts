@@ -60,7 +60,7 @@ export namespace CombatRules {
 
 	// TODO move to extension functions
 	/**
-	 * Attack rating with current mele weapon
+	 * Attack rating with current melee weapon
 	 */
 	export function meleeAttack(attacker:Creature):number {
 		let value = attacker.strMod

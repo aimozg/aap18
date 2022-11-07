@@ -64,6 +64,7 @@ export class BattleContext implements GameContext {
 	) {
 		this.cc = new CombatController(this)
 		this.battlePanel.init();
+		this.enemyPanel.options.money = false;
 	}
 
 	public get grid(): BattleGrid { return this.cc.grid };
