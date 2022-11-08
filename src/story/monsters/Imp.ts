@@ -25,6 +25,8 @@ export class Imp extends Character {
 
         this.abilities.push(TinyFireBolt);
 
+        this.money = this.rng.nextInt(5, 15);
+
         this.updateStats();
     }
 }

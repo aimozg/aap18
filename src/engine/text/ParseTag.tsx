@@ -12,7 +12,7 @@ export interface ParseTagProps {
 export class Parse extends Component<ParseTagProps, any> {
 	render(props: RenderableProps<ParseTagProps>): ComponentChild {
 		let parser = props.parser ?? new Parser(props.self);
-		if (props.select) parser.select(props.select);
+		if (props.select) parser.setTarget(props.select);
 		return walkVNode(props.children, (node,fn)=>{
 			if (typeof node === 'string') {
 				fn.replace = parser.print(node)

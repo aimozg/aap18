@@ -4,39 +4,17 @@
 import {Random} from "./Random";
 
 export class Dice {
-	constructor(spec: string);
 	constructor(
 		rolls: number,
 		sides: number,
 		bonus?: number
-	);
-	constructor() {
-		if (arguments.length === 1) {
-			let spec = arguments[0] as string;
-			let d = spec.indexOf('d');
-			if (d < 0) {
-				this.rolls = 0;
-				this.sides = 0;
-				this.bonus = parseInt(spec);
-			} else {
-				this.rolls = parseInt(spec.substring(0, d));
-				let p = spec.indexOf('+');
-				if (p < 0) p = spec.indexOf("-");
-				if (p < 0) {
-					this.sides = parseInt(spec.substring(d + 1));
-					this.bonus = 0;
-				} else {
-					this.sides = parseInt(spec.substring(d + 1, p));
-					this.bonus = parseInt(spec.substring(p));
-				}
-			}
-		} else {
-			this.rolls = arguments[0] | 0;
-			this.sides = arguments[1] | 0;
-			this.bonus = arguments[2] | 0;
-		}
+	) {
+		this.rolls = arguments[0] | 0;
+		this.sides = arguments[1] | 0;
+		this.bonus = arguments[2] | 0;
 		if (!isFinite(this.rolls) || !isFinite(this.sides) || !isFinite(this.rolls)) throw new Error("Invalid dice " + this.toString())
 	}
+
 	toString() {
 		const {rolls, sides, bonus} = this;
 		if (rolls === 0 || sides === 0) return String(bonus);
@@ -53,17 +31,40 @@ export class Dice {
 	roll(rng: Random): number {
 		return rng.dice(this.rolls, this.sides) + this.bonus;
 	}
+
 	inverse(): Dice {
 		return new Dice(-this.rolls, this.sides, -this.bonus)
 	}
+
 	withBonus(bonus: number): Dice {
 		if (bonus === 0) return this;
 		return new Dice(this.rolls, this.sides, this.bonus + bonus)
 	}
+
 	repeat(n: number): Dice {
 		if (n === 0) return Dices.ZERO
 		if (n === 1) return this
 		return new Dice(this.rolls * n, this.sides, this.bonus * n)
+	}
+
+	static parse(spec: string): Dice {
+		let rolls, sides, bonus;
+		let d = spec.indexOf('d');
+		if (d < 0) {
+			bonus = parseInt(spec);
+			return new Dice(0, 0, bonus);
+		}
+		rolls = parseInt(spec.substring(0, d));
+		let p = spec.indexOf('+');
+		if (p < 0) p = spec.indexOf("-");
+		if (p < 0) {
+			sides = parseInt(spec.substring(d + 1));
+			bonus = 0;
+		} else {
+			sides = parseInt(spec.substring(d + 1, p));
+			bonus = parseInt(spec.substring(p));
+		}
+		return new Dice(rolls, sides, bonus);
 	}
 }
 
@@ -71,7 +72,7 @@ let lib = new Map<string, Dice>();
 
 export function dice(spec: string): Dice {
 	if (lib.has(spec)) return lib.get(spec)!;
-	let dice = new Dice(spec);
+	let dice = Dice.parse(spec);
 	if (dice.bonus === 0) lib.set(spec, dice);
 	return dice;
 }

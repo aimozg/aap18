@@ -16,6 +16,8 @@ import {Random} from "./math/Random";
 import {BattleGrid} from "./combat/BattleGrid";
 import {GridPos} from "./utils/gridutils";
 import {PlaceContext} from "./place/PlaceContext";
+import {Creature} from "./objects/Creature";
+import {atMost} from "./math/utils";
 
 const logger = LogManager.loggerFor("engine.GameController");
 
@@ -183,6 +185,17 @@ export class GameController {
 		this.state.pushGameContext(ctx);
 		this.showGameScreen();
 		return ctx;
+	}
+
+	async restoreHp(creature:Creature, amount:number, output?:TextOutput) {
+		if (amount <= 0) return;
+		// TODO animate hp bar
+		creature.hp = atMost(creature.hp+amount, creature.hpMax);
+		if (output) {
+			output.selectActor(creature);
+			output.print(`<text-hp>[You] [are] healed (${amount}</text-hp>). `);
+			output.deselectActor();
+		}
 	}
 
 	recoverPlayer() {

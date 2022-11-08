@@ -14,19 +14,32 @@ import {Character} from "../../objects/creature/Character";
 const logger = LogManager.loggerFor("engine.text.Parser")
 
 export class Parser extends AbstractParser {
-	constructor(public self:Creature = Game.instance.state.player) {
+	constructor(public self: Creature = Game.instance.state.player) {
 		super();
 	}
+
 	target: Creature = Game.instance.state.player;
-	select(creature: Creature) {
+	private stack: Creature[] = [];
+
+	setTarget(creature: Creature) {
 		this.target = creature
 	}
+
+	selectActor(creature: Creature) {
+		this.stack.push(this.target);
+		this.setTarget(creature);
+	}
+
+	deselectActor() {
+		this.setTarget(this.stack.pop() ?? this.self);
+	}
+
 	print(text: string): VNode {
-		return TextOutput.print(this.parse(text))
+		return TextOutput.render(this.parse(text))
 	}
 
 	protected doEvaluateTag(tag: string, tagArgs: string): Parsed | string {
-		logger.trace("doEvaluateTag {} {}",tag,tagArgs)
+		logger.trace("doEvaluateTag {} {}", tag, tagArgs)
 		let isSelf = this.self && (this.self === this.target);
 		let target = this.target;
 		switch (tag) {

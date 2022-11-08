@@ -12,7 +12,7 @@ import {Parse} from "../../../engine/text/ParseTag";
 // TODO Diversify descriptions - "You have DESC TYPE" | "Your TYPE is DESC" | "CUSTOMDESC"
 export namespace Appearance {
 	export function characterAppearance(pc: Character, parser: Parser): ComponentChild {
-		parser.select(pc)
+		parser.setTarget(pc)
 		return <Parse parser={parser}>
 			<p>{/*Intro*/}{/*TODO feet/inches*/}
 				You are {pc.body.height.toFixed()}cm tall {pc.txt.sex} {pc.rgroup.name.toLowerCase()}. {/*TODO race*/}
@@ -44,7 +44,7 @@ export namespace Appearance {
 	}
 
 	export function characterColors(pc: Character, parser: Parser): ComponentChild {
-		parser.select(pc)
+		parser.setTarget(pc)
 		return <p>
 			<Parse parser={parser}>
 				{pc.body.materials.map(m => m.isPresent &&

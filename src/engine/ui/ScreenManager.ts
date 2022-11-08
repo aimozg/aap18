@@ -9,12 +9,15 @@ import {GameScreen} from "./screens/GameScreen";
 import {LogManager} from "../logging/LogManager";
 import {animateTransition, TransitionAnimationName} from "./animations";
 import {KeyCodes} from "./KeyCodes";
+import {CreaturePanel} from "../../game/ui/CreaturePanel";
 
 const logger = LogManager.loggerFor("engine.ui.ScreenManager");
 
 export class ScreenManager {
 	screens: AbstractScreen[] = [];
 	gameScreen: GameScreen = new GameScreen();
+
+	sharedPlayerPanel: CreaturePanel = new CreaturePanel();
 
 	constructor(
 		private screenHolder: HTMLElement

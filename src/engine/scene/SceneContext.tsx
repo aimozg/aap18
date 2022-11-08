@@ -4,7 +4,6 @@ import {StateManager} from "../state/StateManager";
 import {Scene, SceneFn} from "./Scene";
 import {GameScreenLayout} from "../ui/screens/GameScreen";
 import {Deferred} from "../utils/Deferred";
-import {Parser} from "../text/parser/Parser";
 import {TextOutput} from "../text/output/TextOutput";
 import {Button} from "../ui/components/Button";
 import {h} from "preact";
@@ -12,7 +11,6 @@ import {LogManager} from "../logging/LogManager";
 import {GameController} from "../GameController";
 import {GameContext} from "../state/GameContext";
 import {BattleContext, BattleOptions} from "../combat/BattleContext";
-import {CreaturePanel} from "../../game/ui/CreaturePanel";
 import {AmbushDef, AmbushRules} from "./ambush";
 import {Random} from "../math/Random";
 import {KeyCodes} from "../ui/KeyCodes";
@@ -76,8 +74,7 @@ export class SceneContext implements GameContext {
 	toString() { return `SceneContext(${this.sceneId})`}
 
 	lastValue: string = '';
-	readonly parser: Parser = new Parser();
-	readonly characterPanel = new CreaturePanel();
+	readonly characterPanel = Game.instance.screenManager.sharedPlayerPanel;
 
 	public get sceneId():string { return this.scene.resId }
 	private _scene:Scene;
@@ -181,8 +178,7 @@ export class SceneContext implements GameContext {
 	say(text: string, parseTags: boolean = true) {
 		logger.trace("say {}", text)
 		this._dirty = true;
-		let parsed = this.parser.parse(text, parseTags);
-		this.output.print(parsed);
+		this.output.print(text, parseTags);
 	}
 
 	choicelist(...choices: ChoiceData[]) {

@@ -6,3 +6,5 @@ export function coerce(value:number, min:number, max:number):number {
 	if (value > max) return max;
 	return value;
 }
+export const atLeast = Math.max;
+export const atMost = Math.min;

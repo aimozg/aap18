@@ -5,8 +5,8 @@ import {Fragment, h, VNode} from "preact";
 import {Parser} from "./parser/Parser";
 import {TextOutput} from "./output/TextOutput";
 
-export function simpleparse(input:string|null|undefined):VNode {
+export function simpleparse(input: string | null | undefined): VNode {
 	if (!input) return <Fragment/>
-	return TextOutput.print(new Parser().parse(input));
+	return TextOutput.render(new Parser().parse(input));
 }
 

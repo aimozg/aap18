@@ -81,7 +81,7 @@ export class BattleContext implements GameContext {
 		this._promise.resolve(this)
 		Game.instance.gameController.showGameScreen()
 	}
-	readonly characterPanel = new CreaturePanel()
+	readonly characterPanel = Game.instance.screenManager.sharedPlayerPanel
 	readonly enemyPanel = new CreaturePanel()
 	readonly logPanel = new LogPanel()
 	readonly battlePanel = new BattlePanel(this)

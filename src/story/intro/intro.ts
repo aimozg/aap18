@@ -58,7 +58,7 @@ export function gdRegisterIntro(gd:GameDataBuilder) {
 					tags: ['monster', 'inside', 'demon', 'scripted'],
 					monsters: [monster],
 					fail: "Tutorial ambush failed - this should never happen. Please report a bug.",
-					critFail: "Tutoriam ambush criticall failed - this should never happen. Please report a bug.",
+					critFail: "Tutorial ambush critically failed - this should never happen. Please report a bug.",
 					success: "You peek inside and spot a short, ugly demon crouched in the corner. It rummages the pile of stones, searching for something, with his unprotected back open for you to attack.",
 					successOptions: [{
 						label: "Talk",
