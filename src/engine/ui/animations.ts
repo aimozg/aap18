@@ -28,14 +28,14 @@ function stylePair(from: any, to: any, duration: number): TransitionSpec {
 			from: from,
 			to: to,
 			start: styleRenderer(element),
-			duration: duration,
+			duration: duration/2,
 			render: styleRenderer(element),
 		}),
 		remove: (element: HTMLElement) => ({
 			from: to,
 			to: from,
 			start: styleRenderer(element),
-			duration: duration,
+			duration: duration/2,
 			render: styleRenderer(element),
 		}),
 	}

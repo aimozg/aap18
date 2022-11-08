@@ -3,6 +3,7 @@ import {KeyCodes} from "../KeyCodes";
 
 export interface ButtonProps {
 	label?: string;
+	action?: UIAction;
 	className?: string;
 	onClick?: (e: MouseEvent) => void;
 	disabled?: boolean;
@@ -15,11 +16,29 @@ export interface ButtonState {
 
 }
 
+export interface UIAction {
+	hotkey?: string;
+	disabled?: boolean;
+	callback: ()=>void;
+}
+
+export function execUIAction(event:KeyboardEvent, actions:UIAction[]):boolean {
+	let hk = KeyCodes.eventToHkString(event);
+	for (let action of actions) {
+		if (action.hotkey === hk) {
+			action.callback();
+			return true;
+		}
+	}
+	return false;
+}
+
 export class Button extends Component<ButtonProps, ButtonState> {
 
 	private onClick(ev: MouseEvent) {
 		ev.preventDefault();
 		if (this.props.onClick) this.props.onClick(ev);
+		if (this.props.action?.callback) this.props.action?.callback();
 	}
 	private timeout:number = 0;
 	private interval:number = 0;
@@ -54,11 +73,13 @@ export class Button extends Component<ButtonProps, ButtonState> {
 	}
 
 	render(props: RenderableProps<ButtonProps>, state: Readonly<ButtonState>, context: any): ComponentChild {
-		let hk = props.hotkey ? <span class="--hk">{KeyCodes.hkLongToShort(props.hotkey)}</span> : null
+		let hotkey = props.hotkey ?? props.action?.hotkey;
+		let disabled = props.disabled ?? props.action?.disabled;
+		let hk = hotkey ? <span class="--hk">{KeyCodes.hkLongToShort(hotkey)}</span> : null
 		return <button
 			type="button"
 			class={props.className}
-			disabled={!!props.disabled}
+			disabled={!!disabled}
 			onMouseDown={props.hold?this.onMouseDown.bind(this):undefined}
 			onMouseUp={props.hold?this.onMouseUp.bind(this):undefined}
 			onMouseLeave={props.hold?this.onMouseLeave.bind(this):undefined}
