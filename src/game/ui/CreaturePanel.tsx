@@ -7,7 +7,7 @@ import {removeChildren} from "../../engine/utils/dom";
 import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
 import {CombatRules} from "../combat/CombatRules";
 import {stripedBackground} from "../../engine/utils/css";
-import {Item} from "../../engine/objects/Item";
+import {CommonText} from "../../engine/text/CommonText";
 
 export interface CreaturePanelOptions {
 	ap: boolean;
@@ -175,22 +175,14 @@ export class CreaturePanel extends DomComponent {
 		//-----------//
 		// Equipment //
 		//-----------//
-		function armordesc(a:Item|null):string {
-			if (!a?.asArmor) return "-"
-			let def = a.asArmor.defenseBonus ? "Def "+a.asArmor.defenseBonus : ""
-			let dr = a.asArmor.drBonus ? "DR "+a.asArmor.drBonus : ""
-			if (dr && def) return def+"/"+dr
-			if (dr) return dr
-			if (def) return def
-			return "-"
-		}
+
 		let sectionEquipment = options.equipment && <div className="grid-4 my-2">
 			<div className="text-right">Weapon:</div>
 			<div className="cols-2 text-center">{c.currentWeapon.name}</div>
-			<div className="text-center">{c.currentWeapon.asWeapon!.damage.toString()}</div>
+			<div className="text-center">{CommonText.weaponInfo(c.currentWeapon)}</div>
 			<div className="text-right">Armor:</div>
 			<div className="cols-2 text-center">{c.bodyArmor?.name ?? "-"}</div>
-			<div className="text-center">{armordesc(c.bodyArmor)}</div>
+			<div className="text-center">{CommonText.armorInfo(c.bodyArmor)}</div>
 		</div>
 		//------//
 		// Misc //

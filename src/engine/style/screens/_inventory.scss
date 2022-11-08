@@ -1,0 +1,17 @@
+.screen-inventory {
+  width: 960px;
+  margin: 4em 0;
+
+  .inventory-equipment {
+    display: grid;
+    gap: 4px;
+    /* columns: [hotkey] [name] [props] [unequip] */
+    grid-template-columns: min-content 2fr 1fr min-content;
+  }
+  .inventory-items {
+    display: grid;
+    gap: 4px;
+    /* columns: [hotkey] [name] [props] [equip] */
+    grid-template-columns: min-content 2fr 1fr min-content;
+  }
+}

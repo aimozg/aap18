@@ -18,6 +18,7 @@ import {GridPos} from "./utils/gridutils";
 import {PlaceContext} from "./place/PlaceContext";
 import {Creature} from "./objects/Creature";
 import {atMost} from "./math/utils";
+import {Item} from "./objects/Item";
 
 const logger = LogManager.loggerFor("engine.GameController");
 
@@ -203,5 +204,46 @@ export class GameController {
 		player.hp = player.hpMax;
 		player.ep = player.epMax;
 		player.lp = 0;
+	}
+
+	async unequipToInventory(creature:Creature, item:Item) {
+		// TODO EquipmentSlot system
+		// TODO invoke item's callback, check if unequipable
+		if (item === creature.mainHandItem) {
+			creature.setMainHandItem(null);
+			creature.addToInventory(item);
+			return;
+		}
+		if (item === creature.bodyArmor) {
+			creature.setBodyArmor(null);
+			creature.addToInventory(item);
+			return;
+		}
+		throw new Error(`Cannot unequip ${item}, it is not in any slot.`)
+	}
+	async equipFromInventory(creature:Creature, item:Item) {
+		if (!creature.inventory.includes(item)) throw new Error(`Creature do not carry ${item}`);
+		await this.equipItem(creature, item);
+		creature.removeFromInventory(item);
+	}
+
+	async equipItem(creature: Creature, item: Item) {
+		// TODO EquipmentSlot system
+		// TODO check if equipable, invoke item's callback
+		if (item.isWeapon) {
+			if (creature.mainHandItem) {
+				await this.unequipToInventory(creature, creature.mainHandItem);
+			}
+			creature.setMainHandItem(item);
+			return;
+		}
+		if (item.isArmor) {
+			if (creature.bodyArmor) {
+				await this.unequipToInventory(creature, creature.bodyArmor);
+			}
+			creature.setBodyArmor(item);
+			return;
+		}
+		throw new Error(`Cannot equip ${item} - invalid type`)
 	}
 }

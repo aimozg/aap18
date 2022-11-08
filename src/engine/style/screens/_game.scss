@@ -7,7 +7,7 @@ $duration: 0.5s;
 .game-layout {
   display:flex;
   flex-direction: column;
-  flex-basis: 1200px;
+  width: 1200px;
   &.-wide {
     flex-grow: 1;
   }

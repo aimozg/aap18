@@ -59,8 +59,8 @@ export class ScreenManager {
 
 	async addOnTop(screen: AbstractScreen, transition?: TransitionAnimationName): Promise<void> {
 		this.top?.onDeactivate();
-		await animateTransition(screen.container, transition, "add");
 		this.addTop(screen);
+		await animateTransition(screen.container, transition, "add");
 	}
 
 	async replaceTop(screen: AbstractScreen, transition?: TransitionAnimationName): Promise<void> {

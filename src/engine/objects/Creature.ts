@@ -201,9 +201,9 @@ export class Creature {
 		return value
 	}
 
-	//------------------//
-	// Equipment - Data //
-	//------------------//
+	//--------------//
+	// Items - Data //
+	//--------------//
 	private _money: number = 0;
 	get money():number { return this._money }
 	set money(value:number) {
@@ -216,6 +216,7 @@ export class Creature {
 	get fists(): Item { return this._fists }
 	setFists(item:Item) { this._fists = item }
 
+	// TODO EquipmentSlot system
 	private _mainHandItem: Item|null = null;
 	get mainHandItem(): Item|null { return this._mainHandItem }
 	setMainHandItem(item:Item|null) { this._mainHandItem = item }
@@ -224,9 +225,12 @@ export class Creature {
 	get bodyArmor(): Item|null { return this._bodyArmor }
 	setBodyArmor(item:Item|null) { this._bodyArmor = item }
 
-	////////////////////////
-	// Equipment - Helpers
-	////////////////////////
+	private _inventory:Item[] = [];
+	get inventory(): Item[] { return this._inventory };
+
+	//-----------------//
+	// Items - Helpers //
+	//-----------------//
 	get currentWeapon(): Item {
 		return this.mainHandItem?.ifWeapon ?? this.fists
 	}
@@ -234,6 +238,16 @@ export class Creature {
 		let mw = this.mainHandItem;
 		if (mw?.ifWeapon/* TODO and mw is melee weapon */) return mw;
 		return this.fists;
+	}
+	addToInventory(item:Item) {
+		if (this._inventory.includes(item)) throw new Error("Item already in inventory");
+		this._inventory.push(item);
+	}
+	removeFromInventory(item:Item):Item|null {
+		let i = this._inventory.indexOf(item);
+		if (i < 0) return null;
+		this._inventory.splice(i, 1);
+		return item;
 	}
 
 	///////////////////

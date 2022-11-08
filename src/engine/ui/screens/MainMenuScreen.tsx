@@ -26,13 +26,13 @@ export class MainMenuScreen extends AbstractScreen {
 			<div class="text-s mb-8">{this.game.info.version}</div>
 
 			<div class="d-flex flex-column ai-center gap-4">
-				<Button label={"Resume Game"}
+				<Button label="Resume Game"
 				        disabled={!this.game.saveManager.isRecentSaveAvailable()}
 				        className="-big"
-				        onClick={this.onResumeGameClick.bind(this)}/>
-				<Button label={"New Game"}
+				        onClick={()=>this.onResumeGameClick()}/>
+				<Button label="New Game"
 				        className="-big"
-				        onClick={this.onNewGameClick.bind(this)}/>
+				        onClick={()=>this.onNewGameClick()}/>
 			</div>
 		</div>
 	}
