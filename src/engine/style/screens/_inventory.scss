@@ -1,17 +1,35 @@
+@use "../components/button";
+@use "../components/inputs";
+
+$itemActionCount: 2;
+
 .screen-inventory {
   width: 960px;
   margin: 4em 0;
+  align-self: center;
 
+  /* columns: [hotkey] [name] [props] [transfer] [use] */
+  .inventory-row {
+    display: grid;
+    grid-template-columns: button.$iconBtnSize 2fr 1fr repeat($itemActionCount, button.$iconBtnSize);
+    align-items: center;
+
+    border: 1px solid var(--theme-ctrl-bg);
+    border-radius: (2px + inputs.$ctrlRadius);
+    gap: 4px;
+
+
+    &.-active {
+      border-color: var(--theme-ctrl-fg);
+    }
+  }
   .inventory-equipment {
     display: grid;
+    grid-template-columns: max-content 1fr;
+    align-items: center;
     gap: 4px;
-    /* columns: [hotkey] [name] [props] [unequip] */
-    grid-template-columns: min-content 2fr 1fr min-content;
   }
-  .inventory-items {
-    display: grid;
-    gap: 4px;
-    /* columns: [hotkey] [name] [props] [equip] */
-    grid-template-columns: min-content 2fr 1fr min-content;
+  .inventory-iteminfo {
+    min-height: 10em;
   }
 }

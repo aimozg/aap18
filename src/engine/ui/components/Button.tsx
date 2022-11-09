@@ -18,7 +18,8 @@ export interface ButtonState {
 
 export interface UIAction {
 	hotkey?: string;
-	disabled?: boolean;
+	label?: string;
+	disabled?: boolean|(()=>boolean);
 	callback: ()=>void;
 }
 
@@ -75,6 +76,7 @@ export class Button extends Component<ButtonProps, ButtonState> {
 	render(props: RenderableProps<ButtonProps>, state: Readonly<ButtonState>, context: any): ComponentChild {
 		let hotkey = props.hotkey ?? props.action?.hotkey;
 		let disabled = props.disabled ?? props.action?.disabled;
+		if (typeof disabled === "function") disabled = disabled();
 		let hk = hotkey ? <span class="--hk">{KeyCodes.hkLongToShort(hotkey)}</span> : null
 		return <button
 			type="button"
@@ -83,7 +85,7 @@ export class Button extends Component<ButtonProps, ButtonState> {
 			onMouseDown={props.hold?this.onMouseDown.bind(this):undefined}
 			onMouseUp={props.hold?this.onMouseUp.bind(this):undefined}
 			onMouseLeave={props.hold?this.onMouseLeave.bind(this):undefined}
-			onClick={this.onClick.bind(this)}>{hk}{props.children}{props.label}</button>
+			onClick={this.onClick.bind(this)}>{hk}{props.children}{props.label??props.action?.label}</button>
 	}
 
 }

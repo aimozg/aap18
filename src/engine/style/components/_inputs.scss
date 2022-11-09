@@ -1,7 +1,9 @@
+$ctrlRadius: 4px;
+
 @mixin control {
   &:not(.-link) {
     border: 2px solid var(--theme-ctrl-fg);
-    border-radius: 4px;
+    border-radius: $ctrlRadius;
     background: var(--theme-ctrl-bg);
     color: var(--tc-fg);
   }
@@ -9,6 +11,9 @@
     border: none;
     background: none;
     color: var(--tc-link);
+  }
+  &.-flat {
+    border-color: transparent;
   }
   font-family: var(--theme-ctrl-font-face);
   font-size: var(--theme-ctrl-font-size);
@@ -20,17 +25,23 @@
 
   &:disabled, &.-disabled {
     background: var(--theme-bg);
-    border-color: var(--theme-ctrl-disabled);
+    &:not(.-flat) {
+      border-color: var(--theme-ctrl-disabled);
+    }
     color: var(--tc-disabled);
   }
 
   &.-shadowed {
-    border-color: var(--tc-shadowed);
+    &:not(.-flat) {
+      border-color: var(--tc-shadowed);
+    }
     color: var(--tc-shadowed);
   }
 
   &:focus, &.-focus {
-    outline: var(--tc-focus);
-    border-color: var(--tc-focus);
+    &:not(.-flat) {
+      outline: var(--tc-focus);
+      border-color: var(--tc-focus);
+    }
   }
 }

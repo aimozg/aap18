@@ -1,7 +1,19 @@
 @use "inputs";
 
+$iconBtnSize: 32px;
+
 @mixin button {
   @include inputs.control;
+  &.-icon {
+    width: $iconBtnSize;
+    height: $iconBtnSize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .--hk {
+      margin: 0;
+    }
+  }
   &:not(.-link) {
     text-align: center;
   }

@@ -47,7 +47,10 @@ export class PlaceContext extends SceneContext {
 	async onInventoryClick() {
 		if (!this.canManageInventory()) return;
 
-		await this.game.screenManager.addOnTop(new InventoryScreen(this.player), 'fade-fast');
+		let inventoryScreen = new InventoryScreen(this.player);
+		await this.game.screenManager.addOnTop(inventoryScreen, 'fade-fast');
+		await inventoryScreen.promise;
+		this.characterPanel.update(this.player);
 	}
 
 	canLevelUp(): boolean {

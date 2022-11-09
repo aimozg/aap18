@@ -31,44 +31,34 @@ export class PlaceSidebar extends Component<PlaceSidebarProps, PlaceSidebarState
 	static HkLevelUp = KeyCodes.KEYP;
 	static HkExplore = KeyCodes.KEYE;
 
-	private aRest(): UIAction {
-		return {
-			disabled: this.state.disabled || !this.props.context.canRest(),
-			hotkey: PlaceSidebar.HkRest,
-			callback: () => this.props.context.onRestClick()
-		}
+	private aRest: UIAction = {
+		disabled: () => this.state.disabled || !this.props.context.canRest(),
+		hotkey: PlaceSidebar.HkRest,
+		callback: () => this.props.context.onRestClick()
 	}
 
-	private aInventory(): UIAction {
-		return {
-			disabled: this.state.disabled || !this.props.context.canManageInventory(),
-			hotkey: PlaceSidebar.HkInventory,
-			callback: () => this.props.context.onInventoryClick()
-		}
+	private aInventory: UIAction = {
+		disabled: () => this.state.disabled || !this.props.context.canManageInventory(),
+		hotkey: PlaceSidebar.HkInventory,
+		callback: () => this.props.context.onInventoryClick()
 	}
 
-	private aLevelup(): UIAction {
-		return {
-			disabled: this.state.disabled || !this.props.context.canLevelUp(),
-			hotkey: PlaceSidebar.HkLevelUp,
-			callback: () => this.props.context.onLevelUpClick()
-		}
+	private aLevelup: UIAction = {
+		disabled: () => this.state.disabled || !this.props.context.canLevelUp(),
+		hotkey: PlaceSidebar.HkLevelUp,
+		callback: () => this.props.context.onLevelUpClick()
 	}
 
-	private aExplore(): UIAction {
-		return {
-			disabled: this.state.disabled || !this.props.context.canExplore(),
-			hotkey: PlaceSidebar.HkExplore,
-			callback: () => this.props.context.onExploreClick()
-		}
+	private aExplore: UIAction = {
+		disabled: () => this.state.disabled || !this.props.context.canExplore(),
+		hotkey: PlaceSidebar.HkExplore,
+		callback: () => this.props.context.onExploreClick()
 	}
 
-	private actions(): UIAction[] {
-		return [this.aRest(), this.aInventory(), this.aLevelup(), this.aExplore()];
-	}
+	private actions = [this.aRest, this.aInventory, this.aLevelup, this.aExplore];
 
 	handleKeyboardEvent(e: KeyboardEvent): boolean {
-		return execUIAction(e, this.actions());
+		return execUIAction(e, this.actions);
 	}
 
 	render(props: RenderableProps<PlaceSidebarProps>, state: Readonly<PlaceSidebarState>): ComponentChild {
@@ -81,16 +71,16 @@ export class PlaceSidebar extends Component<PlaceSidebarProps, PlaceSidebarState
 			<div class="place-actions d-flex flex-column ai-stretch gap-2 ma-2">
 				<Button label="Rest"
 				        className="-big"
-				        action={this.aRest()}/>
+				        action={this.aRest}/>
 				<Button label="Inventory"
 				        className="-big"
-						action={this.aInventory()}/>
+				        action={this.aInventory}/>
 				<Button label="Level Up"
 				        className="-big"
-				        action={this.aLevelup()}/>
+				        action={this.aLevelup}/>
 				<Button label="Explore"
 				        className="-big"
-				        action={this.aExplore()}/>
+				        action={this.aExplore}/>
 			</div>
 		</div>;
 	}
