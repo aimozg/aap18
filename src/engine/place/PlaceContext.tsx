@@ -47,9 +47,7 @@ export class PlaceContext extends SceneContext {
 	async onInventoryClick() {
 		if (!this.canManageInventory()) return;
 
-		let inventoryScreen = new InventoryScreen(this.player);
-		await this.game.screenManager.addOnTop(inventoryScreen, 'fade-fast');
-		await inventoryScreen.promise;
+		await new InventoryScreen(this.player).showModal();
 		this.characterPanel.update(this.player);
 	}
 

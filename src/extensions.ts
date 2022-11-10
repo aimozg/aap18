@@ -41,6 +41,8 @@ declare global {
          * @param options Binary flags: 1: sort as case-insensitive strings, 2: sort descending
          */
         sortWith(selector: (item: T, index: number, array: T[]) => string | number, options?: number): this;
+
+        count(predicate: (item: T, index: number, array: T[]) => boolean, thisArg?: any): number;
     }
 }
 
@@ -180,6 +182,19 @@ function initExtensions() {
             return this;
         }
     });
+
+    Object.defineProperty(Array.prototype, "count", {
+        enumerable: false,
+        writable: false,
+        configurable: false,
+        value: function<T>(this: T[], predicate: (item: T, index: number, array: T[]) => boolean, thisArg?: any): number {
+            let n = 0;
+            this.forEach((value,index)=>{
+                if (predicate.call(thisArg, value, index, this)) n++;
+            });
+            return n;
+        }
+    })
 }
 
 initExtensions();

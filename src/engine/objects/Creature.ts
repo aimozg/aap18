@@ -13,6 +13,7 @@ import {TraitType} from "../rules/TraitType";
 import {DefaultMonsterAI, MonsterAI} from "./MonsterAI";
 import {AbstractCombatAbility} from "../combat/AbstractCombatAbility";
 import {GOCreature} from "../combat/BattleGrid";
+import {Inventory} from "./Inventory";
 
 let objectIdCounter = 0;
 
@@ -225,8 +226,8 @@ export class Creature {
 	get bodyArmor(): Item|null { return this._bodyArmor }
 	setBodyArmor(item:Item|null) { this._bodyArmor = item }
 
-	private _inventory:Item[] = [];
-	get inventory(): Item[] { return this._inventory };
+	// TODO move inventory size to game rules
+	readonly inventory: Inventory = new Inventory("Inventory", 20);
 
 	//-----------------//
 	// Items - Helpers //
@@ -240,14 +241,13 @@ export class Creature {
 		return this.fists;
 	}
 	addToInventory(item:Item) {
-		if (this._inventory.includes(item)) throw new Error("Item already in inventory");
-		this._inventory.push(item);
+		this.inventory.addItem(item);
 	}
 	removeFromInventory(item:Item):Item|null {
-		let i = this._inventory.indexOf(item);
-		if (i < 0) return null;
-		this._inventory.splice(i, 1);
-		return item;
+		if (this.inventory.removeItem(item)) {
+			return item;
+		}
+		return null;
 	}
 
 	///////////////////

@@ -17,7 +17,7 @@ $itemActionCount: 2;
     border: 1px solid var(--theme-ctrl-bg);
     border-radius: (2px + inputs.$ctrlRadius);
     gap: 4px;
-
+    min-height: button.$iconBtnSize;
 
     &.-active {
       border-color: var(--theme-ctrl-fg);

@@ -4,6 +4,7 @@
 import {GameDataBuilder} from "../../game/GameDataBuilder";
 import {SceneContext} from "../../engine/scene/SceneContext";
 import {Imp} from "../monsters/Imp";
+import {ConsumableLib} from "../../game/data/items/ConsumableLib";
 
 export function gdRegisterPlayerBase(gd:GameDataBuilder) {
 	gd.logger.debug("gdRegisterPlayerBase")
@@ -47,7 +48,17 @@ export function gdRegisterPlayerBase(gd:GameDataBuilder) {
 					threatName: "a stray imp"
 				});
 			},
+			chance: 0,
 			when: gc => gc.player.isAlive
+		}, {
+			name: "debug_item",
+			scene: async (ctx)=> {
+				let item = ConsumableLib.PotionHealingLesser.spawn();
+				ctx.say(`You found a ${item.name}!`);
+
+				await ctx.pickupItems([item]);
+				ctx.endNow();
+			}
 		}]
 	})
 }

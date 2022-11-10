@@ -23,9 +23,16 @@ export interface UIAction {
 	callback: ()=>void;
 }
 
+export function uiActionEnabled(a:UIAction):boolean {
+	if (typeof a.disabled === 'boolean') return !a.disabled;
+	if (typeof a.disabled === 'function') return !a.disabled();
+	return true;
+}
+
 export function execUIAction(event:KeyboardEvent, actions:UIAction[]):boolean {
 	let hk = KeyCodes.eventToHkString(event);
 	for (let action of actions) {
+		if (!uiActionEnabled(action)) continue;
 		if (action.hotkey === hk) {
 			action.callback();
 			return true;
@@ -75,8 +82,7 @@ export class Button extends Component<ButtonProps, ButtonState> {
 
 	render(props: RenderableProps<ButtonProps>, state: Readonly<ButtonState>, context: any): ComponentChild {
 		let hotkey = props.hotkey ?? props.action?.hotkey;
-		let disabled = props.disabled ?? props.action?.disabled;
-		if (typeof disabled === "function") disabled = disabled();
+		let disabled = props.disabled ?? (props.action && !uiActionEnabled(props.action));
 		let hk = hotkey ? <span class="--hk">{KeyCodes.hkLongToShort(hotkey)}</span> : null
 		return <button
 			type="button"

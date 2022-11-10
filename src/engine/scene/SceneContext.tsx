@@ -14,6 +14,9 @@ import {BattleContext, BattleOptions} from "../combat/BattleContext";
 import {AmbushDef, AmbushRules} from "./ambush";
 import {Random} from "../math/Random";
 import {KeyCodes} from "../ui/KeyCodes";
+import {Inventory} from "../objects/Inventory";
+import {InventoryScreen, InventoryScreenOptions} from "../ui/screens/InventoryScreen";
+import {Item} from "../objects/Item";
 
 export interface ChoiceOptions {
 	/** Button text */
@@ -71,14 +74,17 @@ export class SceneContext implements GameContext {
 	) {
 		this._scene = this.game.data.scene(sceneId);
 	}
+
 	toString() { return `SceneContext(${this.sceneId})`}
 
 	lastValue: string = '';
 	readonly characterPanel = Game.instance.screenManager.sharedPlayerPanel;
 
-	public get sceneId():string { return this.scene.resId }
-	private _scene:Scene;
-	public get scene():Scene { return this._scene }
+	public get sceneId(): string { return this.scene.resId }
+
+	private _scene: Scene;
+	public get scene(): Scene { return this._scene }
+
 	private _ended = false;
 	private nextButtons: InternalChoiceData[] = [];
 	private currentButtons: InternalChoiceData[] = [];
@@ -86,11 +92,16 @@ export class SceneContext implements GameContext {
 	private _dirty = true;
 
 	get promise(): Promise<string> { return this._promise }
+
 	readonly game: Game = Game.instance;
 	readonly state: StateManager = Game.instance.state;
+
 	get player(): PlayerCharacter { return Game.instance.state.player }
+
 	get gc(): GameController { return Game.instance.gameController }
+
 	get ended(): boolean { return this._ended; }
+
 	get layout(): GameScreenLayout {
 		return {
 			left: this.characterPanel.astsx,
@@ -105,6 +116,7 @@ export class SceneContext implements GameContext {
 		this.currentButtons = []
 		this.characterPanel.update(this.player)
 	}
+
 	protected async flush() {
 		logger.debug("flush in {}", this.sceneId);
 		if (this._ended) {
@@ -149,17 +161,20 @@ export class SceneContext implements GameContext {
 		await c.callback();
 		setTimeout(() => this.flush(), 0);
 	}
+
 	private async finish() {
 		this._dirty = true;
 		this._ended = true;
 		await this.flush();
 	}
+
 	async play(scene: string | Scene, append: boolean = false): Promise<string> {
 		logger.debug("play {}", scene);
 		this._scene = this.game.data.scene(scene);
 		return this.playCurrentScene(append);
 	}
-	async playCurrentScene(append:boolean = false): Promise<string> {
+
+	async playCurrentScene(append: boolean = false): Promise<string> {
 		this._dirty = true;
 
 		await this.beginScreen(append);
@@ -185,7 +200,7 @@ export class SceneContext implements GameContext {
 		logger.trace("choiceList")
 		this._dirty = true;
 
-		this.nextButtons = choices.filter(c => !c.hide).map((c,i) => {
+		this.nextButtons = choices.filter(c => !c.hide).map((c, i) => {
 			let callback;
 			if ('scene' in c) {
 				callback = ((scene) => () => this.play(scene))(c.scene)
@@ -218,9 +233,10 @@ export class SceneContext implements GameContext {
 			}
 		});
 	}
+
 	onKeyboardEvent(event: KeyboardEvent): void {
 		let hk = KeyCodes.eventToHkString(event);
-		let btn = this.currentButtons.find(b=>!b.disabled && b.hotkey === hk);
+		let btn = this.currentButtons.find(b => !b.disabled && b.hotkey === hk);
 		if (btn) {
 			event.preventDefault();
 			this.buttonClick(btn).then();
@@ -270,6 +286,21 @@ export class SceneContext implements GameContext {
 
 	async ambush(def: AmbushDef) {
 		await AmbushRules.doAmbush(def, this)
+	}
+
+	async pickupItems(items:Item[]) {
+		if (this.player.inventory.canTakeAll(items)) {
+			this.player.inventory.addAll(items);
+			await this.flipPage();
+		} else {
+			await this.flipPage("Transfer");
+			await this.openTransferMenu(Inventory.wrap(items));
+		}
+	}
+
+	async openTransferMenu(inv: Inventory, options: Partial<InventoryScreenOptions> = {}) {
+		await new InventoryScreen(this.player, inv, options).showModal();
+		this.characterPanel.update(this.player);
 	}
 
 	endNow(value?: string) {

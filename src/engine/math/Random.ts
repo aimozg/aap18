@@ -193,6 +193,14 @@ export abstract class Random {
 	}
 	pickWeightedOrNull<E>(source:E[], weightFn:(e:E)=>number):E|null {
 		if (source.length === 0) return null;
+		// Single-pass weighted random
+		// At each iteration i:
+		// - if Z <= w(i) / S(i), pick x_i
+		// - if Z >  w(i) / S(i), pick unchanged
+		// where Z is random(0..1), w(i) is weight of x_i,
+		// S(i) = w(1) + w(2) + ... + w(i) = partial sum
+		let pick:E|null = null;
+		let z = this.nextFloat();
 		let sum = 0;
 		for (let e of source) {
 			let w = weightFn(e);
@@ -200,19 +208,9 @@ export abstract class Random {
 			if (w <= 0) continue;
 			if (isNaN(w)) throw new Error("Invalid weighted random element");
 			sum += w;
+			if (z <= w/sum) pick = e;
 		}
-		if (source.length === 0) return null;
-		let x = this.nextFloat(sum);
-		for (let e of source) {
-			let w = weightFn(e);
-			if (w >= Infinity) return e;
-			if (w <= 0) continue;
-			if (isNaN(w)) throw new Error("Invalid weighted random element");
-			x -= w;
-			if (x <= 0) return e;
-		}
-		// should never happen
-		return source[source.length-1];
+		return pick;
 	}
 }
 export interface WritableArrayLike<T> {
