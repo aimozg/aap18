@@ -49,6 +49,12 @@
 .text-lust {
   color: var(--tc-lust);
 }
+.text-heal, .text-hp {
+  color: var(--tc-hp);
+}
+.text-damage, .text-dmg {
+  color: var(--tc-damage);
+}
 .text-money {
   color: var(--tc-money);
 }

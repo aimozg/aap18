@@ -194,7 +194,7 @@ export class GameController {
 		creature.hp = atMost(creature.hp+amount, creature.hpMax);
 		if (output) {
 			output.selectActor(creature);
-			output.print(`<text-hp>[You] [are] healed (${amount}</text-hp>). `);
+			output.print(`<hl>[You]</hl> [are] healed (<text-hp>${amount}</text-hp>). `);
 			output.deselectActor();
 		}
 	}
@@ -245,5 +245,19 @@ export class GameController {
 			return;
 		}
 		throw new Error(`Cannot equip ${item} - invalid type`)
+	}
+
+	async consumeFromInventory(creature: Creature, item: Item, output?: TextOutput) {
+		if (!creature.inventory.includes(item)) throw new Error(`Creature does not carry ${item}`);
+		await this.consumeItem(creature, item, output);
+		creature.removeFromInventory(item);
+	}
+
+	async consumeItem(creature: Creature, item: Item, output?: TextOutput) {
+		let cc = item.asConsumable;
+		if (!cc) throw new Error(`Cannot consume ${item}`);
+		for (let effect of cc.effects) {
+			await effect.apply(this, creature, output)
+		}
 	}
 }

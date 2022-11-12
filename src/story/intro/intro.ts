@@ -15,7 +15,7 @@ export function gdRegisterIntro(gd:GameDataBuilder) {
 	gd.buildScenes(namespace, {
 		async intro(ctx: SceneContext) {
 			// Set player location
-			ctx.gc.placePlayer('/base');
+			ctx.gc.placePlayer('/camp');
 			ctx.player.setMainHandItem(MeleeWeaponLib.Dagger.spawn());
 			ctx.player.setBodyArmor(ArmorLib.LeatherArmor.spawn());
 

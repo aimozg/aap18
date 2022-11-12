@@ -5,6 +5,9 @@
 import {IResource} from "../IResource";
 import Symbols from "../symbols";
 import {Item} from "./Item";
+import {WeaponComponent} from "./item/WeaponComponent";
+import {ArmorComponent} from "./item/ArmorComponent";
+import {ConsumableComponent} from "./item/ConsumableComponent";
 
 export abstract class BaseItem implements IResource {
 	get resType() { return Symbols.ResTypeBaseItem }
@@ -16,6 +19,15 @@ export abstract class BaseItem implements IResource {
 		return new Item(this);
 	}
 	readonly components: BaseItemComponent[] = [];
+
+	weapon: WeaponComponent | undefined;
+	get isWeapon(): boolean { return !!this.weapon };
+
+	armor: ArmorComponent | undefined;
+	get isArmor(): boolean { return !!this.armor };
+
+	consumable: ConsumableComponent | undefined;
+	get isConsumable(): boolean { return !!this.consumable };
 }
 
 export abstract class BaseItemComponent {

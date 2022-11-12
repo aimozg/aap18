@@ -3,6 +3,9 @@
  */
 
 import {BaseItem} from "./BaseItem";
+import {WeaponComponent} from "./item/WeaponComponent";
+import {ArmorComponent} from "./item/ArmorComponent";
+import {ConsumableComponent} from "./item/ConsumableComponent";
 
 export class Item {
 	constructor(
@@ -12,4 +15,20 @@ export class Item {
 	public customName:string|null = null;
 
 	public get name():string { return this.customName ?? this.base.name }
+
+	//------------//
+	// Components //
+	//------------//
+
+	asWeapon: WeaponComponent | undefined;
+	isWeapon: boolean;
+	ifWeapon: this | null;
+
+	asArmor: ArmorComponent | undefined;
+	isArmor: boolean;
+	ifArmor: this | null;
+
+	asConsumable: ConsumableComponent | undefined;
+	isConsumable: boolean;
+	ifConsumable: this | null;
 }

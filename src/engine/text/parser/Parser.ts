@@ -14,8 +14,10 @@ import {Character} from "../../objects/creature/Character";
 const logger = LogManager.loggerFor("engine.text.Parser")
 
 export class Parser extends AbstractParser {
+	static AllowedHtmlTags:string[] = ["hl"];
 	constructor(public self: Creature = Game.instance.state.player) {
 		super();
+		for (let tag of Parser.AllowedHtmlTags) this.allowedHtmlTags.add(tag);
 	}
 
 	target: Creature = Game.instance.state.player;

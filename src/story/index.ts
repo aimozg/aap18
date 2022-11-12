@@ -3,7 +3,7 @@
  */
 import {GameDataBuilder} from "../game/GameDataBuilder";
 import {gdRegisterIntro} from "./intro/intro";
-import {gdRegisterPlayerBase} from "./base/base";
+import {gdRegisterPlayerBase} from "./camp/camp";
 
 
 export function gdRegisterStory(gd:GameDataBuilder) {

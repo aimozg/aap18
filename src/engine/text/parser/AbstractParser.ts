@@ -80,8 +80,8 @@ export abstract class AbstractParser {
 			current.push({type:'hr'});
 		} else if (tag === 'br' && single) {
 			current.push({type:'br'})
-		} else if (this.allowedHtmlTags.has(tag)) {
-			let cls = "text-"+tag;
+		} else if (this.allowedHtmlTags.has(tag) || tag.startsWith("text-")) {
+			let cls = tag.startsWith("text-") ? tag : ("text-"+tag);
 			if (attrs['class']) cls += " "+attrs['class'];
 			let block: ParsedStyledText = {
 				type: "styledText",

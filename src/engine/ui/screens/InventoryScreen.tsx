@@ -8,6 +8,10 @@ import {CommonText} from "../../text/CommonText";
 import {Item} from "../../objects/Item";
 import {Deferred} from "../../utils/Deferred";
 import {Inventory} from "../../objects/Inventory";
+import {TextOutput} from "../../text/output/TextOutput";
+import {ScenePanel} from "../panels/ScenePanel";
+
+type ItemAction = UIAction & {longLabel:string, position:number}
 
 interface ItemMenu {
 	item: Item | null;
@@ -15,13 +19,17 @@ interface ItemMenu {
 	natural?: boolean;
 	equipped?: boolean;
 	aSelect?: UIAction;
-	action1?: UIAction;
-	action2?: UIAction;
+	actions: ItemAction[];
 }
-
 export interface InventoryScreenOptions {
 	take: boolean;
 	put: boolean;
+	use: boolean;
+	discard: boolean;
+}
+
+function unhotkey(a:UIAction):UIAction {
+	return Object.assign({}, a, {hotkey:undefined})
 }
 
 export class InventoryScreen extends AbstractScreen {
@@ -39,10 +47,12 @@ export class InventoryScreen extends AbstractScreen {
 		this.options = Object.assign({
 			take: true,
 			put: true,
+			use: true,
+			discard: true,
 		}, options);
 	}
 	readonly options: InventoryScreenOptions;
-	private isEquipment = !this.right;
+	private isEquipmentScreen = !this.right;
 	readonly left = this.creature.inventory;
 	readonly promise = new Deferred<void>();
 
@@ -63,6 +73,7 @@ export class InventoryScreen extends AbstractScreen {
 	}
 
 	selectedItem: Item | null = null;
+	private textOutput: TextOutput = new TextOutput(new ScenePanel())
 	private leftMenus: ItemMenu[] = [];
 	private rightMenus: ItemMenu[] = [];
 
@@ -72,58 +83,108 @@ export class InventoryScreen extends AbstractScreen {
 			slot: string,
 			item: Item | null,
 			natural?: Item,
-			hotkey: string
+			hotkey?: string
 		}[] = [{
 			slot: "Main weapon",
 			item: c.mainHandItem,
 			natural: c.fists,
-			hotkey: KeyCodes.KEYW
+			// hotkey: KeyCodes.KEYW
 		}, {
 			slot: "Body armor",
 			item: c.bodyArmor,
-			hotkey: KeyCodes.KEYA
+			// hotkey: KeyCodes.KEYA
 		}];
 		return equipmentInfos.map(ei => ({
 			item: ei.item ?? ei.natural ?? null,
 			slotName: ei.slot,
 			natural: ei.natural && !ei.item,
 			aSelect: this.selectItemAction(ei.item ?? ei.natural, ei.hotkey),
-			action1: !!ei.item ? {
-				label: "U",
-				callback: () => this.unequip(ei.item!)
-			} : undefined
+			actions: ei.item ? this.itemActions(ei.item) : []
 		}));
+	}
+	private itemActions(item:Item):ItemAction[] {
+		let left = this.left.includes(item);
+		let equipped = !left && this.isEquipmentScreen;
+		let result:ItemAction[] = [];
+		if (this.isEquipmentScreen) {
+			if (left) {
+				if (this.isEquipable(item)) {
+					result.push({
+						position: 1,
+						label: "E",
+						longLabel: "Equip",
+						hotkey: KeyCodes.KEYE,
+						// TODO disabled if fails canEquip
+						callback: () => this.equip(item)
+					})
+				}
+			} else {
+				result.push({
+					position: 1,
+					label: "U",
+					longLabel: "Unequip",
+					hotkey: KeyCodes.KEYU,
+					// TODO disabled if fails canUnequip
+					callback: () => this.unequip(item)
+				})
+			}
+		}
+		if (this.options.use && item.isConsumable) {
+			result.push({
+				position: 1,
+				label: "U",
+				longLabel: "Use",
+				hotkey: KeyCodes.KEYU,
+				// TODO disabled if fails canUse
+				callback: ()=>this.consume(item)
+			});
+		}
+		if (!this.isEquipmentScreen) {
+			if (left && this.options.put) {
+				result.push({
+					position: 2,
+					label: ">",
+					longLabel: "Store",
+					hotkey: KeyCodes.ENTER,
+					// TODO disabled if item not transferable
+					callback: () => this.transferItem(item)
+				})
+			} else if (!left && this.options.take) {
+				result.push({
+					position: 2,
+					label: "<",
+					longLabel: "Take",
+					hotkey: KeyCodes.ENTER,
+					// TODO disabled if item not transferable
+					callback: () => this.transferItem(item)
+				})
+			}
+		}
+		if (!equipped && this.options.discard) {
+			result.push({
+				position: 2,
+				label: "D",
+				longLabel: "Discard",
+				hotkey: KeyCodes.DELETE,
+				// TODO disabled if item cannot be discarded
+				callback: () => this.discard(item)
+			})
+		}
+		return result;
 	}
 	private inventoryMenus(inventory:Inventory, left:boolean):ItemMenu[] {
 		return inventory.map((item, i) => {
 			if (!item) {
 				return {
-					item: null
-				}
-			}
-			let action1: UIAction | undefined, action2;
-			if (this.isEquipment) {
-				if (this.isEquipable(item)) {
-					action1 = {
-						label: "E",
-						// TODO disabled if of equipable class but fails canEquip
-						callback: () => this.equip(item)
-					}
-				}
-				// TODO action2 is drop/transfer
-			} else if (left && this.options.put || !left && this.options.take) {
-				action1 = {
-					label: left ? ">" : "<",
-					// TODO disabled if item not movable
-					callback: () => this.transferItem(item)
+					item: null,
+					actions: []
 				}
 			}
 			return {
 				item: item,
 				aSelect: this.selectItemAction(item, KeyCodes.DefaultHotkeys[i]),
 				equipped: false,
-				action1,
-				action2
+				actions: this.itemActions(item)
 			}
 		});
 	}
@@ -144,13 +205,20 @@ export class InventoryScreen extends AbstractScreen {
 		this.rightMenus = !!this.right
 			? this.inventoryMenus(this.right, false)
 			: this.equipmentMenus();
+		this.updateActions();
+		this.render();
+	}
+
+	private updateActions() {
 		this.actions = [...this.basicActions];
 		for (let im of [...this.leftMenus, ...this.rightMenus]) {
 			if (im.aSelect) this.actions.push(im.aSelect);
-			if (im.action1) this.actions.push(im.action1);
-			if (im.action2) this.actions.push(im.action2);
+			if (im.item === this.selectedItem) {
+				this.actions.push(...im.actions);
+			} else {
+				this.actions.push(...im.actions.map(a => unhotkey(a)))
+			}
 		}
-		this.render();
 	}
 
 	private isEquipable(item: Item): boolean {
@@ -160,6 +228,7 @@ export class InventoryScreen extends AbstractScreen {
 
 	selectItem(item: Item | null) {
 		this.selectedItem = item;
+		this.updateActions();
 		this.render();
 	}
 
@@ -182,6 +251,26 @@ export class InventoryScreen extends AbstractScreen {
 			right.transferTo(item, this.left);
 		}
 		this.update();
+	}
+
+	async consume(item: Item) {
+		this.textOutput.clear();
+		if (this.creature.inventory.includes(item)) {
+			await this.game.gameController.consumeFromInventory(this.creature, item, this.textOutput)
+		} else if (this.right && this.right?.includes(item)) {
+			await this.game.gameController.consumeItem(this.creature, item, this.textOutput)
+			this.right.removeItem(item)
+		}
+		this.textOutput.flush();
+		this.update()
+	}
+
+	async discard(item: Item) {
+		if (this.left.includes(item)) {
+			this.left.removeItem(item)
+		} else {
+			this.right?.removeItem(item)
+		}
 	}
 
 	private selCat(): number {
@@ -260,6 +349,8 @@ export class InventoryScreen extends AbstractScreen {
 
 	private renderItemMenu(im: ItemMenu): VNode {
 		let item = im.item;
+		let action1 = im.actions.find(a=>a.position===1);
+		let action2 = im.actions.find(a=>a.position===2);
 		return <div class={"inventory-row" + (item && item === this.selectedItem ? " -active" : "")}>
 
 			{im.aSelect
@@ -270,12 +361,12 @@ export class InventoryScreen extends AbstractScreen {
 
 			<div class={!im.item || im.natural ? "text-shadowed" : ""}>{item && CommonText.itemInfo(item)}</div>
 
-			{im.action1
-				? <Button action={im.action1} className="-flat -icon"/>
+			{action1
+				? <Button action={action1 && unhotkey(action1)} className="-flat -icon"/>
 				: <div/>}
 
-			{im.action2
-				? <Button action={im.action2} className="-flat -icon"/>
+			{action2
+				? <Button action={action2 && unhotkey(action2)} className="-flat -icon"/>
 				: <div/>}
 
 		</div>
@@ -293,8 +384,8 @@ export class InventoryScreen extends AbstractScreen {
 				</div>
 				<div class="grid-v2">
 					<div>
-						<h3>{this.isEquipment ? "Equipment" : this.right!.name}</h3>
-						<div class={this.isEquipment ? "inventory-equipment" : "inventory-items"}>
+						<h3>{this.isEquipmentScreen ? "Equipment" : this.right!.name}</h3>
+						<div class={this.isEquipmentScreen ? "inventory-equipment" : "inventory-items"}>
 							{this.rightMenus.map(im => <Fragment>
 								<div>{im.slotName}</div>
 								{this.renderItemMenu(im)}
@@ -313,9 +404,19 @@ export class InventoryScreen extends AbstractScreen {
                                 Damage type: <span
                                 class={'text-damage-' + selitem.asWeapon.damageType.cssSuffix}>{selitem.asWeapon.damageType.name}</span>
                             </div>}
+							<div class="d-flex gap-4">
+								{this.itemActions(selitem).map(action=>
+									<Button label={action.longLabel}
+									        action={action}
+									        className="-big"/>
+								)}
+							</div>
                         </Fragment>}
 					</div>
 				</div>
+			</div>
+			<div>
+				{this.textOutput.panel.astsx}
 			</div>
 			<div class="d-flex">
 				{<div>

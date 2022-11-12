@@ -3,21 +3,6 @@
  */
 
 import {BaseItem, BaseItemComponent, registerItemComponent} from "../BaseItem";
-import {IResource} from "../../IResource";
-
-declare module "../BaseItem" {
-	export interface BaseItem extends IResource {
-		armor: ArmorComponent | undefined;
-		isArmor: boolean;
-	}
-}
-declare module "../Item" {
-	export interface Item {
-		asArmor: ArmorComponent | undefined;
-		isArmor: boolean;
-		ifArmor: this | null;
-	}
-}
 
 export class ArmorComponent extends BaseItemComponent {
 
