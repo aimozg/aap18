@@ -3,7 +3,7 @@
  */
 import {ComponentChildren, render, VNode} from "preact";
 
-export function removeChildren(parent?:Node):void {
+export function removeChildren(parent:Node|null|undefined):void {
 	if (!parent) return;
 	let c;
 	while ((c = parent.firstChild)) parent.removeChild(c);

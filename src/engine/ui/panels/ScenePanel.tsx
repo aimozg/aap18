@@ -4,50 +4,45 @@
 import {ComponentChild, ComponentChildren, createRef, h} from "preact";
 import {DomComponent} from "../DomComponent";
 import {removeChildren, renderAppend} from "../../utils/dom";
+import {TextPages} from "./TextPages";
 
+// TODO inheritance instead of composition OR extract "ITextPages" interface
 export class ScenePanel extends DomComponent {
 
-	private readonly refPages
+	readonly pages;
 	private readonly refActions
-	private nextContent: ComponentChild[] = []
 	private nextActions: ComponentChild[] = []
-	private lastPage = createRef<HTMLDivElement>()
 
 	constructor() {
-		let refPages = createRef<HTMLDivElement>()
+		let pages = new TextPages();
 		let refActions = createRef<HTMLDivElement>()
 		super(<div className="scene-panel">
-			<div className="scene-pages" ref={refPages}></div>
+			{pages.astsx}
 			<div className="scene-actions" ref={refActions}></div>
 		</div>);
-		this.refPages = refPages;
+		this.pages = pages;
 		this.refActions = refActions;
 	}
 
 	clear() {
 		this.nextActions = [];
-		this.nextContent = [];
+		this.pages.clear();
 	}
 
 	flush() {
-		let nextPage = <div class="scene-page -current" ref={this.lastPage}>{this.nextContent}</div>;
+		this.pages.flush();
+		removeChildren(this.refActions.current!);
 		renderAppend(this.nextActions, this.refActions.current!)
-		renderAppend(nextPage, this.refPages.current!);
 		this.nextActions = [];
-		this.nextContent = [];
 	}
 
 	flipPage(tail?:ComponentChildren) {
-		if (this.lastPage.current) {
-			this.lastPage.current.classList.remove('-current')
-			this.lastPage.current.classList.add('-history')
-			removeChildren(this.refActions.current!);
-			if (tail) renderAppend(tail, this.lastPage.current)
-		}
+		this.pages.flipPage(tail);
+		removeChildren(this.refActions.current!);
 	}
 
 	addContent(content: ComponentChildren) {
-		this.nextContent.push(content);
+		this.pages.addContent(content);
 	}
 
 	addActions(actions: ComponentChildren) {

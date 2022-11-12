@@ -3,9 +3,11 @@
 .scene-panel {
   @include uibox.uibox;
   flex-grow: 1;
+  .text-pages .text-page {
+    margin: 1rem 0;
+  }
 }
-.scene-page {
-  margin: 1rem 0;
+.text-page {
   &.-history {
     opacity: 0.5;
   }

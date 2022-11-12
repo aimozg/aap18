@@ -4,9 +4,9 @@
 import {Parsed} from "../parser/Parsed";
 import {Fragment, h, VNode} from "preact";
 import {LogManager} from "../../logging/LogManager";
-import {ScenePanel} from "../../ui/panels/ScenePanel";
 import {Parser} from "../parser/Parser";
 import {Creature} from "../../objects/Creature";
+import {TextPages} from "../../ui/panels/TextPages";
 
 const logger = LogManager.loggerFor("engine.text.output.TextOutput")
 
@@ -15,20 +15,20 @@ const logger = LogManager.loggerFor("engine.text.output.TextOutput")
  */
 export class TextOutput {
 
-	constructor(public readonly panel: ScenePanel,
+	constructor(public readonly pages: TextPages,
 	            public readonly parser: Parser = new Parser()) {
 	}
 
 	clear(): void {
-		this.panel.clear()
+		this.pages.clear();
 	}
 
 	flush(): void {
-		this.panel.flush()
+		this.pages.flush();
 	}
 
-	flip(action?: string): void {
-		this.panel.flipPage(action ? '[' + action + ']' : null)
+	flip(suffix?: string): void {
+		this.pages.flipPage(suffix)
 	}
 
 	selectActor(actor: Creature) {
@@ -45,15 +45,11 @@ export class TextOutput {
 
 	append(input: Parsed | Parsed[]): void {
 		let e = TextOutput.render(input);
-		this.panel.addContent(e);
+		this.pages.addContent(e);
 	}
 
 	appendNode(e: Node | string | VNode): void {
-		this.panel.addContent(e);
-	}
-
-	appendAction(e: VNode) {
-		this.panel.addActions(e);
+		this.pages.addContent(e);
 	}
 
 	static render(input: Parsed | Parsed[]): VNode {
@@ -85,3 +81,4 @@ export class TextOutput {
 		}
 	}
 }
+

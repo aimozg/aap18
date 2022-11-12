@@ -1,17 +1,17 @@
 import {Place} from "./Place";
 import {InternalChoiceData, SceneContext} from "../scene/SceneContext";
-import {TextOutput} from "../text/output/TextOutput";
 import {ScenePanel} from "../ui/panels/ScenePanel";
 import {GameScreenLayout} from "../ui/screens/GameScreen";
 import {PlaceSidebar} from "../ui/panels/PlaceSidebar";
 import {createRef, h} from "preact";
 import {InventoryScreen} from "../ui/screens/InventoryScreen";
+import {InteractiveTextOutput} from "../text/output/InteractiveTextOutput";
 
 export class PlaceContext extends SceneContext {
 	readonly sidebarRef = createRef<PlaceSidebar>();
 
 	constructor(public place: Place) {
-		super(place.sceneId, new TextOutput(new ScenePanel()));
+		super(place.sceneId, new InteractiveTextOutput(new ScenePanel()));
 	}
 
 	async display(): Promise<void> {

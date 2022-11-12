@@ -9,9 +9,9 @@ import {Item} from "../../objects/Item";
 import {Deferred} from "../../utils/Deferred";
 import {Inventory} from "../../objects/Inventory";
 import {TextOutput} from "../../text/output/TextOutput";
-import {ScenePanel} from "../panels/ScenePanel";
+import {TextPages} from "../panels/TextPages";
 
-type ItemAction = UIAction & {longLabel:string, position:number}
+type ItemAction = UIAction & { longLabel: string, position: number }
 
 interface ItemMenu {
 	item: Item | null;
@@ -21,6 +21,7 @@ interface ItemMenu {
 	aSelect?: UIAction;
 	actions: ItemAction[];
 }
+
 export interface InventoryScreenOptions {
 	take: boolean;
 	put: boolean;
@@ -28,8 +29,8 @@ export interface InventoryScreenOptions {
 	discard: boolean;
 }
 
-function unhotkey(a:UIAction):UIAction {
-	return Object.assign({}, a, {hotkey:undefined})
+function unhotkey(a: UIAction): UIAction {
+	return Object.assign({}, a, {hotkey: undefined})
 }
 
 export class InventoryScreen extends AbstractScreen {
@@ -40,7 +41,7 @@ export class InventoryScreen extends AbstractScreen {
 	 */
 	constructor(
 		public readonly creature: Creature,
-		public readonly right: Inventory|null=null,
+		public readonly right: Inventory | null = null,
 		options: Partial<InventoryScreenOptions> = {}
 	) {
 		super();
@@ -51,6 +52,7 @@ export class InventoryScreen extends AbstractScreen {
 			discard: true,
 		}, options);
 	}
+
 	readonly options: InventoryScreenOptions;
 	private isEquipmentScreen = !this.right;
 	readonly left = this.creature.inventory;
@@ -72,12 +74,13 @@ export class InventoryScreen extends AbstractScreen {
 		this.update();
 	}
 
+	// TODO store category & position instead
 	selectedItem: Item | null = null;
-	private textOutput: TextOutput = new TextOutput(new ScenePanel())
+	private textOutput: TextOutput = new TextOutput(new TextPages())
 	private leftMenus: ItemMenu[] = [];
 	private rightMenus: ItemMenu[] = [];
 
-	private equipmentMenus():ItemMenu[] {
+	private equipmentMenus(): ItemMenu[] {
 		let c = this.creature;
 		let equipmentInfos: {
 			slot: string,
@@ -102,10 +105,12 @@ export class InventoryScreen extends AbstractScreen {
 			actions: ei.item ? this.itemActions(ei.item) : []
 		}));
 	}
-	private itemActions(item:Item):ItemAction[] {
+
+	// TODO consider moving it outside
+	private itemActions(item: Item): ItemAction[] {
 		let left = this.left.includes(item);
 		let equipped = !left && this.isEquipmentScreen;
-		let result:ItemAction[] = [];
+		let result: ItemAction[] = [];
 		if (this.isEquipmentScreen) {
 			if (left) {
 				if (this.isEquipable(item)) {
@@ -136,7 +141,7 @@ export class InventoryScreen extends AbstractScreen {
 				longLabel: "Use",
 				hotkey: KeyCodes.KEYU,
 				// TODO disabled if fails canUse
-				callback: ()=>this.consume(item)
+				callback: () => this.consume(item)
 			});
 		}
 		if (!this.isEquipmentScreen) {
@@ -172,7 +177,8 @@ export class InventoryScreen extends AbstractScreen {
 		}
 		return result;
 	}
-	private inventoryMenus(inventory:Inventory, left:boolean):ItemMenu[] {
+
+	private inventoryMenus(inventory: Inventory, left: boolean): ItemMenu[] {
 		return inventory.map((item, i) => {
 			if (!item) {
 				return {
@@ -188,6 +194,7 @@ export class InventoryScreen extends AbstractScreen {
 			}
 		});
 	}
+
 	private selectItemAction(
 		item: Item | null | undefined,
 		hotkey: string | undefined,
@@ -199,6 +206,7 @@ export class InventoryScreen extends AbstractScreen {
 			callback: () => item && this.selectItem(item)
 		}
 	}
+
 	update() {
 		// TODO equip/unequip/drop hotkeys
 		this.leftMenus = this.inventoryMenus(this.left, true);
@@ -210,6 +218,9 @@ export class InventoryScreen extends AbstractScreen {
 	}
 
 	private updateActions() {
+		if (!this.left.includes(this.selectedItem) && !(this.right?.includes(this.selectedItem))) {
+			this.selectedItem = null;
+		}
 		this.actions = [...this.basicActions];
 		for (let im of [...this.leftMenus, ...this.rightMenus]) {
 			if (im.aSelect) this.actions.push(im.aSelect);
@@ -242,7 +253,7 @@ export class InventoryScreen extends AbstractScreen {
 		this.update();
 	}
 
-	async transferItem(item:Item) {
+	async transferItem(item: Item) {
 		let right = this.right;
 		if (!right) throw new Error(`No storage to transfer item to/from`)
 		if (this.left.includes(item)) {
@@ -262,6 +273,7 @@ export class InventoryScreen extends AbstractScreen {
 			this.right.removeItem(item)
 		}
 		this.textOutput.flush();
+		this.selectedItem = null;
 		this.update()
 	}
 
@@ -271,11 +283,13 @@ export class InventoryScreen extends AbstractScreen {
 		} else {
 			this.right?.removeItem(item)
 		}
+		this.selectedItem = null;
+		this.update();
 	}
 
 	private selCat(): number {
 		if (!this.selectedItem) return -1;
-		if (this.leftMenus.some(im=>im.item===this.selectedItem)) return 0;
+		if (this.leftMenus.some(im => im.item === this.selectedItem)) return 0;
 		return 1;
 	}
 
@@ -349,8 +363,8 @@ export class InventoryScreen extends AbstractScreen {
 
 	private renderItemMenu(im: ItemMenu): VNode {
 		let item = im.item;
-		let action1 = im.actions.find(a=>a.position===1);
-		let action2 = im.actions.find(a=>a.position===2);
+		let action1 = im.actions.find(a => a.position === 1);
+		let action2 = im.actions.find(a => a.position === 2);
 		return <div class={"inventory-row" + (item && item === this.selectedItem ? " -active" : "")}>
 
 			{im.aSelect
@@ -404,19 +418,19 @@ export class InventoryScreen extends AbstractScreen {
                                 Damage type: <span
                                 class={'text-damage-' + selitem.asWeapon.damageType.cssSuffix}>{selitem.asWeapon.damageType.name}</span>
                             </div>}
-							<div class="d-flex gap-4">
-								{this.itemActions(selitem).map(action=>
+                            <div class="d-flex gap-4">
+								{this.itemActions(selitem).map(action =>
 									<Button label={action.longLabel}
 									        action={action}
 									        className="-big"/>
 								)}
-							</div>
+                            </div>
                         </Fragment>}
+						<div class="my-4">
+							{this.textOutput.pages.astsx}
+						</div>
 					</div>
 				</div>
-			</div>
-			<div>
-				{this.textOutput.panel.astsx}
 			</div>
 			<div class="d-flex">
 				{<div>

@@ -7,6 +7,7 @@ import {GameDataBuilder} from "../../game/GameDataBuilder";
 import {MeleeWeaponLib} from "../../game/data/items/MeleeWeaponLib";
 import {ArmorLib} from "../../game/data/items/ArmorLib";
 import {TutorialImp} from "../monsters/TutorialImp";
+import {ConsumableLib} from "../../game/data/items/ConsumableLib";
 
 const namespace = '/000';
 
@@ -18,6 +19,7 @@ export function gdRegisterIntro(gd:GameDataBuilder) {
 			ctx.gc.placePlayer('/camp');
 			ctx.player.setMainHandItem(MeleeWeaponLib.Dagger.spawn());
 			ctx.player.setBodyArmor(ArmorLib.LeatherArmor.spawn());
+			ctx.player.inventory.addItem(ConsumableLib.PotionHealingLesser.spawn());
 
 			let origin = ctx.player.origin;
 			if (origin && origin.introText) {

@@ -19,6 +19,7 @@ import {PlaceContext} from "./place/PlaceContext";
 import {Creature} from "./objects/Creature";
 import {atMost} from "./math/utils";
 import {Item} from "./objects/Item";
+import {InteractiveTextOutput} from "./text/output/InteractiveTextOutput";
 
 const logger = LogManager.loggerFor("engine.GameController");
 
@@ -71,7 +72,7 @@ export class GameController {
 
 	async playScene(scene:string):Promise<string> {
 		logger.info("playScene {}", scene);
-		let context:SceneContext = new SceneContext(scene, new TextOutput(new ScenePanel()));
+		let context:SceneContext = new SceneContext(scene, new InteractiveTextOutput(new ScenePanel()));
 		this.state.pushGameContext(context);
 		this.showGameScreen();
 		return context.promise;
@@ -98,7 +99,7 @@ export class GameController {
 			return;
 		}
 		if (context instanceof SceneContext) {
-			context.output = new TextOutput(new ScenePanel());
+			context.output = new InteractiveTextOutput(new ScenePanel());
 			gameScreen.applyLayout(context.layout);
 			context.playCurrentScene().then(()=>this.showGameScreen());
 			return;

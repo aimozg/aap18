@@ -4,7 +4,6 @@ import {StateManager} from "../state/StateManager";
 import {Scene, SceneFn} from "./Scene";
 import {GameScreenLayout} from "../ui/screens/GameScreen";
 import {Deferred} from "../utils/Deferred";
-import {TextOutput} from "../text/output/TextOutput";
 import {Button} from "../ui/components/Button";
 import {h} from "preact";
 import {LogManager} from "../logging/LogManager";
@@ -17,6 +16,7 @@ import {KeyCodes} from "../ui/KeyCodes";
 import {Inventory} from "../objects/Inventory";
 import {InventoryScreen, InventoryScreenOptions} from "../ui/screens/InventoryScreen";
 import {Item} from "../objects/Item";
+import {InteractiveTextOutput} from "../text/output/InteractiveTextOutput";
 
 export interface ChoiceOptions {
 	/** Button text */
@@ -70,7 +70,7 @@ const logger = LogManager.loggerFor("engine.scene.SceneContext");
 export class SceneContext implements GameContext {
 	constructor(
 		sceneId: string,
-		public output: TextOutput
+		public output: InteractiveTextOutput
 	) {
 		this._scene = this.game.data.scene(sceneId);
 	}
@@ -156,7 +156,7 @@ export class SceneContext implements GameContext {
 		if (c.clear) {
 			this.output.clear()
 		} else {
-			this.output.flip(c.label);
+			this.output.flip("["+c.label+"]");
 		}
 		await c.callback();
 		setTimeout(() => this.flush(), 0);
