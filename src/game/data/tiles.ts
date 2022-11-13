@@ -9,11 +9,14 @@ export function gdRegisterTiles(gd:GameDataBuilder) {
 		ch: '#',
 		id: '/wall',
 		name: 'wall',
+		fg: "#cccccc",
+		bg: "#999999",
 		solid: true
 	}, {
 		ch: '%',
 		id: '/rubble',
 		name: 'rubble',
+		fg: "#cccccc",
 		walkable: false
 	}])
 }

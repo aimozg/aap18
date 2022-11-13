@@ -42,7 +42,7 @@
 .text-damage-none {
   color: var(--tc-shadowed);
 }
-.text-damage-sharp, .text-damage-blunt {
+.text-damage-slashing, .text-damage-blunt, .text-damage-piercing {
   color: #a85;
 }
 
@@ -62,7 +62,8 @@
   color: #84c;
 }
 .text-damage-darkness {
-  color: #666;
+  color: #111;
+  @include cssutils.textcontour(#eee);
 }
 .text-damage-light {
   color: #cc8;

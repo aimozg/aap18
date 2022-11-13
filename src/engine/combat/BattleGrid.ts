@@ -11,33 +11,51 @@ import {Random} from "../math/Random";
 import {GridPos} from "../utils/gridutils";
 import {IResource} from "../IResource";
 import Symbols from "../symbols";
+import {ApToAct} from "./CombatController";
 
 export abstract class GridObject {
+	get glyph(): GlyphData {
+		return {ch:'?',fg:tinycolor("#ff00ff")};
+	}
 	protected constructor(public x:number, public y:number) {
-		this.glyph = {ch:'?',fg:tinycolor("#ff00ff")};
 	}
 
-	public update():void{}
 	public grid:BattleGrid|null = null;
-	public glyph:GlyphData;
 	public get pos():GridPos { return {x:this.x, y:this.y} }
 }
 
 export class GOCreature extends GridObject{
 	constructor(x: number, y: number, public readonly creature: Creature) {
 		super(x, y);
-		this.update();
 	}
-	update() {
+
+	get glyph(): GlyphData {
 		// TODO character glyph
-		if (this.creature instanceof PlayerCharacter) this.glyph = {
-			ch: '@',
-			fg: tinycolor("#77cc00")
-		}; else this.glyph = {
-			ch: this.creature.name[0],
-			fg: tinycolor("#0077cc")
+		let glyph: GlyphData;
+		if (this.creature instanceof PlayerCharacter) {
+			glyph = {
+				ch: '@',
+				fg: tinycolor("#77cc00")
+			};
+		} else {
+			glyph = {
+				ch: this.creature.name[0],
+				fg: tinycolor("#0077cc")
+			}
 		}
+		if (this.creature.ap >= ApToAct) {
+			glyph.fg = {
+				fx: "brighten",
+				speed: "fblink",
+				color: (glyph.fg as RGBColor)
+			}
+		}
+		if (!this.creature.isAlive) {
+			glyph.bg = tinycolor("#733")
+		}
+		return glyph;
 	}
+
 }
 export class TileType implements GlyphData, IResource {
 	constructor(
@@ -58,7 +76,7 @@ export namespace TileType {
 		"/floor",
 		"floor",
 		".",
-		tinycolor("#cccccc"),
+		tinycolor("#555555"),
 		null,
 		true,
 		false);

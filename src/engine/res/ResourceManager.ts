@@ -35,7 +35,13 @@ export class ResourceManager {
 		data.tiles.clear();
 		data.tiles.register(TileType.FLOOR);
 		for (let gdtt of idata.tiles) {
-			let tt:TileType = new TileType(gdtt.id, gdtt.name, gdtt.ch, tinycolor(gdtt.fg ?? '#cccccc'), null, !!gdtt.walkable && !gdtt.solid, !!gdtt.solid)
+			let tt:TileType = new TileType(gdtt.id,
+				gdtt.name,
+				gdtt.ch,
+				tinycolor(gdtt.fg ?? '#cccccc'),
+				gdtt.bg ? tinycolor(gdtt.bg) : null,
+				!!gdtt.walkable && !gdtt.solid,
+				!!gdtt.solid)
 			data.tiles.register(tt)
 		}
 		data.traits.clear();

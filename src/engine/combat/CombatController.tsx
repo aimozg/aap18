@@ -43,6 +43,7 @@ export const enum AttackRollResult {
 }
 
 export let TicksPerRound = 1000;
+export let ApToAct = 1000;
 export let AnimationTime = 500;
 export let AnimationTimeFast = 250;
 export let AnimationTimeVeryFast = 125;
@@ -109,7 +110,7 @@ export class CombatController {
 			}
 			// TODO execute scheduled events
 			// find actor
-			let nextActor = this.participants.find(c => c.isAlive && c.ap >= TicksPerRound)
+			let nextActor = this.participants.find(c => c.isAlive && c.ap >= ApToAct)
 			if (nextActor) {
 				if (nextActor instanceof PlayerCharacter) {
 					// TODO if player-controller, actually
