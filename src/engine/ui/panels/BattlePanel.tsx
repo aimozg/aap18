@@ -19,7 +19,7 @@ export interface BattleActionButton {
 export class BattlePanel extends DomComponent {
 	private readonly refMain
 	private readonly refActions
-	private canvas:GlyphCanvas
+	private readonly canvas:GlyphCanvas
 	constructor(public context: BattleContext) {
 		let refMain = createRef<HTMLCanvasElement>()
 		let refActions = createRef<HTMLDivElement>()
@@ -40,7 +40,9 @@ export class BattlePanel extends DomComponent {
 		this.canvas.windowWidth = this.context.grid.width;
 		this.canvas.windowHeight = this.context.grid.height;
 	}
-
+	animationFrame(dt:number, time:number):void{
+		this.canvas.render(this.context.grid);
+	}
 	private hotkey(action:CombatAction<any>, index:number):string|undefined {
 		if (index in KeyCodes.DefaultHotkeys) return KeyCodes.DefaultHotkeys[index];
 		return undefined;

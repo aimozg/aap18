@@ -8,6 +8,8 @@ import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
 import {CombatRules} from "../combat/CombatRules";
 import {stripedBackground} from "../../engine/utils/css";
 import {CommonText} from "../../engine/text/CommonText";
+import {PartialRecord} from "../../engine/utils/types";
+import {LogManager} from "../../engine/logging/LogManager";
 
 export interface CreaturePanelOptions {
 	ap: boolean;
@@ -33,12 +35,41 @@ export interface CreaturePanelOptions {
 
 	money:boolean;
 }
-
+type CreatureValueDef = (c:Creature)=>number
+export type CreatureValueId = 'ap'|'xp'|'hp'|'ep'|'lp'|'money';
+const CreatureValueDefs: Record<CreatureValueId,CreatureValueDef> = {
+	ap: (c=>c.ap),
+	xp: (c=>c.xp),
+	hp: (c=>c.hp),
+	ep: (c=>c.ep),
+	lp: (c=>c.lp),
+	money: (c=>c.money),
+}
+interface CreatureValueAnimation {
+	x: number;
+	x2: number;
+	v: number;
+}
 export class CreaturePanel extends DomComponent {
-	constructor(options:Partial<CreaturePanelOptions> = {}) {
+	constructor(
+		creature: Creature|null,
+		options:Partial<CreaturePanelOptions> = {}) {
 		super(<div class="creature-panel"></div>);
+		this._creature = creature;
 		this.options = Object.assign({}, CreaturePanel.DefaultOptions, options);
 	}
+	private _creature:Creature|null;
+	get creature(): Creature|null {
+		return this._creature;
+	}
+
+	set creature(value: Creature | null) {
+		this._creature = value;
+		this.animatedValues = {};
+		this.update()
+	}
+
+
 	options: CreaturePanelOptions;
 	static DefaultOptions: CreaturePanelOptions = {
 		ap: true,
@@ -63,7 +94,40 @@ export class CreaturePanel extends DomComponent {
 
 		money: true,
 	}
-	update(c: Creature | null) {
+	animatedValues:PartialRecord<CreatureValueId, CreatureValueAnimation> = {}
+	value(id:CreatureValueId):number {
+		if (!this.creature) return 0;
+		return Math.floor(this.animatedValues[id]?.x ?? CreatureValueDefs[id](this.creature));
+	}
+	animateValue(valueId:CreatureValueId, newValue:number, durationMs:number) {
+		if (!this.creature) return;
+		let oldValue = CreatureValueDefs[valueId](this.creature);
+		if (oldValue === newValue) {
+			delete this.animatedValues[valueId];
+			return
+		}
+		let v = (newValue-oldValue)/durationMs;
+		logger.debug("animating {} {} -> {} (v={})", valueId, oldValue, newValue, v)
+		this.animatedValues[valueId] = {
+			x: oldValue,
+			x2: newValue,
+			v: v
+		}
+	}
+	animationFrame(dt:number) {
+		let animatedValues = Object.entries(this.animatedValues);
+		if (animatedValues.length === 0) return;
+		for (let [k,v] of animatedValues) {
+			v.x += v.v*dt;
+			if (v.v > 0 && v.x >= v.x2 || v.x <= v.x2) {
+				delete this.animatedValues[k as CreatureValueId];
+				logger.debug("value {} animation to {} finished",k,v.x2);
+			}
+		}
+		this.update();
+	}
+	update() {
+		let c = this.creature;
 		if (!c) {
 			removeChildren(this.node);
 			return;
@@ -75,7 +139,7 @@ export class CreaturePanel extends DomComponent {
 		// Name and AP as bg //
 		//-------------------//
 		let sectionName = <div className="text-center text-l" style={{
-			'background': stripedBackground('var(--theme-ctrl-bg)', 'transparent', c.ap/1000)
+			'background': stripedBackground('var(--theme-ctrl-bg)', 'transparent', this.value("ap")/1000)
 		}}>{c.name.capitalize()}</div>
 		//------------------//
 		// Level, sex, race //
@@ -90,7 +154,7 @@ export class CreaturePanel extends DomComponent {
 		//--------//
 		let sectionXp;
 		if (c instanceof PlayerCharacter) {
-			let xp = c.xp;
+			let xp = this.value('xp');
 			let xpmax = c.nextLevelXp();
 			let className = "bar-xp"
 			if (!isFinite(xpmax)) {
@@ -111,11 +175,11 @@ export class CreaturePanel extends DomComponent {
 			style="display: grid; grid-template-columns: max-content auto; gap: 4px; align-items: baseline"
 			className="mt-4 mb-1">
 			<div>Health</div>
-			<Bar value={c.hp} max={c.hpMax} className="bar-hp">{options.hp && Math.round(c.hp)}</Bar>
+			<Bar value={this.value('hp')} max={c.hpMax} className="bar-hp" print={options.hp}/>
 			<div>Lust</div>
-			<Bar value={c.lp} max={c.lpMax} className="bar-lp">{options.lp && Math.round(c.lp)}</Bar>
+			<Bar value={this.value("lp")} max={c.lpMax} className="bar-lp" print={options.lp}/>
 			<div>Energy</div>
-			<Bar value={c.ep} max={c.epMax} className="bar-ep">{options.ep && Math.round(c.ep)}</Bar>
+			<Bar value={this.value("ep")} max={c.epMax} className="bar-ep" print={options.ep}/>
 		</div>
 		//------------//
 		// Attributes //
@@ -190,7 +254,7 @@ export class CreaturePanel extends DomComponent {
 		let sectionMisc = <div className="grid-4 my-2">
 			{options.money && <Fragment>
 				<div className="text-right">Money:</div>
-				<div className="text-right text-money cols-2">{c.money.format(",d")}</div>
+				<div className="text-right text-money cols-2">{this.value('money').format(",d")}</div>
 				<div></div>
 			</Fragment>}
 		</div>
@@ -208,3 +272,5 @@ export class CreaturePanel extends DomComponent {
 		</Fragment>, this.node)
 	}
 }
+
+const logger = LogManager.loggerFor("game.ui.CreaturePanel");

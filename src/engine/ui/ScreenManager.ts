@@ -10,6 +10,8 @@ import {LogManager} from "../logging/LogManager";
 import {animateTransition, TransitionAnimationName} from "./animations";
 import {KeyCodes} from "./KeyCodes";
 import {CreaturePanel} from "../../game/ui/CreaturePanel";
+import {milliTime} from "../utils/time";
+import {Game} from "../Game";
 
 const logger = LogManager.loggerFor("engine.ui.ScreenManager");
 
@@ -17,7 +19,7 @@ export class ScreenManager {
 	screens: AbstractScreen[] = [];
 	gameScreen: GameScreen = new GameScreen();
 
-	sharedPlayerPanel: CreaturePanel = new CreaturePanel();
+	sharedPlayerPanel: CreaturePanel = new CreaturePanel(null);
 
 	constructor(
 		private screenHolder: HTMLElement
@@ -75,10 +77,27 @@ export class ScreenManager {
 		this.top.onKeyboardEvent(event)
 	}
 
+	t1:number;
+	t2:number;
+	dt:number;
+	private animationFrame() {
+		this.t2 = milliTime();
+		this.dt = this.t2 - this.t1;
+		Game.instance.gameController.animationFrame(this.dt, this.t2);
+		this.top.animationFrame(this.dt, this.t2);
+		this.t1 = this.t2;
+		requestAnimationFrame(()=>this.animationFrame());
+	}
+
 	setupKeyboardInput() {
 		document.addEventListener("keydown", event=>{
 			this.handleKeyboardEvent(event);
 		}, true)
+	}
+
+	setupAnimations() {
+		this.t1 = milliTime();
+		requestAnimationFrame(()=>this.animationFrame());
 	}
 }
 

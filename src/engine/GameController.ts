@@ -66,6 +66,7 @@ export class GameController {
 		logger.info("beginStory")
 		let ss = this.game.screenManager.gameScreen;
 		await this.game.screenManager.replaceTop(ss, 'fade-fast');
+		this.game.screenManager.sharedPlayerPanel.creature = this.player;
 		await this.playScene(this.game.idata.startingSceneId);
 		this.showGameScreen()
 	}
@@ -87,6 +88,9 @@ export class GameController {
 		setTimeout(()=>this.showGameScreen0());
 	}
 	private queuedSGS = false;
+	animationFrame(dt:number, time:number):void{
+		this.state.currentContext().animationFrame?.(dt,time);
+	}
 	showGameScreen0() {
 		this.queuedSGS = false;
 		let context = this.state.flushGameContext();

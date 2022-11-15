@@ -121,7 +121,7 @@ export class GlyphCanvas {
 
 	phase = 0;
 	animationSpeed = 1;
-	animated = true;
+	animated = false;
 
 	get width() { return this.windowWidth*this.cellWidth + this.padding*2 }
 	set width(value:number) {

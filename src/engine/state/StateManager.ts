@@ -21,7 +21,7 @@ export class StateManager {
 
 	private _player: PlayerCharacter;
 	get player(): PlayerCharacter { return this._player; }
-	private _gcStack: GameContext[];
+	private _gcStack: GameContext[] = [ new NullGameContext() ];
 
 	//////////////////
 	// Mass managers
@@ -63,6 +63,9 @@ export class StateManager {
 		this._gcStack.push(context);
 	}
 
+	currentContext():GameContext {
+		return this._gcStack[this._gcStack.length-1];
+	}
 	flushGameContext(): GameContext {
 		logger.debug("flushGameContext");
 		while (true) {

@@ -11,6 +11,7 @@ export interface BarProps {
 	height?: number | string;
 	value?: number;
 	values?: number[];
+	print?: boolean;
 	min?: number;
 	max?: number;
 }
@@ -26,6 +27,10 @@ export class Bar extends Component<BarProps, {}> {
 		let classes = props.classes ?? [];
 		let min = props.min ?? 0;
 		let max = props.max ?? 1;
+		let children = props.children;
+		if (props.print) {
+			children = [values[0],props.children];
+		}
 		return <div style={style} class={"bar " + (props.className ?? "")}>
 			{values.map((x, i) =>
 				<div style={{
@@ -35,7 +40,7 @@ export class Bar extends Component<BarProps, {}> {
 						coerce((x - min) / max * 100, 1, 99)) + '%'
 				}} className={"bar-value " + (classes[i] ?? "")}/>
 			)}
-			{props.children !== undefined && <div class="bar-content">{props.children}</div>}
+			{children !== undefined && <div class="bar-content">{children}</div>}
 		</div>
 	}
 

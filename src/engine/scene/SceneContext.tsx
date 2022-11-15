@@ -114,7 +114,7 @@ export class SceneContext implements GameContext {
 		if (!append) this.clear();
 		this.nextButtons = [];
 		this.currentButtons = []
-		this.characterPanel.update(this.player)
+		this.characterPanel.update()
 	}
 
 	protected async flush() {
@@ -124,7 +124,7 @@ export class SceneContext implements GameContext {
 			return;
 		}
 		if (!this._dirty) return;
-		this.characterPanel.update(this.player);
+		this.characterPanel.update();
 		this._dirty = false;
 		this.checkDeadEnd();
 		// TODO tooltip
@@ -300,7 +300,7 @@ export class SceneContext implements GameContext {
 
 	async openTransferMenu(inv: Inventory, options: Partial<InventoryScreenOptions> = {}) {
 		await new InventoryScreen(this.player, inv, options).showModal();
-		this.characterPanel.update(this.player);
+		this.characterPanel.update();
 	}
 
 	endNow(value?: string) {

@@ -8,6 +8,7 @@ export interface GameContext {
 	ended:boolean;
 	promise:Promise<any>;
 	onKeyboardEvent?: (event:KeyboardEvent)=>void;
+	animationFrame?:(dt:number, time:number)=>void;
 }
 
 export class NullGameContext implements GameContext {

@@ -34,4 +34,6 @@ export abstract class AbstractScreen {
 	}
 
 	onKeyboardEvent(event:KeyboardEvent):void {}
+
+	animationFrame(dt:number, time:number):void{}
 }

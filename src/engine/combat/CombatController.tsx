@@ -332,20 +332,21 @@ export class CombatController {
 	async deduceAP(creature: Creature, value: number) {
 		value |= 0;
 		logger.info("deduceAP {} {}", creature, value);
-		// TODO parallelize and detach animation from model
-		await this.animateValueChange(creature, "ap", creature.ap - value, AnimationTimeVeryFast)
+		this.ctx.animateValueChange(creature, "ap", creature.ap - value, AnimationTimeVeryFast);
+		creature.ap -= value;
 	}
 
 	async deduceEP(creature: Creature, value: number) {
 		logger.info("deduceEP {} {}", creature, value);
-		// TODO parallelize and detach animation from model
-		await this.animateValueChange(creature, "ep", creature.ep - value, AnimationTimeVeryFast)
+		this.ctx.animateValueChange(creature, "ep", creature.ep - value, AnimationTimeVeryFast);
+		creature.ep -= value;
 	}
 
 	async deduceHP(target: Creature, damage: number, source: Creature | null) {
 		logger.info("deduceHP {} {} {}", target, damage, source)
 		let wasAlive = target.isAlive
-		await this.animateValueChange(target, "hp", target.hp - damage)
+		this.ctx.animateValueChange(target, "hp", target.hp - damage, AnimationTime)
+		target.hp -= damage;
 		if (wasAlive && !target.isAlive) {
 			// TODO consider handling death later, as an immediate follow-up event
 			await this.onDeath(target, source)
@@ -356,7 +357,7 @@ export class CombatController {
 		logger.info("increaseLP {} {} {}", target, change, source)
 		// TODO do not instalose
 		let wasAlive = target.isAlive
-		await this.animateValueChange(target, "lp", target.lp + change)
+		this.ctx.animateValueChange(target, "lp", target.lp + change, AnimationTime)
 		if (wasAlive && !target.isAlive) {
 			// TODO consider handling death later, as an immediate follow-up event
 			await this.onDeath(target, source)
@@ -389,7 +390,8 @@ export class CombatController {
 		let xp = 50
 		if (xp > 0) {
 			this.logInfo("+" + xp + " XP.")
-			await this.animateValueChange(player, "xp", player.xp + xp)
+			this.ctx.animateValueChange(player, "xp", player.xp + xp, AnimationTime)
+			player.xp += xp;
 			this.ctx.redraw()
 		}
 	}

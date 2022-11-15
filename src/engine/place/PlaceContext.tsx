@@ -48,7 +48,7 @@ export class PlaceContext extends SceneContext {
 		if (!this.canManageInventory()) return;
 
 		await new InventoryScreen(this.player).showModal();
-		this.characterPanel.update(this.player);
+		this.characterPanel.update();
 	}
 
 	canLevelUp(): boolean {

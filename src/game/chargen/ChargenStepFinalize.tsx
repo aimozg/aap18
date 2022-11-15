@@ -13,7 +13,7 @@ export class ChargenStepFinalize extends ChargenStep {
 	}
 
 	label: string = "Finalize";
-	panel = new CreaturePanel();
+	panel = new CreaturePanel(null);
 
 	complete(): boolean {
 		return false;
@@ -22,7 +22,7 @@ export class ChargenStepFinalize extends ChargenStep {
 	node(): VNode {
 		let pc = this.player;
 		let parser = new Parser(pc);
-		this.panel.update(pc)
+		this.panel.creature = pc;
 		return <Fragment>
 			<h3>Review</h3>
 			<div class="grid-12 gap-4 text-justify">

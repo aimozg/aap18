@@ -4,7 +4,7 @@
 import {Creature} from "../objects/Creature";
 import {GameContext} from "../state/GameContext";
 import {GameScreenLayout} from "../ui/screens/GameScreen";
-import {CreaturePanel} from "../../game/ui/CreaturePanel";
+import {CreaturePanel, CreatureValueId} from "../../game/ui/CreaturePanel";
 import {Deferred} from "../utils/Deferred";
 import {CombatController, CombatFlowResultType} from "./CombatController";
 import {milliTime} from "../utils/time";
@@ -64,6 +64,7 @@ export class BattleContext implements GameContext {
 	) {
 		this.cc = new CombatController(this)
 		this.battlePanel.init();
+		this.enemyPanel = new CreaturePanel(this.cc.enemies[0]);
 		this.enemyPanel.options.money = false;
 	}
 
@@ -82,15 +83,17 @@ export class BattleContext implements GameContext {
 		Game.instance.gameController.showGameScreen()
 	}
 	readonly characterPanel = Game.instance.screenManager.sharedPlayerPanel
-	readonly enemyPanel = new CreaturePanel()
+	readonly enemyPanel
 	readonly logPanel = new LogPanel()
 	readonly battlePanel = new BattlePanel(this)
-	layout: GameScreenLayout = {
-		className: "-combat",
-		left: this.characterPanel.astsx,
-		right: this.enemyPanel.astsx,
-		center: this.battlePanel.astsx,
-		bottom: this.logPanel.astsx
+	get layout(): GameScreenLayout {
+		return {
+			className: "-combat",
+			left: this.characterPanel.astsx,
+			right: this.enemyPanel.astsx,
+			center: this.battlePanel.astsx,
+			bottom: this.logPanel.astsx
+		}
 	}
 	private _redrawing = false
 	private playerActions():CombatAction<any>[] {
@@ -106,13 +109,19 @@ export class BattleContext implements GameContext {
 			this.scheduleTick()
 		}
 	}
+	animateValueChange(creature:Creature, key:CreatureValueId, newValue:number, durationMs:number) {
+		// TODO wait for half of the animation time? so animations won't stack on top of each other
+		let panel = [this.characterPanel, this.enemyPanel].find(p=>p.creature === creature);
+		if (!panel) return;
+		panel.animateValue(key, newValue, durationMs);
+	}
 	redraw() {
 		if (this._redrawing) return
 		this._redrawing = true
 		setTimeout(()=>{
 			this._redrawing = false;
-			this.characterPanel.update(this.cc.party[0])
-			this.enemyPanel.update(this.cc.enemies[0])
+			this.characterPanel.update()
+			this.enemyPanel.update()
 			this.battlePanel.update(this.playerActions())
 		}, 0)
 	}
@@ -129,23 +138,27 @@ export class BattleContext implements GameContext {
 		this.scheduleTick();
 	}
 	private _scheduled = false
+	private _t1 = milliTime()
 	scheduleTick() {
 		if (this._scheduled) return
 		this.playerCanAct = false;
 		this._t1 = milliTime()
 		this._scheduled = true
-		requestAnimationFrame(() => {
-			this._scheduled = false
-			this.tick().then()
-		})
 	}
-	private _t1 = milliTime()
-	private async tick() {
-		let t2 = milliTime()
-		let dt = coerce(t2 - this._t1, 1, 1000)
-		dt = Math.round(dt*1000/MillisPerRound)
+	async animationFrame(dt:number, t2:number) {
+		if (this._scheduled) {
+			this._scheduled = false;
+			let dticks = coerce(t2 - this._t1, 1, 1000);
+			dticks = Math.round(dticks*1000/MillisPerRound)
+			await this.tick(dticks);
+		}
+		this.battlePanel.animationFrame(dt,t2);
+		this.characterPanel.animationFrame(dt);
+		this.enemyPanel.animationFrame(dt);
+	}
+	private async tick(dticks:number) {
 		this.playerCanAct = false
-		let fr = this.cc.advanceTime(dt);
+		let fr = this.cc.advanceTime(dticks);
 		this.redraw()
 		await this.cc.applyFlowResult(fr)
 		if (fr.type === CombatFlowResultType.PLAYER_ACTION) {

@@ -48,3 +48,4 @@ export class LogManager {
 		return LogManager.instance.loggerFor(name)
 	}
 }
+(window as any).LogManager = LogManager;
