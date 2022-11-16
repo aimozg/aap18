@@ -109,7 +109,7 @@ export namespace CombatRules {
 		return attacker.chaMod;
 	}
 	export function teaseDefenseVs(creature:Creature, attacker:Creature):number {
-		return creature.will;
+		return creature.willpower;
 	}
 	export function teaseDamageVs(attacker:Creature, target:Creature):Dice {
 		return Dices.x1d10.withBonus(attacker.chaMod)

@@ -81,6 +81,7 @@ export class ScreenManager {
 	t2:number;
 	dt:number;
 	private animationFrame() {
+		// TODO consider instead of propagating top-down maintaining a list of things that want animations. first - logic, then - FX. and a way to auto-unsubscribe if they are outside DOM
 		this.t2 = milliTime();
 		this.dt = this.t2 - this.t1;
 		Game.instance.gameController.animationFrame(this.dt, this.t2);

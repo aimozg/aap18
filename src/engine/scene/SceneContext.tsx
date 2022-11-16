@@ -14,7 +14,6 @@ import {AmbushDef, AmbushRules} from "./ambush";
 import {Random} from "../math/Random";
 import {KeyCodes} from "../ui/KeyCodes";
 import {Inventory} from "../objects/Inventory";
-import {InventoryScreen, InventoryScreenOptions} from "../ui/screens/InventoryScreen";
 import {Item} from "../objects/Item";
 import {InteractiveTextOutput} from "../text/output/InteractiveTextOutput";
 
@@ -294,13 +293,8 @@ export class SceneContext implements GameContext {
 			await this.flipPage();
 		} else {
 			await this.flipPage("Transfer");
-			await this.openTransferMenu(Inventory.wrap(items));
+			await this.gc.openTransferMenu(Inventory.wrap(items));
 		}
-	}
-
-	async openTransferMenu(inv: Inventory, options: Partial<InventoryScreenOptions> = {}) {
-		await new InventoryScreen(this.player, inv, options).showModal();
-		this.characterPanel.update();
 	}
 
 	endNow(value?: string) {

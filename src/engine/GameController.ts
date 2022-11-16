@@ -20,6 +20,8 @@ import {Creature} from "./objects/Creature";
 import {atMost} from "./math/utils";
 import {Item} from "./objects/Item";
 import {InteractiveTextOutput} from "./text/output/InteractiveTextOutput";
+import {Inventory} from "./objects/Inventory";
+import {InventoryScreen, InventoryScreenOptions} from "./ui/screens/InventoryScreen";
 
 const logger = LogManager.loggerFor("engine.GameController");
 
@@ -264,5 +266,9 @@ export class GameController {
 		for (let effect of cc.effects) {
 			await effect.apply(this, creature, output)
 		}
+	}
+	async openTransferMenu(inv: Inventory|null, options: Partial<InventoryScreenOptions> = {}) {
+		await new InventoryScreen(this.player, inv, options).showModal();
+		this.game.screenManager.sharedPlayerPanel.update();
 	}
 }

@@ -98,6 +98,8 @@ export abstract class Random {
 	}
 
 	nextBoolean(trueChance: number = 0.5): boolean {
+		if (trueChance <= 0.0) return false;
+		if (trueChance >= 1.0) return true;
 		return this.next01() < trueChance;
 	}
 

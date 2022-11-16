@@ -11,6 +11,10 @@ export class Inventory {
 	}
 	toString():string { return `[Inventory "${this.name}"(${this.size})]`}
 
+	[Symbol.iterator](): IterableIterator<Item | null> {
+		return this.slots[Symbol.iterator]();
+	}
+
 	get name(): string { return this._name; }
 	set name(value: string) { this._name = value; }
 	private _name: string;
@@ -23,10 +27,20 @@ export class Inventory {
 			this.slots.push(null);
 		}
 	}
+	ensureSlots(n: number) {
+		if (this.size < n) this.addSlots(n - this.size);
+	}
+	ensureEmptySlots(n:number) {
+		this.ensureSlots(this.size + n - this.emptySlotCount());
+	}
 
 	get items(): Item[] {
 		return this.slots.filter(i => !!i) as Item[];
 	}
+
+	get isEmpty(): boolean { return this.slots.every(e => !e)};
+
+	get isFull(): boolean { return this.slots.every(e => !!e)};
 
 	emptySlot(): number {
 		return this.slots.findIndex(i => !i);

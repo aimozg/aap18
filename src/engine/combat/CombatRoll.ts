@@ -17,8 +17,11 @@ export class CombatRoll {
 	constructor(
 		public actor: Creature,
 		// TODO target area or group
-		public target: Creature
-	) {}
+		public target: Creature,
+		options?: Partial<CombatRoll>
+	) {
+		if (options) Object.assign(this, options);
+	}
 
 	ability: UseAbilityAction|null = null;
 

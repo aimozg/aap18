@@ -4,8 +4,6 @@
 import {RacialGroup} from "../../engine/rules/RacialGroup";
 import {GameDataBuilder} from "../GameDataBuilder";
 
-export const RGID_ABOMINATION = 'abomination';
-export const RGID_ANGEL = 'angel';
 export const RGID_BEAST = 'beast';
 export const RGID_CONSTRUCT = 'construct';
 export const RGID_DEITY = 'deity';
@@ -17,11 +15,8 @@ export const RGID_MAGICAL_BEAST = 'magical_beast';
 export const RGID_SLIME = 'slime';
 export const RGID_SPIRIT = 'spirit';
 export const RGID_UNDEAD = 'undead';
-export const RGID_VERMIN = 'vermin';
 
 export const RacialGroups = {
-	ABOMINATION: new RacialGroup(RGID_ABOMINATION, 'Abomination'),
-	ANGEL: new RacialGroup(RGID_ANGEL, 'Angel'),
 	BEAST: new RacialGroup(RGID_BEAST, 'Beast'),
 	CONSTRUCT: new RacialGroup(RGID_CONSTRUCT, 'Construct'),
 	DEITY: new RacialGroup(RGID_DEITY, 'Deity'),
@@ -33,7 +28,6 @@ export const RacialGroups = {
 	SLIME: new RacialGroup(RGID_SLIME, 'Slime'),
 	SPIRIT: new RacialGroup(RGID_SPIRIT, 'Spirit'),
 	UNDEAD: new RacialGroup(RGID_UNDEAD, 'Undead'),
-	VERMIN: new RacialGroup(RGID_VERMIN, 'Vermin'),
 }
 
 export function gdRegisterRacialGroups(gd:GameDataBuilder) {

@@ -97,7 +97,7 @@ export class CreaturePanel extends DomComponent {
 	animatedValues:PartialRecord<CreatureValueId, CreatureValueAnimation> = {}
 	value(id:CreatureValueId):number {
 		if (!this.creature) return 0;
-		return Math.floor(this.animatedValues[id]?.x ?? CreatureValueDefs[id](this.creature));
+		return this.animatedValues[id]?.x ?? CreatureValueDefs[id](this.creature);
 	}
 	animateValue(valueId:CreatureValueId, newValue:number, durationMs:number) {
 		if (!this.creature) return;
@@ -216,7 +216,7 @@ export class CreaturePanel extends DomComponent {
 			<div className="text-s"></div>
 			<div>{c.fortitude}</div>
 			<div>{c.reflex}</div>
-			<div>{c.will}</div>
+			<div>{c.willpower}</div>
 			<div></div>
 			<div>{CombatRules.meleeAttack(c)}</div>
 			<div>{CombatRules.meleeDefense(c)}</div>

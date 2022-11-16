@@ -41,7 +41,7 @@ Attributes have an integer value of 1 or more. "Average" value is 5. Attribute m
 * **Speed (SPE)**. Decreases AP cost of most actions. Increases melee attack (small weapons)
 * **Perception (PER)**. Increases attack with ranged weapons.
 * **Intelligence (INT)**.
-* **Wisdom (WIS)**. Increases will.
+* **Wisdom (WIS)**. Increases willpower.
 * **Charisma (CHA)**.
 
 ## Secondary stats

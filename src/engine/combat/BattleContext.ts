@@ -19,6 +19,7 @@ import {BattleGrid} from "./BattleGrid";
 
 export let MillisPerRound = 1000;
 
+// TODO This should not be an action but a special button instead
 class FinishCombatAction extends CombatAction<void> {
 	constructor(public ctx:BattleContext) {
 		super(ctx.player);
@@ -30,7 +31,7 @@ class FinishCombatAction extends CombatAction<void> {
 	label: string = "Finish";
 	tooltip: string = "Finish battle";
 	async perform(cc: CombatController): Promise<void> {
-		this.ctx.onBattleFinishClick()
+		await this.ctx.onBattleFinishClick()
 	}
 }
 
@@ -78,7 +79,8 @@ export class BattleContext implements GameContext {
 	battleEnded() {
 		this.playerCanAct = false
 	}
-	onBattleFinishClick() {
+	async onBattleFinishClick() {
+		await this.cc.awardLoot();
 		this._promise.resolve(this)
 		Game.instance.gameController.showGameScreen()
 	}
@@ -102,7 +104,7 @@ export class BattleContext implements GameContext {
 	}
 	async execAction(action:CombatAction<any>) {
 		if (action instanceof FinishCombatAction) {
-			this.onBattleFinishClick()
+			await this.onBattleFinishClick()
 		} else if (this.playerCanAct) {
 			this.playerCanAct = false;
 			await this.cc.performAction(action);

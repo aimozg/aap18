@@ -5,28 +5,37 @@ import {Random} from "./Random";
 
 export class Dice {
 	constructor(
-		rolls: number,
-		sides: number,
-		bonus?: number
+		public readonly rolls: number,
+		public readonly sides: number,
+		public readonly bonus: number = 1,
+		public readonly rangeFormat: boolean = false
 	) {
-		this.rolls = arguments[0] | 0;
-		this.sides = arguments[1] | 0;
-		this.bonus = arguments[2] | 0;
-		if (!isFinite(this.rolls) || !isFinite(this.sides) || !isFinite(this.rolls)) throw new Error("Invalid dice " + this.toString())
+		if (!isFinite(rolls)
+			|| !isFinite(sides)
+			|| !isFinite(rolls)
+			|| (sides|0) < 0
+			|| rangeFormat && rolls > 1
+		) throw new Error(`Invalid dice ${rolls} d ${sides} + ${bonus} / ${rangeFormat}`)
+		this.rolls |= 0;
+		this.sides |= 0;
+		this.bonus |= 0;
+		// 0dX && Xd0 -> 0
+		if (this.rolls === 0) this.sides = 0;
+		else if (this.sides === 0) this.rolls = 0;
 	}
 
 	toString() {
 		const {rolls, sides, bonus} = this;
 		if (rolls === 0 || sides === 0) return String(bonus);
+		if (this.rangeFormat) return String(this.min)+".."+String(this.max);
 		let s = "" + rolls + "d" + sides;
 		if (bonus > 0) s += "+" + bonus;
 		else if (bonus < 0) s += bonus;
 		return s;
 	}
 
-	public readonly rolls: number;
-	public readonly sides: number;
-	public readonly bonus: number;
+	get min():number { return this.bonus + this.rolls }
+	get max():number { return this.bonus + this.rolls * this.sides }
 
 	roll(rng: Random): number {
 		return rng.dice(this.rolls, this.sides) + this.bonus;
@@ -47,13 +56,34 @@ export class Dice {
 		return new Dice(this.rolls * n, this.sides, this.bonus * n)
 	}
 
+	static ranged(min:number, max:number):Dice {
+		if (min > max) throw new Error(`Invalid dice ${min}..${max}`);
+		if (min < 0 && max < 0) return Dice.ranged(-max, -min).inverse();
+		return new Dice(1, max - min + 1, min - 1);
+	}
+	/**
+	 * Spec formats:
+	 * * X (can be signed)
+	 * * XdY
+	 * * XdY+Z, XdY-Z
+	 * * X..Y (inclusive, can be signed)
+	 */
 	static parse(spec: string): Dice {
 		let rolls, sides, bonus;
 		let d = spec.indexOf('d');
 		if (d < 0) {
-			bonus = parseInt(spec);
-			return new Dice(0, 0, bonus);
+			d = spec.indexOf('..');
+			if (d < 0) {
+				// X
+				bonus = parseInt(spec);
+				return new Dice(0, 0, bonus);
+			}
+			// X..Y
+			let min = parseInt(spec.substring(0, d));
+			let max = parseInt(spec.substring(d + 1));
+			return Dice.ranged(min, max);
 		}
+		// XdY
 		rolls = parseInt(spec.substring(0, d));
 		let p = spec.indexOf('+');
 		if (p < 0) p = spec.indexOf("-");
@@ -70,6 +100,13 @@ export class Dice {
 
 let lib = new Map<string, Dice>();
 
+/**
+ * Spec formats:
+ * * X (can be signed)
+ * * XdY
+ * * XdY+Z, XdY-Z
+ * * X..Y (can be signed)
+ */
 export function dice(spec: string): Dice {
 	if (lib.has(spec)) return lib.get(spec)!;
 	let dice = Dice.parse(spec);

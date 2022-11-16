@@ -12,6 +12,7 @@ export interface BarProps {
 	value?: number;
 	values?: number[];
 	print?: boolean;
+	format?: string;
 	min?: number;
 	max?: number;
 }
@@ -29,7 +30,7 @@ export class Bar extends Component<BarProps, {}> {
 		let max = props.max ?? 1;
 		let children = props.children;
 		if (props.print) {
-			children = [values[0],props.children];
+			children = [values[0].format(props.format ?? ",d"),props.children];
 		}
 		return <div style={style} class={"bar " + (props.className ?? "")}>
 			{values.map((x, i) =>

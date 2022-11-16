@@ -94,7 +94,7 @@ export class ChargenStepAttrs extends ChargenStep {
 			<div>Reflex saving throw</div>
 
 			<div>Will</div>
-			<div>{this.player.will}</div>
+			<div>{this.player.willpower}</div>
 			<div></div>
 			<div>Will saving throw</div>
 

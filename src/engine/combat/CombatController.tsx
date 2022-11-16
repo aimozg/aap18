@@ -8,13 +8,14 @@ import {PlayerCharacter} from "../objects/creature/PlayerCharacter";
 import {LogManager} from "../logging/LogManager";
 import {ComponentChildren, h} from "preact";
 import {Fragment} from "preact/compat";
-import {tween} from "shifty";
 import {CombatAction} from "./CombatAction";
 import {Damage, DamageType} from "../rules/Damage";
 import {coerce} from "../math/utils";
 import {CombatRoll} from "./CombatRoll";
 import {CombatRules} from "../../game/combat/CombatRules";
 import {BattleGrid} from "./BattleGrid";
+import {mergeLoot} from "../objects/Loot";
+import {Inventory} from "../objects/Inventory";
 
 const logger = LogManager.loggerFor("engine.combat.CombatController")
 
@@ -275,10 +276,21 @@ export class CombatController {
 			roll.damage = CombatRules.rollDamage(roll.damageSpec, roll.critHit, 2);
 			await roll.onHit?.(roll, this);
 			if (roll.hit && !roll.cancelled) {
+				if (roll.critHit) {
+					this.logActionVs(roll.actor, "attacks", roll.target, <Fragment><span title={""+roll.roll}>critical hit</span>!</Fragment>)
+				} else {
+					this.logActionVs(roll.actor, "attacks", roll.target, <Fragment><span title={""+roll.roll+roll.bonus.signed()+" vs "+roll.dc}>hit</span>.</Fragment>)
+				}
 				await this.doDamages(roll.target, roll.damage, roll.actor);
 			}
 		} else {
 			// TODO onMiss callback
+			if (roll.critMiss) {
+				this.logActionVs(roll.actor, "attacks", roll.target,
+					<Fragment><span title={""+roll.roll}>critical miss</span>!</Fragment>)
+			} else {
+				this.logActionVs(roll.actor, "attacks", roll.target, <Fragment><span title={""+roll.roll+roll.bonus.signed()+" vs "+roll.dc}>miss</span>.</Fragment>)
+			}
 		}
 		return roll;
 	}
@@ -396,24 +408,20 @@ export class CombatController {
 		}
 	}
 
-	private async animateValueChange<T extends { [key in PROP]: number },
-		PROP extends keyof T>(creature: T,
-	                          prop: PROP,
-	                          value2: number,
-	                          duration: number = AnimationTime) {
-		logger.debug("animateValueChange {} {} {}", creature, prop, value2)
-		// TODO move to CombatAnimations or something
-		let value1 = creature[prop]
-		await (tween({
-			from: {value: value1},
-			to: {value: value2},
-			duration: duration,
-			render: ({value}: { value: number }) => {
-				(creature as { [key in PROP]: number })[prop] = value;
-				this.ctx.redraw()
-			}
-		}) as PromiseLike<any>);
-		(creature as { [key in PROP]: number })[prop] = value2;
-		this.ctx.redraw()
+	async awardLoot() {
+		let loot = mergeLoot(this.enemies.map(e=>e.loot));
+		logger.info("awardLoot rolled money = {} items = {}", loot.money, loot.items);
+		let receiver = this.ctx.player;
+		// TODO +XXXX floatig number for gold
+		receiver.money += loot.money;
+		// TODO this isn't displayed properly!
+		this.logInfo(`You receive ${loot.money} gold.`);
+		if (loot.items.length > 0) {
+			await Game.instance.gameController.openTransferMenu(
+				Inventory.wrap(loot.items, "Loot"),
+				{ /*use: false, equip: false, unequip: false*/ }
+			)
+		}
 	}
+
 }

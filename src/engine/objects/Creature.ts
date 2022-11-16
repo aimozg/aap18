@@ -15,6 +15,7 @@ import {AbstractCombatAbility} from "../combat/AbstractCombatAbility";
 import {GOCreature} from "../combat/BattleGrid";
 import {Inventory} from "./Inventory";
 import {MaxLevel, XpPerLevel} from "../../game/xp";
+import {Loot} from "./Loot";
 
 let objectIdCounter = 0;
 
@@ -201,7 +202,7 @@ export class Creature {
 		return this.dexMod
 	}
 	/** Universal willpower saving throw */
-	get will():number {
+	get willpower():number {
 		// TODO other sources (base value, buffs)
 		return this.wisMod
 	}
@@ -240,6 +241,8 @@ export class Creature {
 
 	// TODO move inventory size to game rules
 	readonly inventory: Inventory = new Inventory("Inventory", 20);
+
+	loot: Loot = {money:0, items:[]};
 
 	//-----------------//
 	// Items - Helpers //

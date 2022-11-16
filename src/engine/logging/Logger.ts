@@ -51,6 +51,12 @@ export abstract class Logger {
 			if (Array.isArray(v.props.children)) return v.props.children.map(c => Logger.toString(c)).join("")
 			return Logger.toString(v.props.children)
 		}
+		if (Array.isArray(x)) {
+			if (x.length > 20) {
+				return "["+x.slice(0,20).map(c=>Logger.toString(c)).join(", ")+", ...]"
+			}
+			return "["+x.map(c=>Logger.toString(c)).join(", ")+"]"
+		}
 		let s = String(x);
 		if (s === '[object Object]') s = '[object '+Object.getPrototypeOf(x).constructor.name+']';
 		return s

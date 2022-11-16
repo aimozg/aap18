@@ -4,7 +4,6 @@ import {ScenePanel} from "../ui/panels/ScenePanel";
 import {GameScreenLayout} from "../ui/screens/GameScreen";
 import {PlaceSidebar} from "../ui/panels/PlaceSidebar";
 import {createRef, h} from "preact";
-import {InventoryScreen} from "../ui/screens/InventoryScreen";
 import {InteractiveTextOutput} from "../text/output/InteractiveTextOutput";
 
 export class PlaceContext extends SceneContext {
@@ -47,8 +46,7 @@ export class PlaceContext extends SceneContext {
 	async onInventoryClick() {
 		if (!this.canManageInventory()) return;
 
-		await new InventoryScreen(this.player).showModal();
-		this.characterPanel.update();
+		await this.gc.openTransferMenu(null);
 	}
 
 	canLevelUp(): boolean {
