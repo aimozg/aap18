@@ -17,13 +17,14 @@ export class BattlePanel extends DomComponent {
 			</div>
 		);
 		this.refMain = refMain;
-		this.canvas = new GlyphCanvas(refMain.current!!.getContext("2d")!!, "fit")
+		this.canvas = new GlyphCanvas(refMain.current!.getContext("2d")!!, "fit")
 	}
 	init() {
 		this.canvas.windowWidth = this.context.grid.width;
 		this.canvas.windowHeight = this.context.grid.height;
 	}
 	animationFrame(dt:number, time:number):void{
+		this.context.grid.animationFrame(dt);
 		this.canvas.render(this.context.grid);
 	}
 	update(){

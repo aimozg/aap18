@@ -4,7 +4,7 @@
 
 import {CombatAction} from "../CombatAction";
 import {Creature} from "../../objects/Creature";
-import {CombatController} from "../CombatController";
+import {AnimationTimeFast, CombatController} from "../CombatController";
 import {Direction, GridPos} from "../../utils/gridutils";
 import {CombatRules} from "../../../game/combat/CombatRules";
 
@@ -18,7 +18,7 @@ export class StepAction extends CombatAction<StepActionResult> {
 	constructor(actor: Creature,
 	            public readonly target: GridPos) {
 		super(actor);
-		this.direction = Direction.to(actor.gobj!!, target)
+		this.direction = Direction.to(actor.gobj!, target)
 		this.label = "Step " + this.direction.name;
 		this.tooltip = this.label
 	}
@@ -39,8 +39,9 @@ export class StepAction extends CombatAction<StepActionResult> {
 		apcost *= CombatRules.speedApFactorMove(this.actor.spe);
 		await cc.deduceAP(this.actor, apcost);
 		// TODO AOO, generic intercept
-		// TODO animate movement
-		cc.grid.setPos(this.actor.gobj!!, this.target)
+		let from = this.actor.gobj!.pos;
+		cc.grid.setPos(this.actor.gobj!, this.target)
+		await cc.grid.animateMovement(this.actor.gobj!, from, this.target, AnimationTimeFast).finished;
 		return {success:true,intercepted:false}
 	}
 

@@ -144,7 +144,7 @@ export class CombatController {
 				await this.nextRound()
 				break;
 			case CombatFlowResultType.AI_ACTION:
-				await this.performAIAction(fr.creature!!)
+				await this.performAIAction(fr.creature!)
 				break;
 			case CombatFlowResultType.COMBAT_ENDED:
 				this.battleEnd()

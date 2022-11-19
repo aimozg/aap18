@@ -60,7 +60,7 @@ export class Place implements IResource {
 	get scene(): Scene { return Game.instance.data.scene(this.props.scene()); }
 
 	pickEncounter(rng:Random=Game.instance.rng):Encounter|null {
-		return this.props.encounters!!.pickOrNull(rng);
+		return this.props.encounters!.pickOrNull(rng);
 	}
 
 	static Limbo = new Place("/Limbo", {

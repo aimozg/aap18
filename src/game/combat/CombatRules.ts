@@ -30,7 +30,7 @@ export namespace CombatRules {
 		// TODO targets
 		actions.push(new MeleeAttackAction(player, cc.enemies[0]))
 		for (let dir of Direction.Steps) {
-			actions.push(new StepAction(player, dir.add(player.gobj!!)))
+			actions.push(new StepAction(player, dir.add(player.gobj!)))
 		}
 		// TODO tease
 		// TODO abilities

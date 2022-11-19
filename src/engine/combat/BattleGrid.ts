@@ -5,13 +5,16 @@
 import {Creature} from "../objects/Creature";
 import {RGBColor} from "../objects/Color";
 import * as tinycolor from "tinycolor2";
-import {GlyphData, GlyphSource} from "../ui/components/GlyphCanvas";
+import {CanvasOverlay, GlyphData, GlyphSource} from "../ui/components/GlyphCanvas";
 import {PlayerCharacter} from "../objects/creature/PlayerCharacter";
 import {Random} from "../math/Random";
 import {GridPos} from "../utils/gridutils";
 import {IResource} from "../IResource";
 import Symbols from "../symbols";
 import {ApToAct} from "./CombatController";
+import {lint} from "../math/utils";
+import {LogManager} from "../logging/LogManager";
+import {Deferred} from "../utils/Deferred";
 
 export abstract class GridObject {
 	get glyph(): GlyphData {
@@ -93,6 +96,22 @@ export interface GridCell {
 	data: GridCellData;
 }
 
+interface MovingGlyph {
+	go:GridObject;
+	pos:GridPos;
+	from:GridPos;
+	to:GridPos;
+	phase:number;
+	durationMs:number;
+	steps:number;
+	promise:Deferred<void>;
+}
+
+export interface WrappedAnimationPromise {
+	finished:Promise<void>;
+}
+
+const logger = LogManager.loggerFor("engine.combat.BattleGrid")
 export class BattleGrid implements GlyphSource {
 	constructor(
 		public readonly width:number,
@@ -106,6 +125,22 @@ export class BattleGrid implements GlyphSource {
 	}
 	public _data:GridCellData[];
 	public readonly size:number = this.width*this.height;
+	private movingGlyphs:Map<GridObject,MovingGlyph> = new Map();
+	animateMovement(go:GridObject, from:GridPos, to:GridPos, durationMs:number, steps:number=4):WrappedAnimationPromise {
+		let mg:MovingGlyph = {
+			go,
+			from,
+			to,
+			pos: {x:from.x,y:from.y},
+			phase: 0,
+			durationMs,
+			steps,
+			promise:new Deferred<void>()
+		}
+		logger.debug("animateMovement {}: {},{} -> {},{}",go,from.x,from.y,to.x,to.y);
+		this.movingGlyphs.set(go, mg);
+		return {finished:mg.promise};
+	}
 	glyphAt(x: number, y: number): GlyphData | null {
 		if (!this.hasxy(x,y)) return null;
 		let cd = this.data({x, y});
@@ -113,9 +148,36 @@ export class BattleGrid implements GlyphSource {
 		if (cd.objects.length === 0) return cd.tile;
 		let gd: GlyphData = {ch: cd.tile.ch, fg: cd.tile.fg, bg: cd.tile.bg};
 		for (let o of cd.objects) {
+			if (this.movingGlyphs.has(o)) continue;
 			Object.assign(gd, o.glyph);
 		}
 		return gd;
+	}
+	overlays(): CanvasOverlay[] {
+		return [...this.movingGlyphs.values()].map(mg=>({
+			type: "glyph",
+			row: mg.pos.y,
+			col: mg.pos.x,
+			glyph: mg.go.glyph
+		}))
+	}
+	animationFrame(dt:number) {
+		for (let mg of this.movingGlyphs.values()) {
+			let phase = (mg.phase += dt/mg.durationMs);
+			if (phase >= 1.0) {
+				this.movingGlyphs.delete(mg.go);
+				logger.debug("animation finished for {}", mg.go);
+				mg.promise.resolve();
+				continue;
+			}
+			if (mg.steps) {
+				phase = Math.floor(phase*mg.steps)/mg.steps;
+			}
+			mg.pos = {
+				x: lint(phase, mg.from.x, mg.to.x),
+				y: lint(phase, mg.from.y, mg.to.y),
+			}
+		}
 	}
 	public index(x:number, y:number):number {
 		return y*this.width + x;

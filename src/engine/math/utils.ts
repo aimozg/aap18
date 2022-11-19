@@ -9,6 +9,6 @@ export function coerce(value:number, min:number, max:number):number {
 export const atLeast = Math.max;
 export const atMost = Math.min;
 /** Linear interpolation */
-export function lint(t:number, x1:number, x2:number):number {
-	return x1 + (x2-x1)*t;
+export function lint(t:number, value0:number, value1:number):number {
+	return value0 + (value1-value0)*t;
 }

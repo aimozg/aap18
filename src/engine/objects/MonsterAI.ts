@@ -41,8 +41,8 @@ export class DefaultMonsterAI extends MonsterAI {
 			if (cc.adjacent(actor, target)) {
 				options.push(new MeleeAttackAction(actor, target));
 			} else {
-				let dir = Direction.to(actor.gobj!!, target.gobj!!);
-				options.push(new StepAction(actor, dir.add(actor.gobj!!)));
+				let dir = Direction.to(actor.gobj!, target.gobj!);
+				options.push(new StepAction(actor, dir.add(actor.gobj!)));
 			}
 			options.push(new TeaseAction(actor, target));
 		}

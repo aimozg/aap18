@@ -12,14 +12,16 @@ export interface GlyphAnimatedColor1 {
 	speed: "normal" | "fast" | "blink" | "fblink" | "slow";
 	color: RGBColor;
 }
+
 export interface GlyphAnimatedColor2 {
 	fx: "tween";
 	speed: "normal" | "fast" | "slow";
 	colors: RGBColor[]
 }
+
 export type GlyphColor = string | RGBColor | GlyphAnimatedColor1 | GlyphAnimatedColor2;
 
-export function glyphColorToRGB(color:GlyphColor, phase:number):RGBColor {
+export function glyphColorToRGB(color: GlyphColor, phase: number): RGBColor {
 	if (color instanceof tinycolor) {
 		return color;
 	}
@@ -31,17 +33,17 @@ export function glyphColorToRGB(color:GlyphColor, phase:number):RGBColor {
 			// phase = phase
 			break;
 		case "fast":
-			phase = phase*2;
+			phase = phase * 2;
 			break;
 		case "slow":
-			phase = phase/2;
+			phase = phase / 2;
 			break;
 		case "blink":
-			phase = (phase-Math.floor(phase)) > 0.75 ? 0.5 : 0;
+			phase = (phase - Math.floor(phase)) > 0.75 ? 0.5 : 0;
 			break;
 		case "fblink":
-			phase = phase*2;
-			phase = (phase-Math.floor(phase)) > 0.75 ? 0.5 : 0;
+			phase = phase * 2;
+			phase = (phase - Math.floor(phase)) > 0.75 ? 0.5 : 0;
 			break;
 	}
 	phase = coerce(phase, 0, 1);
@@ -73,18 +75,21 @@ export function glyphColorToRGB(color:GlyphColor, phase:number):RGBColor {
 export interface GlyphData {
 	ch: string;
 	fg: GlyphColor;
-	bg?: RGBColor|null;
+	bg?: RGBColor | null;
 }
 
 export interface GlyphSource {
 	width: number;
 	height: number;
-	glyphAt(x:number, y:number):GlyphData|null;
+
+	glyphAt(x: number, y: number): GlyphData | null;
+
+	overlays?(): CanvasOverlay[];
 }
 
-export type GlyphCanvasSizing = "force"|"fit"
+export type GlyphCanvasSizing = "force" | "fit"
 
-export function createCanvas(w:number, h:number, fill?:string):CanvasRenderingContext2D {
+export function createCanvas(w: number, h: number, fill?: string): CanvasRenderingContext2D {
 	let c = document.createElement("canvas");
 	c.width = w;
 	c.height = h;
@@ -96,10 +101,29 @@ export function createCanvas(w:number, h:number, fill?:string):CanvasRenderingCo
 	return c2d;
 }
 
+export interface ICanvasOverlay {
+	hide?: boolean;
+	row: number;
+	col: number;
+}
+
+export interface CanvasOverlayGlyph extends ICanvasOverlay {
+	type: "glyph";
+	glyph: GlyphData;
+}
+
+export interface CanvasOverlayImage extends ICanvasOverlay {
+	type: "image";
+	image: CanvasImageSource;
+}
+
+export type CanvasOverlay = CanvasOverlayGlyph | CanvasOverlayImage;
+
 export class GlyphCanvas {
 	constructor(private readonly c2d: CanvasRenderingContext2D,
-	            public sizing:GlyphCanvasSizing) {
+	            public sizing: GlyphCanvasSizing) {
 	}
+
 	// TODO move to config
 	font = "32px monospace"
 	// Cell size in pixel
@@ -121,25 +145,34 @@ export class GlyphCanvas {
 
 	phase = 0;
 	animationSpeed = 1;
-	animated = false;
 
-	get width() { return this.windowWidth*this.cellWidth + this.padding*2 }
-	set width(value:number) {
-		if (this.sizing === "force") return;
-		this.windowWidth = (value-this.padding*2)/this.cellWidth;
-	}
-	get height() { return this.windowHeight*this.cellHeight + this.padding*2 }
-	set height(value:number) {
-		if (this.sizing === "force") return;
-		this.windowHeight = (value-this.padding*2)/this.cellHeight;
+	beforeRender: (() => void) | null = null;
+	afterRender: (() => void) | null = null;
+
+	get width() {
+		return this.windowWidth * this.cellWidth + this.padding * 2
 	}
 
-	scroll(dx:number, dy:number) {
+	set width(value: number) {
+		if (this.sizing === "force") return;
+		this.windowWidth = (value - this.padding * 2) / this.cellWidth;
+	}
+
+	get height() {
+		return this.windowHeight * this.cellHeight + this.padding * 2
+	}
+
+	set height(value: number) {
+		if (this.sizing === "force") return;
+		this.windowHeight = (value - this.padding * 2) / this.cellHeight;
+	}
+
+	scroll(dx: number, dy: number) {
 		this.scrollX += dx
 		this.scrollY += dy
 	}
 
-	renderGlyph(glyph:GlyphData, x:number, y:number) {
+	renderGlyph(glyph: GlyphData, x: number, y: number) {
 		const c2d = this.c2d;
 		if (glyph.bg) {
 			c2d.fillStyle = glyphColorToRGB(glyph.bg, this.phase).toString();
@@ -150,8 +183,24 @@ export class GlyphCanvas {
 			c2d.fillText(glyph.ch, this.x0 + x, y + this.y0 + this.cellHeight)
 		}
 	}
-	render(source:GlyphSource) {
-		this.phase = this.animationSpeed*milliTime()/1000;
+
+	renderOverlay(overlay: CanvasOverlay) {
+		let x = (overlay.col - this.scrollX) * this.cellWidth + this.padding;
+		let y = (overlay.row - this.scrollY) * this.cellHeight + this.padding;
+		switch (overlay.type) {
+			case "image":
+				this.c2d.drawImage(overlay.image, x, y);
+				break;
+			case "glyph":
+				this.c2d.font = this.font;
+				this.renderGlyph(overlay.glyph, x, y);
+				break;
+		}
+	}
+
+	render(source: GlyphSource) {
+		this.beforeRender?.();
+		this.phase = this.animationSpeed * milliTime() / 1000;
 		const c2d = this.c2d;
 		const canvas = c2d.canvas;
 		switch (this.sizing) {
@@ -162,8 +211,8 @@ export class GlyphCanvas {
 			case "fit":
 				if (this.width !== canvas.clientWidth || this.height !== canvas.clientHeight) {
 					// adjust scroll maintaining center position
-					this.scrollX += (this.width - canvas.clientWidth)/this.cellWidth/2;
-					this.scrollY += (this.height - canvas.clientHeight)/this.cellHeight/2;
+					this.scrollX += (this.width - canvas.clientWidth) / this.cellWidth / 2;
+					this.scrollY += (this.height - canvas.clientHeight) / this.cellHeight / 2;
 					this.scrollX |= 0;
 					this.scrollY |= 0;
 					this.width = canvas.width = canvas.clientWidth;
@@ -188,8 +237,12 @@ export class GlyphCanvas {
 			}
 			y += this.cellHeight
 		}
-		if (document.contains(c2d.canvas) && this.animated) {
-			requestAnimationFrame(()=>this.render(source));
+
+		for (let overlay of source.overlays?.() ?? []) {
+			if (overlay.hide) continue;
+			this.renderOverlay(overlay);
 		}
+
+		this.afterRender?.();
 	}
 }
