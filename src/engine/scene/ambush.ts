@@ -6,6 +6,7 @@ import {Creature} from "../objects/Creature";
 import {ChoiceData, SceneContext} from "./SceneContext";
 import {SceneFn} from "./Scene";
 import {substitutePattern} from "../utils/string";
+import {CoreSkills} from "../objects/creature/CoreSkills";
 
 export interface EAmbushTags {
 	// Target types
@@ -155,8 +156,10 @@ export namespace AmbushRules {
 		throw new Error("defaultSuccessRape not implemented")
 	}
 	export async function defaultSuccessSneakAttack(def: AmbushDef, ctx:SceneContext) {
-		// TODO add "sneak" condition
-		ctx.endNowAndBattle({enemies:def.monsters})
+		ctx.endNowAndBattle({
+			enemies:def.monsters,
+			ambushed: "enemies"
+		})
 	}
 	export async function defaultSuccessLeave(def: AmbushDef, ctx:SceneContext) {
 		ctx.endNow()
@@ -173,16 +176,15 @@ export namespace AmbushRules {
 	}
 
 	export async function doAmbushFail(def: AmbushDef, ctx: SceneContext, critFail: boolean) {
-		// TODO if critFail, give monsters a boost
 		ctx.endAndBattle({
-			enemies:def.monsters
+			enemies:def.monsters,
+			ambushed: critFail ? "party" : undefined
 		});
 	}
 
 	export async function doAmbush(def: AmbushDef, ctx: SceneContext) {
 		let roll = def.roll ?? ctx.d20();
-		// TODO ambush skill value
-		let bonus = 0;
+		let bonus = ctx.player.skillValue(CoreSkills.Ambush);
 		let dc = def.dc ?? calcAmbushDc(def);
 		let diff = roll + bonus - dc;
 		let resultType:AmbushResultType;

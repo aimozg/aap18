@@ -187,7 +187,8 @@ export class GameController {
 			player: options.player ?? this.player,
 			party: party,
 			enemies: enemies,
-			grid
+			grid,
+			ambushed: options.ambushed
 		}
 		let ctx = new BattleContext(settings);
 		this.state.pushGameContext(ctx);

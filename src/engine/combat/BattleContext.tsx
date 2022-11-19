@@ -51,6 +51,7 @@ export interface BattleOptions {
 	player?: PlayerCharacter;
 	party?: Creature[];
 	enemies: Creature[];
+	ambushed?:'party'|'enemies';
 
 	map?: BattleMapOptions;
 }
@@ -60,11 +61,12 @@ export interface BattleSettings {
 	enemies: Creature[];
 
 	grid: BattleGrid;
+	ambushed:'party'|'enemies'|undefined;
 }
 
 export class BattleContext implements GameContext {
 	constructor(
-		public options: BattleSettings
+		public settings: BattleSettings
 	) {
 		this.cc = new CombatController(this)
 		this.battlePanel.init();
@@ -77,7 +79,7 @@ export class BattleContext implements GameContext {
 
 	private charPanelWasCollapsed: boolean;
 	public get grid(): BattleGrid { return this.cc.grid };
-	public player: PlayerCharacter = this.options.player;
+	public player: PlayerCharacter = this.settings.player;
 	playerCanAct = false
 	readonly cc: CombatController
 	get ended(): boolean { return this._promise.completed; }

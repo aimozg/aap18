@@ -27,6 +27,8 @@ export interface CreaturePanelOptions {
 	lp: boolean;
 	ep: boolean;
 
+	conditions: boolean;
+
 	attributes: boolean;
 
 	combatStats: boolean;
@@ -106,6 +108,8 @@ export class CreaturePanel extends DomComponent {
 		hp: true,
 		lp: true,
 		ep: true,
+
+		conditions: true,
 
 		attributes: true,
 
@@ -316,12 +320,26 @@ export class CreaturePanel extends DomComponent {
         </div>
 	}
 
+	private sectionStatusCompact():ComponentChildren {
+		let c = this.creature!;
+		// TODO tooltips
+		return this.options.conditions && <Fragment>
+			{[...c.conditions].map(cc=>
+				<div class="condition-icon" style={{
+					color: cc.icon.fg,
+					background: cc.icon.bg
+				}}>{cc.icon.text}</div>
+			)}
+		</Fragment>
+	}
+
 	private renderCollapsed(): VNode {
 		return <Fragment>
 			{this.sectionNameCompact()}
 			{this.sectionXp()}
 			{this.sectionResourcesCompact()}
 			<div class="d-flex flex-wrap gap-2">
+				{this.sectionStatusCompact()}
 				<div class="flex-grow-1"></div>
 				{this.options.collapsible && <Button className="-icon -flat" onClick={() => this.expand()}>▾</Button>}
 			</div>

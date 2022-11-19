@@ -6,7 +6,7 @@ import {Creature} from "../objects/Creature";
 import {Game} from "../Game";
 import {PlayerCharacter} from "../objects/creature/PlayerCharacter";
 import {LogManager} from "../logging/LogManager";
-import {ComponentChildren, h} from "preact";
+import {ComponentChildren, h, VNode} from "preact";
 import {Fragment} from "preact/compat";
 import {CombatAction} from "./CombatAction";
 import {Damage, DamageType} from "../rules/Damage";
@@ -16,6 +16,9 @@ import {CombatRules} from "../../game/combat/CombatRules";
 import {BattleGrid} from "./BattleGrid";
 import {mergeLoot} from "../objects/Loot";
 import {Inventory} from "../objects/Inventory";
+import {CoreConditions} from "../objects/creature/CoreConditions";
+import {SkipCombatAction} from "./actions/SkipCombatAction";
+import {CoreSkills} from "../objects/creature/CoreSkills";
 
 const logger = LogManager.loggerFor("engine.combat.CombatController")
 
@@ -49,24 +52,38 @@ export let AnimationTime = 500;
 export let AnimationTimeFast = 250;
 export let AnimationTimeVeryFast = 125;
 
+export function logref(creature:Creature): VNode {
+	return <span class="--actor">{creature.name.capitalize()}</span>
+}
+
 export class CombatController {
 	constructor(
 		public readonly ctx: BattleContext,
 	) {
 		CombatRules.postSetup();
-		this.grid = ctx.options.grid;
+		this.grid = ctx.settings.grid;
 		for (let creature of [...this.party, ...this.enemies]) {
+			// TODO put them on different sides
 			if (creature.gobj?.grid === this.grid) continue;
 			let pos = this.grid.randomEmptyCell(this.rng);
 			if (!pos) throw new Error(`Nowhere to place ${creature.name}!`)
 			this.grid.placeCreature(creature, pos);
 		}
-		// TODO for tiles and layout, use options-provided static map or generated
 	}
 
 	public readonly grid: BattleGrid;
-	public readonly party: Creature[] = this.ctx.options.party
-	public readonly enemies: Creature[] = this.ctx.options.enemies
+	public readonly party: Creature[] = this.ctx.settings.party
+	public readonly enemies: Creature[] = this.ctx.settings.enemies
+	public ownSide(creature:Creature):Creature[] {
+		if (this.party.includes(creature)) return this.party;
+		if (this.enemies.includes(creature)) return this.enemies;
+		throw new Error("Not a combatant: "+creature);
+	}
+	public otherSide(creature:Creature):Creature[] {
+		if (this.party.includes(creature)) return this.enemies;
+		if (this.enemies.includes(creature)) return this.party;
+		throw new Error("Not a combatant: "+creature);
+	}
 
 	public get rng() { return Game.instance.rng }
 
@@ -86,6 +103,18 @@ export class CombatController {
 		logger.info("battleStart {} vs {}", this.party, this.enemies)
 		for (let p of this.participants) {
 			this.prepareForCombat(p)
+		}
+		switch (this.ctx.settings.ambushed) {
+			case "enemies":
+				this.logInfo("You're sneaking!");
+				for (let c of this.party) c.setCondition(CoreConditions.Stealth);
+				for (let c of this.enemies) c.setCondition(CoreConditions.Unaware);
+				break;
+			case "party":
+				// TODO what to do when party is ambushed? Give bonus AP?
+				// for (let c of this.enemies) c.setCondition(CoreConditions.Stealth);
+				// for (let c of this.party) c.setCondition(CoreConditions.Unaware);
+				break;
 		}
 		this.roundNo = 0;
 		this.tickTime = TicksPerRound;
@@ -152,17 +181,68 @@ export class CombatController {
 		}
 	}
 
+	async doSingleStealthCheck(spotter:Creature, sneaker:Creature) {
+		logger.info("doSingleStealthCheck {} {}", spotter, sneaker);
+		if (!spotter.isAlive) return;
+		let spotSkill = spotter.skillValue(CoreSkills.Spot);
+		let stealthSkill = sneaker.skillValue(CoreSkills.Stealth);
+
+		let roll = this.rng.d20();
+		let bonus = spotSkill;
+		let dc = 10 + stealthSkill;
+		// TODO critical success/failure?
+		let success = roll + bonus >= dc
+		let successIsGood = this.ownSide(sneaker) !== this.party;
+		this.logSkillCheck(roll, bonus, dc, successIsGood,
+			<Fragment>
+				{logref(spotter)}{' '}Spot vs {logref(sneaker)}{' '}Stealth check
+			</Fragment>);
+		if (success) {
+			await this.noticeCreature(sneaker);
+		}
+	}
+	async doFullStealthCheck(creature:Creature) {
+		logger.debug("doFullStealthCheck {}", creature)
+		for (let spotter of this.otherSide(creature)) {
+			if (!creature.hasCondition(CoreConditions.Stealth)) break;
+			await this.doSingleStealthCheck(spotter, creature);
+		}
+	}
+	async noticeCreature(creature:Creature) {
+		logger.debug("noticeCreature {}",creature);
+		if (creature.removeCondition(CoreConditions.Stealth)) {
+			this.logInfo(<Fragment>{logref(creature)} is found!</Fragment>);
+		}
+		for (let enemy of this.otherSide(creature)) {
+			if (enemy.removeCondition(CoreConditions.Unaware)) {
+				this.logInfo(<Fragment>{logref(enemy)} is alerted!</Fragment>)
+			}
+		}
+	}
+
 	async nextRound() {
+		logger.info("nextRound()")
+
 		this.tickTime -= TicksPerRound
 		this.roundNo++
+
 		this.logbr()
 		this.logInfo("Round " + this.roundNo + ".")
+		this.logbr()
+
+		for (let creature of this.participants) {
+			if (creature.hasCondition(CoreConditions.Stealth)) {
+				await this.doFullStealthCheck(creature);
+			}
+		}
 		// TODO advance effects
 	}
 
 	async performAIAction(actor: Creature) {
 		logger.debug("performAIAction {}", actor.name)
-		let action = actor.ai.performAI(this);
+		let action = actor.hasCondition(CoreConditions.Unaware)
+			? new SkipCombatAction(actor)
+			: actor.ai.performAI(this);
 		await this.performAction(action);
 		logger.debug("/performAIAction {}", actor.name)
 	}
@@ -203,17 +283,22 @@ export class CombatController {
 	logAction(c: Creature, action: ComponentChildren, joiner: string = ': ') {
 		// TODO special hostile/friendly style?
 		this.log("-action", <Fragment>
-			<span className="--actor">{c.name.capitalize()}</span>{joiner}
-			<span className="--action">{action}</span>
+			{logref(c)}{joiner}<span className="--action">{action}</span>
 		</Fragment>)
 	}
 
 	logActionVs(actor: Creature, verb: ComponentChildren, target: Creature, action: ComponentChildren) {
 		// TODO special hostile/friendly style?
 		this.log("-action", <Fragment>
-			<span className="--actor">{actor.name.capitalize()}</span>{" "}{verb}{" "}
-			<span className="--actor">{target.name.capitalize()}</span>{": "}
+			{logref(actor)}{" "}{verb}{" "}{logref(target)}{": "}
 			<span className="--action">{action}</span>
+		</Fragment>)
+	}
+	logSkillCheck(roll:number,bonus:number,dc:number,successIsGood:boolean,name:ComponentChildren) {
+		let success = roll + bonus >= dc
+		let className = (success === successIsGood) ? "text-roll-success" : "text-roll-fail";
+		this.log("-check", <Fragment>
+			[{name}: <span class={className}>{success?"Success":"Failure"} ({roll}{bonus.signed()} vs {dc})</span>]
 		</Fragment>)
 	}
 
@@ -223,7 +308,6 @@ export class CombatController {
 
 	prepareForCombat(c: Creature) {
 		logger.debug("prepareForCombat {}", c)
-		// TODO clean combat buffs
 		// TODO setup AI
 		c.ap = this.rng.nextInt(TicksPerRound)
 		this.logAction(c, "Initiative roll (" + c.ap + ").")
@@ -232,6 +316,9 @@ export class CombatController {
 	cleanupAfterCombat(c: Creature) {
 		logger.debug("cleanupAfterCombat {}", c);
 		// TODO clean combat buffs
+		for (let cc of c.conditions) {
+			if (cc.combatOnly) c.removeCondition(cc);
+		}
 		c.ap = 0;
 		c.gobj = null;
 	}
@@ -291,6 +378,9 @@ export class CombatController {
 			} else {
 				this.logActionVs(roll.actor, "attacks", roll.target, <Fragment><span title={""+roll.roll+roll.bonus.signed()+" vs "+roll.dc}>miss</span>.</Fragment>)
 			}
+		}
+		if (roll.target.hasCondition(CoreConditions.Unaware)) {
+			roll.target.removeCondition(CoreConditions.Unaware);
 		}
 		return roll;
 	}

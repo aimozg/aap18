@@ -6,8 +6,8 @@ import {SceneContext} from "../../engine/scene/SceneContext";
 import {Imp} from "../monsters/Imp";
 import {ConsumableLib} from "../../game/data/items/ConsumableLib";
 
-export function gdRegisterPlayerBase(gd:GameDataBuilder) {
-	gd.logger.debug("gdRegisterPlayerBase")
+export function gdRegisterPlayerCamp(gd:GameDataBuilder) {
+	gd.logger.debug("gdRegisterPlayerCamp")
 	gd.buildScenes("/001", {
 		camp: (ctx:SceneContext) => {
 			ctx.say("A ruined tower you use as your base.");

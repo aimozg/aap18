@@ -7,6 +7,7 @@ import {Creature} from "../../objects/Creature";
 import {AnimationTimeFast, CombatController} from "../CombatController";
 import {Direction, GridPos} from "../../utils/gridutils";
 import {CombatRules} from "../../../game/combat/CombatRules";
+import {CoreConditions} from "../../objects/creature/CoreConditions";
 
 export interface StepActionResult {
 	success: boolean;
@@ -34,14 +35,25 @@ export class StepAction extends CombatAction<StepActionResult> {
 		return "";
 	}
 	async perform(cc: CombatController): Promise<StepActionResult> {
+		let actor = this.actor;
+		let gobj = actor.gobj!;
+
 		// TODO ap cost
 		let apcost = 500
-		apcost *= CombatRules.speedApFactorMove(this.actor.spe);
-		await cc.deduceAP(this.actor, apcost);
-		// TODO AOO, generic intercept
-		let from = this.actor.gobj!.pos;
-		cc.grid.setPos(this.actor.gobj!, this.target)
-		await cc.grid.animateMovement(this.actor.gobj!, from, this.target, AnimationTimeFast).finished;
+		apcost *= CombatRules.speedApFactorMove(actor.spe);
+		await cc.deduceAP(actor, apcost);
+
+		// TODO AOO, generic intercept (combat controller beforeMove)
+
+		let from = gobj.pos;
+		cc.grid.setPos(gobj, this.target)
+		await cc.grid.animateMovement(gobj, from, this.target, AnimationTimeFast).finished;
+
+		// TODO move to combat controller afterMove
+		if (actor.hasCondition(CoreConditions.Stealth)) {
+			await cc.doFullStealthCheck(actor);
+		}
+
 		return {success:true,intercepted:false}
 	}
 

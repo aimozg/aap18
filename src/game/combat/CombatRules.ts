@@ -13,6 +13,7 @@ import {Dice, Dices} from "../../engine/math/Dice";
 import {CombatRoll} from "../../engine/combat/CombatRoll";
 import {Direction} from "../../engine/utils/gridutils";
 import {StepAction} from "../../engine/combat/actions/StepAction";
+import {CoreConditions} from "../../engine/objects/creature/CoreConditions";
 
 export namespace CombatRules {
 
@@ -71,11 +72,23 @@ export namespace CombatRules {
 		return meleeAttack(attacker)
 	}
 
+	export function defenseNatural(creature: Creature):number {
+		return 5;
+	}
+	export function defenseDodge(creature: Creature):number {
+		let value = 0;
+		value += creature.dexMod;
+		return value;
+	}
+	export function defenseArmor(creature: Creature):number {
+		return creature.bodyArmor?.asArmor?.defenseBonus ?? 0;
+	}
 	export function defense(creature:Creature):number {
-		let value = 5
-		value += creature.dexMod
-		value += creature.bodyArmor?.asArmor?.defenseBonus ?? 0
-		// TODO armor
+		let value = defenseNatural(creature);
+		if (!creature.hasCondition(CoreConditions.Unaware)) {
+			value += defenseDodge(creature);
+		}
+		value += defenseArmor(creature);
 		// TODO enchantments
 		return value
 	}

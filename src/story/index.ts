@@ -3,11 +3,11 @@
  */
 import {GameDataBuilder} from "../game/GameDataBuilder";
 import {gdRegisterIntro} from "./intro/intro";
-import {gdRegisterPlayerBase} from "./camp/camp";
+import {gdRegisterPlayerCamp} from "./camp/camp";
 
 
 export function gdRegisterStory(gd:GameDataBuilder) {
 	gd.logger.debug("gdRegisterStory");
 	gdRegisterIntro(gd);
-	gdRegisterPlayerBase(gd);
+	gdRegisterPlayerCamp(gd);
 }

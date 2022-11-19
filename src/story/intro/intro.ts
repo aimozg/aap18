@@ -78,9 +78,9 @@ export function gdRegisterIntro(gd:GameDataBuilder) {
 						label: "Sneak Attack",
 						tooltip: "Start the combat in sneak mode",
 						call(ctx) {
-							// TODO add "sneak" condition
 							ctx.endNowAndBattle({
-								enemies: [new TutorialImp()],
+								enemies: [monster],
+								ambushed: "enemies",
 								map: {
 									cells: [
 										" ###### ",

@@ -16,6 +16,8 @@ import {GOCreature} from "../combat/BattleGrid";
 import {Inventory} from "./Inventory";
 import {MaxLevel, XpPerLevel} from "../../game/xp";
 import {Loot} from "./Loot";
+import {CreatureCondition} from "./creature/CreatureCondition";
+import {Skill} from "./creature/Skill";
 
 let objectIdCounter = 0;
 
@@ -275,11 +277,39 @@ export class Creature {
 
 	// TODO make these computable
 	abilities: AbstractCombatAbility[] = [];
+	conditions: Set<CreatureCondition> = new Set();
 
 	//////////////////////
 	// Combat - Helpers //
 	//////////////////////
 	get isAlive():boolean { return this.hp > 0 }
+	hasCondition(condition:CreatureCondition):boolean {
+		return this.conditions.has(condition)
+	}
+	setCondition(condition:CreatureCondition):void {
+		this.conditions.add(condition);
+	}
+	removeCondition(condition:CreatureCondition):boolean {
+		return this.conditions.delete(condition)
+	}
+
+	//---------------//
+	// Skills - Data //
+	//---------------//
+
+	/** key: skill id */
+	naturalSkills: Record<string, number> = {};
+
+	//------------------//
+	// Skills - Helpers //
+	//------------------//
+
+	naturalSkillValue(skill: Skill):number {
+		return this.naturalSkills[skill.id] ?? 0;
+	}
+	skillValue(skill: Skill):number {
+		return this.naturalSkillValue(skill) + (skill.attr >= 0 ? this.attrMod(skill.attr) : 0)
+	}
 
 	///////////////////
 	// Traits - Data //

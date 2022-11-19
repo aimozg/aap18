@@ -15,10 +15,8 @@
   &.-info {
     color: var(--tc-hl);
   }
-  &.-action {
-    .--actor {
-      color: var(--tc-bold);
-      font-weight: bold;
-    }
+  .--actor {
+    color: var(--tc-bold);
+    font-weight: bold;
   }
 }
