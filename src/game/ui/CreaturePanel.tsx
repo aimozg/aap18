@@ -261,6 +261,19 @@ export class CreaturePanel extends DomComponent {
             <div></div>
         </div>;
 	}
+	/** Status effects */
+	private sectionStatus():ComponentChildren {
+		let c = this.creature!;
+		// TODO tooltips
+		return this.options.conditions && <div class="my-2">
+			{[...c.conditions].map(cc=>
+				<div class="creature-condition" style={{
+					color: cc.icon.fg,
+					background: cc.icon.bg
+				}}>{cc.name}</div>
+			)}
+        </div>
+	}
 	private sectionEquipment():ComponentChildren {
 		let c = this.creature!;
 		return this.options.equipment && <div className="grid-4 my-2">
@@ -272,7 +285,7 @@ export class CreaturePanel extends DomComponent {
             <div className="text-center">{CommonText.armorInfo(c.bodyArmor)}</div>
         </div>;
 	}
-
+	/** Money (what else?) */
 	private sectionMisc():ComponentChildren {
 		let options = this.options;
 		return <div className="grid-4 my-2">
@@ -294,6 +307,7 @@ export class CreaturePanel extends DomComponent {
 			{this.sectionSecondaryStats()}
 			{this.sectionEquipment()}
 			{this.sectionMisc()}
+			{this.sectionStatus()}
 			{this.options.collapsible && <Button className="-flat -bottom-collapser text-center" onClick={() => this.collapse()}>▴</Button>}
 		</Fragment>
 	}

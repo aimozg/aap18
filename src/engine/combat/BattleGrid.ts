@@ -15,6 +15,7 @@ import {ApToAct} from "./CombatController";
 import {lint} from "../math/utils";
 import {LogManager} from "../logging/LogManager";
 import {Deferred} from "../utils/Deferred";
+import {CoreConditions} from "../objects/creature/CoreConditions";
 
 export abstract class GridObject {
 	get glyph(): GlyphData {
@@ -45,6 +46,9 @@ export class GOCreature extends GridObject{
 				ch: this.creature.name[0],
 				fg: tinycolor("#0077cc")
 			}
+		}
+		if (this.creature.hasCondition(CoreConditions.Stealth)) {
+			(glyph.fg as RGBColor).setAlpha(0.5);
 		}
 		if (this.creature.ap >= ApToAct) {
 			glyph.fg = {
