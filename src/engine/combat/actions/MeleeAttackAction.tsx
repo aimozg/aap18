@@ -3,6 +3,7 @@ import {CombatController} from "../CombatController";
 import {CombatAction} from "../CombatAction";
 import {h} from "preact";
 import {CombatRoll} from "../CombatRoll";
+import {Direction} from "../../utils/gridutils";
 
 export class MeleeAttackAction extends CombatAction<CombatRoll> {
 	constructor(
@@ -11,6 +12,9 @@ export class MeleeAttackAction extends CombatAction<CombatRoll> {
 		public free: boolean = false
 	) {
 		super(actor);
+		if (actor.gobj!.grid!.adjacent(actor.gobj!, target.gobj!)) {
+			this.direction = Direction.to(actor.gobj!.pos, target.gobj!.pos);
+		}
 	}
 
 	toString(): string {
@@ -23,6 +27,10 @@ export class MeleeAttackAction extends CombatAction<CombatRoll> {
 		return "";
 	}
 	label = "Strike " + this.target.name
+
+	get dpadLabel() { return "Strike" }
+	get dpadClass() { return "dpad-strike"}
+
 	tooltip = "Strike " + this.target.name // TODO details
 	async perform(cc: CombatController): Promise<CombatRoll> {
 		return await cc.processMeleeRoll(new CombatRoll(

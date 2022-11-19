@@ -14,6 +14,9 @@
   .ai-#{$align} {
     align-items: $align;
   }
+  .as-#{$align} {
+    align-self: $align;
+  }
 }
 @each $align in center, start, end, left, right, flex-start, flex-end, stretch, space-around, space-between, space-evenly {
   .jc-#{$align} {

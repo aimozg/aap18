@@ -16,6 +16,7 @@ runGame({
 	logLevel: LogLevel.DEBUG,
 	logLevels: {
 		// "engine.text.parser.AbstractParser": LogLevel.TRACE,
+		// "game.ui.CreaturePanel": LogLevel.TRACE,
 		"engine.combat.CombatRoll": LogLevel.TRACE
 	},
 	info: {

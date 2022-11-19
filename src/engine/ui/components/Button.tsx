@@ -1,4 +1,4 @@
-import {Component, ComponentChild, h, RenderableProps} from "preact";
+import {Component, ComponentChild, ComponentChildren, h, RenderableProps} from "preact";
 import {KeyCodes} from "../KeyCodes";
 
 export interface ButtonProps {
@@ -18,7 +18,8 @@ export interface ButtonState {
 
 export interface UIAction {
 	hotkey?: string;
-	label?: string;
+	hotkeys?: string[];
+	label?: string|ComponentChildren;
 	disabled?: boolean|(()=>boolean);
 	callback: ()=>void;
 }
@@ -33,7 +34,7 @@ export function execUIAction(event:KeyboardEvent, actions:UIAction[]):boolean {
 	let hk = KeyCodes.eventToHkString(event);
 	for (let action of actions) {
 		if (!uiActionEnabled(action)) continue;
-		if (action.hotkey === hk) {
+		if (action.hotkey === hk || action.hotkeys?.includes(hk)) {
 			action.callback();
 			return true;
 		}
@@ -81,7 +82,7 @@ export class Button extends Component<ButtonProps, ButtonState> {
 	}
 
 	render(props: RenderableProps<ButtonProps>, state: Readonly<ButtonState>, context: any): ComponentChild {
-		let hotkey = props.hotkey ?? props.action?.hotkey;
+		let hotkey = props.hotkey ?? props.action?.hotkey ?? props.action?.hotkeys?.[0];
 		let disabled = props.disabled ?? (props.action && !uiActionEnabled(props.action));
 		let hk = hotkey ? <span class="--hk">{KeyCodes.hkLongToShort(hotkey)}</span> : null
 		return <button

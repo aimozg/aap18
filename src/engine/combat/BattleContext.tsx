@@ -16,6 +16,9 @@ import {CombatAction} from "./CombatAction";
 import {PlayerCharacter} from "../objects/creature/PlayerCharacter";
 import {CombatRules} from "../../game/combat/CombatRules";
 import {BattleGrid} from "./BattleGrid";
+import {h} from "preact";
+import {Fragment} from "preact/compat";
+import {BattleActionsPanel} from "../ui/panels/BattleActionsPanel";
 
 export let MillisPerRound = 1000;
 
@@ -67,8 +70,12 @@ export class BattleContext implements GameContext {
 		this.battlePanel.init();
 		this.enemyPanel = new CreaturePanel(this.cc.enemies[0]);
 		this.enemyPanel.options.money = false;
+		this.charPanelWasCollapsed = this.characterPanel.collapsed;
+		this.characterPanel.collapse();
+		this.enemyPanel.collapse();
 	}
 
+	private charPanelWasCollapsed: boolean;
 	public get grid(): BattleGrid { return this.cc.grid };
 	public player: PlayerCharacter = this.options.player;
 	playerCanAct = false
@@ -81,6 +88,7 @@ export class BattleContext implements GameContext {
 	}
 	async onBattleFinishClick() {
 		await this.cc.awardLoot();
+		this.characterPanel.collapsed = this.charPanelWasCollapsed;
 		this._promise.resolve(this)
 		Game.instance.gameController.showGameScreen()
 	}
@@ -88,11 +96,19 @@ export class BattleContext implements GameContext {
 	readonly enemyPanel
 	readonly logPanel = new LogPanel()
 	readonly battlePanel = new BattlePanel(this)
+	readonly battleActionsPanel = new BattleActionsPanel(this)
 	get layout(): GameScreenLayout {
 		return {
 			className: "-combat",
-			left: this.characterPanel.astsx,
-			right: this.enemyPanel.astsx,
+			// TODO support multiple battlers
+			// TODO expanding one collapses others
+			left: <Fragment>
+				{/*<h3 class="text-positive mt-0">Party:</h3>*/}
+				{this.characterPanel.astsx}
+				<h3 class="text-negative">Enemies:</h3>
+				{this.enemyPanel.astsx}
+			</Fragment>,
+			right: this.battleActionsPanel.astsx,
 			center: this.battlePanel.astsx,
 			bottom: this.logPanel.astsx
 		}
@@ -124,7 +140,8 @@ export class BattleContext implements GameContext {
 			this._redrawing = false;
 			this.characterPanel.update()
 			this.enemyPanel.update()
-			this.battlePanel.update(this.playerActions())
+			this.battleActionsPanel.update(this.playerActions())
+			this.battlePanel.update()
 		}, 0)
 	}
 	update() {
@@ -172,7 +189,7 @@ export class BattleContext implements GameContext {
 	}
 	onKeyboardEvent(event: KeyboardEvent): void {
 		if (this.playerCanAct || this.cc.ended) {
-			this.battlePanel.onKeyboardEvent(event);
+			this.battleActionsPanel.onKeyboardEvent(event);
 		}
 	}
 

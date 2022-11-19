@@ -4,6 +4,7 @@
 import {CombatAction} from "../CombatAction";
 import {CombatController} from "../CombatController";
 import {Creature} from "../../objects/Creature";
+import {Direction} from "../../utils/gridutils";
 
 export class SkipCombatAction extends CombatAction<void> {
 
@@ -13,7 +14,9 @@ export class SkipCombatAction extends CombatAction<void> {
 	protected disabledReason(cc: CombatController): string {
 		return "";
 	}
+	direction = Direction.CENTER;
 	label = "Skip";
+	get dpadClass() { return "dpad-skip" }
 	tooltip = "Skip your turn"
 	async perform(cc: CombatController): Promise<void> {
 		cc.logAction(this.actor, "does nothing.", " ");

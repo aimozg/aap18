@@ -142,7 +142,8 @@ export class CreaturePanel extends DomComponent {
 		if (animatedValues.length === 0) return;
 		for (let [k,v] of animatedValues) {
 			v.x += v.v*dt;
-			if (v.v > 0 && v.x >= v.x2 || v.x <= v.x2) {
+			logger.trace("animated {} x={} v={} dt={}",k,v.x,v.v,dt);
+			if (v.v > 0 && v.x >= v.x2 || v.v < 0 && v.x <= v.x2) {
 				delete this.animatedValues[k as CreatureValueId];
 				logger.debug("value {} animation to {} finished",k,v.x2);
 			}

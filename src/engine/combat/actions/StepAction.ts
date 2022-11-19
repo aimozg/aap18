@@ -22,8 +22,11 @@ export class StepAction extends CombatAction<StepActionResult> {
 		this.label = "Step " + this.direction.name;
 		this.tooltip = this.label
 	}
-	direction: Direction
 	label: string
+
+	get dpadLabel(): string { return "Move"; }
+	get dpadClass() { return "dpad-move"}
+
 	tooltip: string
 	protected disabledReason(cc: CombatController): string {
 		if (!cc.grid.hasxy(this.target.x, this.target.y)) return "Occupied"

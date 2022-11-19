@@ -370,6 +370,7 @@ export class CombatController {
 		// TODO do not instalose
 		let wasAlive = target.isAlive
 		this.ctx.animateValueChange(target, "lp", target.lp + change, AnimationTime)
+		target.lp += change;
 		if (wasAlive && !target.isAlive) {
 			// TODO consider handling death later, as an immediate follow-up event
 			await this.onDeath(target, source)

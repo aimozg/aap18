@@ -8,6 +8,7 @@ $duration: 0.5s;
   display:flex;
   flex-direction: column;
   width: 1200px;
+  gap: 1rem;
   &.-wide {
     flex-grow: 1;
   }
@@ -18,6 +19,7 @@ $duration: 0.5s;
     flex-grow: 1;
     display: flex;
     overflow: hidden auto;
+    gap: 1rem;
   }
   .gl-left, .gl-right {
     flex-grow: 0;
@@ -41,6 +43,7 @@ $duration: 0.5s;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    gap: 1rem;
   }
   .gl-center {
     flex-grow: 1;

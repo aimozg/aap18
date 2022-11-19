@@ -4,6 +4,7 @@
 
 import {Creature} from "../objects/Creature";
 import {CombatController} from "./CombatController";
+import {Direction} from "../utils/gridutils";
 
 export abstract class CombatAction<RESULT> {
 	protected constructor(
@@ -12,6 +13,11 @@ export abstract class CombatAction<RESULT> {
 	toString():string {
 		return "["+Object.getPrototypeOf(this).constructor.name+" "+this.actor.name+"]"
 	}
+	/** This action is bound to a particular direction and should be placed on a d-pad in the actions menu */
+	public direction:Direction|null = null;
+	/** Short label for a d-pad button */
+	get dpadLabel():string { return this.label }
+	get dpadClass():string { return "" }
 
 	abstract perform(cc: CombatController): Promise<RESULT>
 	protected abstract disabledReason(cc: CombatController): string;

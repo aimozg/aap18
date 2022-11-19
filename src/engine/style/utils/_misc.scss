@@ -14,3 +14,7 @@
 :disabled .--hk, .disabled .--hk {
   color: var(--tc-disabled);
 }
+
+.hidden {
+  display: none !important;
+}
