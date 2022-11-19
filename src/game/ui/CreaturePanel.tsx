@@ -1,17 +1,19 @@
 import {DomComponent} from "../../engine/ui/DomComponent";
-import {h} from "preact";
+import {ComponentChildren, h, VNode} from "preact";
 import {Creature} from "../../engine/objects/Creature";
 import {Fragment, render} from "preact/compat";
 import {Bar} from "../../engine/ui/components/Bar";
 import {removeChildren} from "../../engine/utils/dom";
-import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
-import {CombatRules} from "../combat/CombatRules";
 import {stripedBackground} from "../../engine/utils/css";
 import {CommonText} from "../../engine/text/CommonText";
 import {PartialRecord} from "../../engine/utils/types";
 import {LogManager} from "../../engine/logging/LogManager";
+import {Button} from "../../engine/ui/components/Button";
+import {CombatRules} from "../combat/CombatRules";
 
 export interface CreaturePanelOptions {
+	collapsible: boolean;
+
 	ap: boolean;
 
 	level: boolean;
@@ -69,9 +71,30 @@ export class CreaturePanel extends DomComponent {
 		this.update()
 	}
 
+	private _collapsed: boolean = false;
+	get collapsed():boolean { return this._collapsed }
+	set collapsed(value: boolean) {
+		if (value) {
+			this.collapse();
+		} else {
+			this.expand();
+		}
+	}
+	collapse() {
+		if (this._collapsed) return;
+		this._collapsed = true;
+		this.update();
+	}
+	expand() {
+		if (!this._collapsed) return;
+		this._collapsed = false;
+		this.update();
+	}
 
 	options: CreaturePanelOptions;
 	static DefaultOptions: CreaturePanelOptions = {
+		collapsible: true,
+
 		ap: true,
 
 		level: true,
@@ -126,150 +149,196 @@ export class CreaturePanel extends DomComponent {
 		}
 		this.update();
 	}
-	update() {
-		let c = this.creature;
-		if (!c) {
-			removeChildren(this.node);
-			return;
+	/** Name with AP as bg */
+	private sectionName(): ComponentChildren {
+		let c = this.creature!;
+		return <div className="text-center text-l" style={{
+			'background': stripedBackground('var(--theme-ctrl-bg)', 'transparent', this.value("ap") / 1000)
+		}}>{c.name.capitalize()}</div>;
+	}
+	/** XP bar */
+	private sectionXp(): ComponentChildren {
+		if (!this.options.xp) return null;
+		let c = this.creature!;
+		let xp = this.value('xp');
+		let xpmax = c.nextLevelXp();
+		let className = "bar-xp"
+		if (!isFinite(xpmax)) {
+			xp = xpmax = 100;
+			className += " -cap";
+		} else if (xp >= xpmax) {
+			className += " -up"
 		}
+		return <Bar value={xp} max={xpmax} className={className}></Bar>
+	}
+	/** Level, sex, race */
+	private sectionSubtitle(): ComponentChildren {
 		let options = this.options;
-
-		this.node.classList.toggle("-dead", !c.isAlive);
-		//-------------------//
-		// Name and AP as bg //
-		//-------------------//
-		let sectionName = <div className="text-center text-l" style={{
-			'background': stripedBackground('var(--theme-ctrl-bg)', 'transparent', this.value("ap")/1000)
-		}}>{c.name.capitalize()}</div>
-		//------------------//
-		// Level, sex, race //
-		//------------------//
-		let sectionTitle = (options.level || options.sex || options.race) ? <div className="text-center text-s">
+		let c = this.creature!;
+		return (options.level || options.sex || options.race) ? <div className="text-center text-s">
 			{options.level && ('Level ' + c.level)}
 			{' '}{options.sex && c.txt.sex}
 			{' '}{options.race && c.txt.race}
-		</div> : null;
-		//--------//
-		// XP bar //
-		//--------//
-		let sectionXp;
-		if (c instanceof PlayerCharacter) {
-			let xp = this.value('xp');
-			let xpmax = c.nextLevelXp();
-			let className = "bar-xp"
-			if (!isFinite(xpmax)) {
-				xp = xpmax = 100;
-				className += " -cap";
-			} else if (xp >= xpmax) {
-				className += " -up"
-			}
-			sectionXp = <Bar value={xp} max={xpmax} className={className}></Bar>
-		} else {
-			sectionXp = null
-		}
-		//-----------//
-		// Resources //
-		//-----------//
+		</div> : null
+	}
+	/** Resources */
+	private sectionResources(): ComponentChildren {
+		let options = this.options;
+		let c = this.creature!;
 		/*TODO hide bars if creature have no such resource*/
-		let sectionResources = options.resources && <div
-			style="display: grid; grid-template-columns: max-content auto; gap: 4px; align-items: baseline"
-			className="mt-4 mb-1">
-			<div>Health</div>
-			<Bar value={this.value('hp')} max={c.hpMax} className="bar-hp" print={options.hp}/>
-			<div>Lust</div>
-			<Bar value={this.value("lp")} max={c.lpMax} className="bar-lp" print={options.lp}/>
-			<div>Energy</div>
-			<Bar value={this.value("ep")} max={c.epMax} className="bar-ep" print={options.ep}/>
-		</div>
-		//------------//
-		// Attributes //
-		//------------//
-		let sectionAttributes = options.attributes && <div className="grid-8 text-center my-2">
-			<div className="text-s">STR</div>
-			<div className="text-s">DEX</div>
-			<div className="text-s">CON</div>
-			<div className="text-s">SPE</div>
-			<div className="text-s">PER</div>
-			<div className="text-s">INT</div>
-			<div className="text-s">WIS</div>
-			<div className="text-s">CHA</div>
-			<div>{c.str}</div>
-			<div>{c.dex}</div>
-			<div>{c.con}</div>
-			<div>{c.spe}</div>
-			<div>{c.per}</div>
-			<div>{c.int}</div>
-			<div>{c.wis}</div>
-			<div>{c.cha}</div>
-		</div>
-		//--------------//
-		// Combat stats //
-		//--------------//
-		let sectionCombatStats = options.combatStats && <div className="grid-8 text-center my-2">
-			<div className="text-s">For</div>
-			<div className="text-s">Ref</div>
-			<div className="text-s">Wil</div>
-			<div className="text-s"></div>
-			<div className="text-s">Atk</div>
-			<div className="text-s">Def</div>
-			<div className="text-s">DR</div>
-			<div className="text-s"></div>
-			<div>{c.fortitude}</div>
-			<div>{c.reflex}</div>
-			<div>{c.willpower}</div>
-			<div></div>
-			<div>{CombatRules.meleeAttack(c)}</div>
-			<div>{CombatRules.meleeDefense(c)}</div>
-			<div>{c.dmgRedAll}</div>
-			<div></div>
-		</div>
-		//-------------//
-		// Other stats //
-		//-------------//
-		let sectionOtherStats = options.otherStats && <div className="grid-4 text-center my-2">
-			<div className="text-s">Libido</div>
-			<div className="text-s">Perversion</div>
-			<div className="text-s">Corruption</div>
-			<div className="text-s"></div>
-			<div>{c.lib}</div>
-			<div>{c.perv}</div>
-			<div>{c.cor}</div>
-			<div></div>
-		</div>
-		//-----------//
-		// Equipment //
-		//-----------//
+		return options.resources && <div
+            style="display: grid; grid-template-columns: max-content auto; gap: 4px; align-items: baseline"
+            className="mt-4 mb-1">
+            <div>Health</div>
+            <Bar value={this.value('hp')} max={c.hpMax} className="bar-hp" print={options.hp}/>
+            <div>Lust</div>
+            <Bar value={this.value("lp")} max={c.lpMax} className="bar-lp" print={options.lp}/>
+            <div>Energy</div>
+            <Bar value={this.value("ep")} max={c.epMax} className="bar-ep" print={options.ep}/>
+        </div>
+	}
+	/** Attributes */
+	private sectionAttributes():ComponentChildren {
+		let c = this.creature!;
+		return this.options.attributes && <div className="grid-8 text-center my-2">
+            <div className="text-s">STR</div>
+            <div className="text-s">DEX</div>
+            <div className="text-s">CON</div>
+            <div className="text-s">SPE</div>
+            <div className="text-s">PER</div>
+            <div className="text-s">INT</div>
+            <div className="text-s">WIS</div>
+            <div className="text-s">CHA</div>
+            <div>{c.str}</div>
+            <div>{c.dex}</div>
+            <div>{c.con}</div>
+            <div>{c.spe}</div>
+            <div>{c.per}</div>
+            <div>{c.int}</div>
+            <div>{c.wis}</div>
+            <div>{c.cha}</div>
+        </div>
+	}
+	/** Combat stats - saving throws, attack, defense, DR */
+	private sectionCombatStats():ComponentChildren {
+		let c = this.creature!;
+		let options = this.options;
+		return options.combatStats && <div className="grid-8 text-center my-2">
+            <div className="text-s">For</div>
+            <div className="text-s">Ref</div>
+            <div className="text-s">Wil</div>
+            <div className="text-s"></div>
+            <div className="text-s">Atk</div>
+            <div className="text-s">Def</div>
+            <div className="text-s">DR</div>
+            <div className="text-s"></div>
+            <div>{c.fortitude}</div>
+            <div>{c.reflex}</div>
+            <div>{c.willpower}</div>
+            <div></div>
+            <div>{CombatRules.meleeAttack(c)}</div>
+            <div>{CombatRules.meleeDefense(c)}</div>
+            <div>{c.dmgRedAll}</div>
+            <div></div>
+        </div>
+	}
+	/** Libido, perversion, corruption */
+	private sectionSecondaryStats():ComponentChildren {
+		let c = this.creature!;
+		return this.options.otherStats && <div className="grid-4 text-center my-2">
+            <div className="text-s">Libido</div>
+            <div className="text-s">Perversion</div>
+            <div className="text-s">Corruption</div>
+            <div className="text-s"></div>
+            <div>{c.lib}</div>
+            <div>{c.perv}</div>
+            <div>{c.cor}</div>
+            <div></div>
+        </div>;
+	}
+	private sectionEquipment():ComponentChildren {
+		let c = this.creature!;
+		return this.options.equipment && <div className="grid-4 my-2">
+            <div className="text-right">Weapon:</div>
+            <div className="cols-2 text-center">{c.currentWeapon.name}</div>
+            <div className="text-center">{CommonText.weaponInfo(c.currentWeapon)}</div>
+            <div className="text-right">Armor:</div>
+            <div className="cols-2 text-center">{c.bodyArmor?.name ?? "-"}</div>
+            <div className="text-center">{CommonText.armorInfo(c.bodyArmor)}</div>
+        </div>;
+	}
 
-		let sectionEquipment = options.equipment && <div className="grid-4 my-2">
-			<div className="text-right">Weapon:</div>
-			<div className="cols-2 text-center">{c.currentWeapon.name}</div>
-			<div className="text-center">{CommonText.weaponInfo(c.currentWeapon)}</div>
-			<div className="text-right">Armor:</div>
-			<div className="cols-2 text-center">{c.bodyArmor?.name ?? "-"}</div>
-			<div className="text-center">{CommonText.armorInfo(c.bodyArmor)}</div>
-		</div>
-		//------//
-		// Misc //
-		//------//
-		let sectionMisc = <div className="grid-4 my-2">
+	private sectionMisc():ComponentChildren {
+		let options = this.options;
+		return <div className="grid-4 my-2">
 			{options.money && <Fragment>
-				<div className="text-right">Money:</div>
-				<div className="text-right text-money cols-2">{this.value('money').format(",d")}</div>
-				<div></div>
-			</Fragment>}
+                <div className="text-right">Money:</div>
+                <div className="text-right text-money cols-2">{this.value('money').format(",d")}</div>
+                <div></div>
+            </Fragment>}
 		</div>
+	}
+	private renderExpanded(): VNode {
+		return <Fragment>
+			{this.sectionName()}
+			{this.sectionSubtitle()}
+			{this.sectionXp()}
+			{this.sectionResources()}
+			{this.sectionAttributes()}
+			{this.sectionCombatStats()}
+			{this.sectionSecondaryStats()}
+			{this.sectionEquipment()}
+			{this.sectionMisc()}
+			{this.options.collapsible && <Button className="-flat -bottom-collapser text-center" onClick={() => this.collapse()}>▴</Button>}
+		</Fragment>
+	}
 
-		render(<Fragment>
-			{sectionName}
-			{sectionTitle}
-			{sectionXp}
-			{sectionResources}
-			{sectionAttributes}
-			{sectionCombatStats}
-			{sectionOtherStats}
-			{sectionEquipment}
-			{sectionMisc}
-		</Fragment>, this.node)
+	/** Name and level with AP as bg */
+	private sectionNameCompact(): ComponentChildren {
+		let c = this.creature!;
+		return <div style={{
+			'background': stripedBackground('var(--theme-ctrl-bg)', 'transparent', this.value("ap") / 1000)
+		}} class="d-flex jc-space-between ai-baseline px-2">
+			<span className="text-l">{c.name.capitalize()}</span>
+			{this.options.level && <span className="text-s">Lv {c.level}</span>}
+		</div>
+	}
+
+	/** Resources (compact) */
+	private sectionResourcesCompact():ComponentChildren {
+		let options = this.options;
+		let c = this.creature!;
+		return options.resources && <div class="d-grid grid-3 gap-1 my-1">
+            <Bar value={this.value('hp')} max={c.hpMax} className="bar-hp" print={options.hp}/>
+            <Bar value={this.value("lp")} max={c.lpMax} className="bar-lp" print={options.lp}/>
+            <Bar value={this.value("ep")} max={c.epMax} className="bar-ep" print={options.ep}/>
+        </div>
+	}
+
+	private renderCollapsed(): VNode {
+		return <Fragment>
+			{this.sectionNameCompact()}
+			{this.sectionXp()}
+			{this.sectionResourcesCompact()}
+			<div class="d-flex flex-wrap gap-2">
+				<div class="flex-grow-1"></div>
+				{this.options.collapsible && <Button className="-icon -flat" onClick={() => this.expand()}>▾</Button>}
+			</div>
+		</Fragment>
+	}
+
+	update() {
+		if (!this.creature) {
+			removeChildren(this.node);
+			return;
+		}
+		this.node.classList.toggle("-dead", !this.creature.isAlive);
+		this.node.classList.toggle("-collapsed", this.collapsed);
+		this.node.classList.toggle("-collapsible", this.options.collapsible);
+		render(
+			this.collapsed ? this.renderCollapsed() : this.renderExpanded(),
+			this.node
+		)
 	}
 }
 

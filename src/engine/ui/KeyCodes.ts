@@ -183,6 +183,8 @@ export namespace KeyCodes {
 		return {key,ctrl,alt,shift}
 	}
 
+	// TODO pick these from Keyboard API
+	//    await navigator.keyboard
 	const charKeys:Record<string,string> = {
 		[BACKQUOTE]: '`',
 		[DIGIT1]: '1',

@@ -13,7 +13,7 @@ export class ChargenStepFinalize extends ChargenStep {
 	}
 
 	label: string = "Finalize";
-	panel = new CreaturePanel(null);
+	panel = new CreaturePanel(null, {collapsible:false});
 
 	complete(): boolean {
 		return false;

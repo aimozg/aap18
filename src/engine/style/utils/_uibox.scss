@@ -2,6 +2,14 @@
   border: 1px solid var(--theme-ctrl-fg);
   background: var(--theme-bg);
   padding: 0.5rem;
+
+  > .-bottom-collapser {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    width: calc(100% + 1rem);
+    border-radius: 0;
+    padding: 0;
+  }
 }
 .ui-box {
   @include uibox;
