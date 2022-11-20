@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
 	mode: "development",
@@ -23,6 +24,11 @@ module.exports = {
 			},
 		],
 	},
+	plugins: [
+		new webpack.DefinePlugin({
+			PACKAGE_VERSION: JSON.stringify(require('./package.json').version)
+		})
+	],
 	resolve: {
 		extensions: ['.tsx', '.ts', '.js'],
 	},

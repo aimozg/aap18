@@ -9,7 +9,6 @@ import {Fragment, h} from "preact";
 import {loadGameData} from "./game/gamedata";
 import {LogLevel} from "./engine/logging/Logger";
 
-const PACKAGE = require("../package.json");
 
 runGame({
 	screenContainer: "#root",
@@ -24,7 +23,7 @@ runGame({
 		subtitle: <Fragment>
 			A <a href="https://github.com/Ormael13/CoCX" target="_blank">CoCX</a> inspired game.
 		</Fragment>,
-		version: "v"+PACKAGE.version
+		version: "v"+PACKAGE_VERSION
 	},
 	data: loadGameData
 });
