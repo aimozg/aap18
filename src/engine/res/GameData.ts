@@ -12,6 +12,7 @@ import {Color, colorSortKey} from "../objects/Color";
 import {Game} from "../Game";
 import {TraitType} from "../rules/TraitType";
 import {TileType} from "../combat/BattleGrid";
+import {Skill} from "../objects/creature/Skill";
 
 export class GameData {
 	constructor(public readonly game:Game) {}
@@ -49,6 +50,9 @@ export class GameData {
 		return typeof scene === 'string' ? this.scenes.get(scene) : scene
 	}
 	sceneOrNull(id: string): Scene|null { return this.scenes.getOrNull(id) }
+
+	readonly skills = new ResLib<Skill>(Symbols.ResTypeSkill, "Skill");
+	skill(id: string): Skill { return this.skills.get(id) }
 
 	readonly tiles = new ResLib<TileType>(Symbols.ResTypeTile, "Tile");
 	private tilesByChar: Record<string,TileType>|null = null;

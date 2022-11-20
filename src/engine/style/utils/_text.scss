@@ -1,10 +1,10 @@
-.text-bold, .text-b, .text-strong {
+b, .text-bold, .text-b, .text-strong {
   font-weight: bold;
 }
-.text-i, .text-em {
+i, .text-i, .text-em {
   font-style: italic;
 }
-.text-u {
+u, .text-u {
   text-decoration: underline;
 }
 .text-p {
@@ -32,6 +32,9 @@
   }
 }
 
+.text-hl {
+  color: var(--tc-hl);
+}
 .text-error {
   background: #111;
   color: #a00;

@@ -3,21 +3,27 @@
  */
 
 import {TAttribute} from "../../rules/TAttribute";
+import {IResource} from "../../IResource";
+import Symbols from "../../symbols";
 
 export interface SkillOptions {
 	name: string;
-	attr?: TAttribute
+	attr?: TAttribute;
+	description: string;
 }
 
-// TODO put in registry
-export class Skill {
-	public readonly name: string;
-	public readonly attr: TAttribute | -1;
+export class Skill implements IResource {
+	public name: string;
+	public attr: TAttribute | -1;
+	public description: string;
+	resType = Symbols.ResTypeSkill;
+
 	constructor(
-		public readonly id:string,
+		public readonly resId:string,
 		options: SkillOptions
 	) {
 		this.name = options.name;
 		this.attr = options.attr ?? -1;
+		this.description = options.description;
 	}
 }

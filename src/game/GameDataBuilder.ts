@@ -14,6 +14,7 @@ import {BodyMaterial, BodyMaterialType} from "../engine/objects/creature/BodyMat
 import {Color} from "../engine/objects/Color";
 import {PlayerCharacter} from "../engine/objects/creature/PlayerCharacter";
 import {SimpleTraitType, TraitType} from "../engine/rules/TraitType";
+import {Skill} from "../engine/objects/creature/Skill";
 
 /**
  * Essential game data (races, traits, items, ...)
@@ -27,6 +28,7 @@ export interface ImportedGameData {
 	racialGroups: RacialGroup[];
 	rgHumanoid: RacialGroup;
 	scenes: Scene[][];
+	skills: Skill[];
 	tiles: GDTileType[];
 	traits: TraitType[];
 }
@@ -73,6 +75,7 @@ export class GameDataBuilder {
 			racialGroups: [],
 			rgHumanoid: RacialGroup.INVALID,
 			scenes: [],
+			skills: [],
 			tiles: [],
 			traits: [],
 		}
@@ -169,6 +172,9 @@ export class GameDataBuilder {
 	}
 	addScenes(scenes: Scene[]): void {
 		this.data.scenes.push(scenes);
+	}
+	addSkills(skills: Skill[]): void {
+		this.data.skills.push(...skills);
 	}
 	addTiles(tiles:GDTileType[]):void {
 		this.data.tiles.push(...tiles);

@@ -14,6 +14,7 @@ import {ChargenStep} from "../chargen/ChargenStep";
 import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
 import {ChargenStepAttrs} from "../chargen/ChargenStepAttrs";
 import {ChargenController} from "../chargen/ChargenController";
+import {ChargenStepSkills} from "../chargen/ChargenStepSkills";
 
 export class NewGameScreen extends AbstractScreen {
 
@@ -36,6 +37,7 @@ export class NewGameScreen extends AbstractScreen {
 			new ChargenStepClass(cc),
 			new ChargenStepAttrs(cc),
 			new ChargenStepStats(cc),
+			new ChargenStepSkills(cc),
 			new ChargenStepTraits(cc),
 			new ChargenStepFinalize(cc),
 		];

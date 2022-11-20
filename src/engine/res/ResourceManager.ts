@@ -5,6 +5,7 @@ import {ImportedGameData} from "../../game/GameDataBuilder";
 import {Game} from "../Game";
 import {TileType} from "../combat/BattleGrid";
 import * as tinycolor from "tinycolor2";
+import {CoreSkills} from "../objects/creature/CoreSkills";
 
 /**
  * Loads images and other resources required by game
@@ -32,6 +33,9 @@ export class ResourceManager {
 		data.racialGroups.registerMany(idata.racialGroups)
 		data.scenes.clear();
 		for (let list of idata.scenes) data.scenes.registerMany(list);
+		data.skills.clear();
+		data.skills.registerMany(CoreSkills.list);
+		data.skills.registerMany(idata.skills, true);
 		data.tiles.clear();
 		data.tiles.register(TileType.FLOOR);
 		for (let gdtt of idata.tiles) {

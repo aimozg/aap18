@@ -305,7 +305,7 @@ export class Creature {
 	//------------------//
 
 	naturalSkillValue(skill: Skill):number {
-		return this.naturalSkills[skill.id] ?? 0;
+		return this.naturalSkills[skill.resId] ?? 0;
 	}
 	skillValue(skill: Skill):number {
 		return this.naturalSkillValue(skill) + (skill.attr >= 0 ? this.attrMod(skill.attr) : 0)

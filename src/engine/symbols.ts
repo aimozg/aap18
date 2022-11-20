@@ -7,6 +7,7 @@ namespace Symbols {
 	export const ResTypePlace = Symbol("ResType_Place");
 	export const ResTypeRacialGroup = Symbol("ResType_RacialGroup");
 	export const ResTypeScene = Symbol("ResType_Scene");
+	export const ResTypeSkill = Symbol("ResType_Skill");
 	export const ResTypeTile = Symbol("ResType_Tile");
 	export const ResTypeTrait = Symbol("ResType_Trait");
 }

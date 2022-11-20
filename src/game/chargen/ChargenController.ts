@@ -20,6 +20,7 @@ import {CharacterClass} from "../../engine/rules/classes/CharacterClass";
 import {PenisSizeTier, PenisSizeTiers} from "../data/body/Penis";
 import {GdStartingTraits} from "../data/traits/starting";
 import {TraitType} from "../../engine/rules/TraitType";
+import {Skill} from "../../engine/objects/creature/Skill";
 
 interface IChargenSecondaryStat {
 	key: keyof ChargenController;
@@ -143,6 +144,19 @@ export class ChargenController {
 			meta: StatMetadata.cor
 		}]
 	}
+	allowedSkills(): Skill[] {
+		return Game.instance.data.skills.values().sortOn("name");
+	}
+	skillMax(skill: Skill): number {
+		// TODO affected by class
+		return ChargenRules.skillMax;
+	}
+	skillPointsTotal():number {
+		return ChargenRules.skillPoints + Math.max(0, this.attrMod(TAttribute.INT)) * ChargenRules.skillPointsPerIntMod;
+	}
+	getUpgradeableSkills() {
+		return this.allowedSkills().filter(skill => this.canIncSkill(skill));
+	}
 	allowedTraits(withNone:boolean=true): ButtonMenuItem<string | null>[] {
 		let list: ButtonMenuItem<string|null>[] = GdStartingTraits.ALL.map(t=>({
 			label: t.name(null),
@@ -178,6 +192,9 @@ export class ChargenController {
 	lib: number;
 	perv: number;
 	cor: number;
+	// Skills
+	skillPointsSpent: number;
+	skills: Record<string,number> = {};
 	// Traits
 	trait: string|null; // TODO allow multiple traits in chargen
 
@@ -268,6 +285,9 @@ export class ChargenController {
 		this.lib = 0;
 		this.perv = 0;
 		this.cor = 0;
+		// Skills
+		this.skillPointsSpent = 0;
+		this.skills = {};
 		// Traits
 		this.trait = null;
 	}
@@ -293,6 +313,10 @@ export class ChargenController {
 		this.player.naturalLib = this.lib;
 		this.player.naturalPerv = this.perv;
 		this.player.cor = this.cor;
+		// Skills
+		for (let [id, value] of Object.entries(this.skills)) {
+			this.player.naturalSkills[id] = value;
+		}
 		// Traits
 		if (this.traitObject) this.player.addTrait(this.traitObject);
 
@@ -320,6 +344,13 @@ export class ChargenController {
 		}
 		// Stats
 		// TODO class-dependent starting stats
+		// Skills
+		// TODO class-dependent starting skills
+		while (this.skillPointsSpent < this.skillPointsTotal()) {
+			let validSkills = this.getUpgradeableSkills();
+			if (validSkills.length === 0) break;
+			this.skillInc(fxrng.pick(validSkills));
+		}
 		// Traits
 		// TODO class-dependent trait
 		this.trait = fxrng.pick(this.allowedTraits(false)).value;
@@ -327,18 +358,19 @@ export class ChargenController {
 		this.updatePlayer();
 		this.internalUpdate = false;
 	}
-	update() {
+
+	update(): void {
 		if (this.internalUpdate) return;
 		this.updatePlayer()
 		this.screen.update()
 	}
 
-	attrInc(id: TAttribute) {
+	attrInc(id: TAttribute): void {
 		this.attrPoints -= this.attrCost(id);
 		this.attrs[id]++;
 		this.update()
 	}
-	attrDec(id: TAttribute) {
+	attrDec(id: TAttribute): void {
 		this.attrs[id]--;
 		this.attrPoints += this.attrCost(id);
 		this.update()
@@ -348,17 +380,20 @@ export class ChargenController {
 		// 1 at 8 and below, +1 for each 2
 		return Math.max(1, 1 + Math.floor((x - 8) / 2));
 	}
-	canIncAttr(id: TAttribute) {
+	attrMod(id: TAttribute): number {
+		return this.attrs[id] - 5;
+	}
+	canIncAttr(id: TAttribute): boolean {
 		return this.attrs[id] < ChargenRules.maxAttr && this.attrPoints >= this.attrCost(id)
 	}
-	canDecAttr(id: TAttribute) {
+	canDecAttr(id: TAttribute): boolean {
 		return this.attrs[id] > ChargenRules.minAttr
 	}
-	statInc(stat: IChargenSecondaryStat) {
+	statInc(stat: IChargenSecondaryStat): void {
 		(this as any)[stat.key]++;
 		this.update()
 	}
-	statDec(stat: IChargenSecondaryStat) {
+	statDec(stat: IChargenSecondaryStat): void {
 		(this as any)[stat.key]--;
 		this.update()
 	}
@@ -367,5 +402,27 @@ export class ChargenController {
 	}
 	canDecStat(stat: IChargenSecondaryStat): boolean {
 		return stat.natural > stat.min;
+	}
+	canIncSkill(skill: Skill): boolean {
+		return (this.skills[skill.resId] ?? 0) < this.skillMax(skill);
+	}
+	canDecSkill(skill: Skill): boolean {
+		return (this.skills[skill.resId] ?? 0) > 0;
+	}
+	skillNatural(skill: Skill): number {
+		return this.skills[skill.resId] ?? 0;
+	}
+	skillTotal(skill: Skill): number {
+		return (this.skills[skill.resId] ?? 0) + (skill.attr >= 0 ? this.attrMod(skill.attr) : 0);
+	}
+	skillInc(skill: Skill): void {
+		this.skills[skill.resId] = (this.skills[skill.resId] ?? 0) + 1;
+		this.skillPointsSpent++;
+		this.update();
+	}
+	skillDec(skill: Skill): void {
+		this.skills[skill.resId] = (this.skills[skill.resId] ?? 0) - 1;
+		this.skillPointsSpent--;
+		this.update();
 	}
 }

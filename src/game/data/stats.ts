@@ -9,6 +9,7 @@ import {CombatRules} from "../combat/CombatRules";
 export interface IAttrMetadata {
 	id: TAttribute;
 	name: string;
+	abbr: string;
 	description: string;
 	explain: (mod: number, value: number, host: Creature) => string;
 }
@@ -17,51 +18,59 @@ export const AttrMetadata: IAttrMetadata[] = [
 	{
 		id: TAttribute.STR,
 		name: 'Strength',
-		description: 'Increases melee damage and accuracy with large weapons.',
+		abbr: "STR",
+		description: 'Raw physical power.',
 		explain: (mod) =>
-			`${mod.format('+d')} melee damage, ${(mod * 5).format('+d')}% large weapon accuracy.`
+			`${mod.signed()} melee damage (non-small weapons), ${(mod * 5).signed()}% huge weapon accuracy.`
 	}, {
 		id: TAttribute.DEX,
 		name: 'Dexterity',
-		description: 'Increases evasion, reflex, and accuracy with small weapons.',
+		abbr: "DEX",
+		description: 'Finesse and coordination.',
 		explain: (mod) =>
-			`${(mod * 5).format('+d')}% dodge, ${mod.format('+d')} reflex, ${(mod * 5).format('+d')}% small weapon accuracy.`
+			`${(mod * 5).signed()}% dodge, ${mod.signed()} reflex, ${(mod * 5).signed()}% medium and large weapon accuracy, ${mod.signed()} small weapon damage.`
 	}, {
 		id: TAttribute.CON,
 		name: 'Constitution',
-		description: 'Increases hit points, energy, and fortitude.',
+		abbr: "CON",
+		description: 'Endurance.',
 		explain: (mod) =>
-			`${mod.format('+d')} HP and energy per level, ${mod.format('+d')} fortitude.`
+			`${mod.signed()} HP and energy per level, ${mod.signed()} fortitude.`
 	}, {
 		id: TAttribute.SPE,
 		name: 'Speed',
+		abbr: "SPE",
 		description: 'Decreases actions\' AP cost.',
 		explain: (mod,value) =>
-			`${(CombatRules.speedApFactor(value)-1).format('+d%')}% action AP cost, ${(CombatRules.speedApFactorMove(value)-1).format('+d%')}% move AP cost.`
+			`${(CombatRules.speedApFactor(value)-1).format('+d%')}% action AP cost, ${(CombatRules.speedApFactorMove(value)-1).format('+d%')}% move AP cost, ${(mod * 5).signed()}% small weapon accuracy.`
 	}, {
 		id: TAttribute.PER,
 		name: 'Perception',
-		description: 'Increases accuracy with ranged weapons and many spot skills.',
+		abbr: "PER",
+		description: 'Eyesight, hearing, and other senses.',
 		explain: (mod) =>
-			`${(mod * 5).format('+d')}% ranged accuracy, ${(mod * 5).format('+d')}% spot chance.`
+			`${(mod * 5).signed()}% ranged accuracy.`
 	}, {
 		id: TAttribute.INT,
 		name: 'Intellect',
-		description: 'Increases skill limits and growth speed.',
+		abbr: "INT",
+		description: 'Analytical abilities.',
 		explain: (mod) =>
-			`${mod.format('+d')} to something skill-related`
+			`${mod.signed()} to skill points per level. ${(mod*5).signed()}% skill growth speed.`
 	}, {
 		id: TAttribute.WIS,
 		name: 'Wisdom',
-		description: 'Increases willpower.',
+		abbr: "WIS",
+		description: 'Common sense and willpower.',
 		explain: (mod) =>
-			`${mod.format('+d')} to willpower`
+			`${mod.signed()} to willpower.`
 	}, {
 		id: TAttribute.CHA,
 		name: 'Charisma',
-		description: 'Increases persuasion, seduction, and follower limit.',
+		abbr: "CHA",
+		description: 'Physical and personal attractiveness.',
 		explain: (mod) =>
-			`${mod.format('+d')} to something seduction-related`
+			`${mod.signed()} to something seduction-related.`
 	}
 ];
 
@@ -95,6 +104,6 @@ export const StatMetadata = {
 		name: "Corruption",
 		description: "", // TODO Corruption stat description
 		explain: (value) =>
-			`${value.format('+d')} min. Perversion. ${value.format('+d')} Libido.`
+			`${value.signed()} min. Perversion. ${value.signed()} Libido.`
 	} as IStatMetadata
 }

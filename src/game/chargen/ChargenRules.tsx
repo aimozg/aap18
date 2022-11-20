@@ -14,6 +14,10 @@ export const ChargenRules = {
 	minCor: 0,
 	maxCor: 10,
 
+	skillPoints: 4,
+	skillPointsPerIntMod: 1,
+	skillMax: 4,
+
 	breastsMaxMale: BreastSizeTiers.FLAT.value,
 	breastsMinFemale: BreastSizeTiers.FLAT.value,
 	breastsMaxFemale: BreastSizeTiers.H_CUP.value,

@@ -6,16 +6,31 @@ import {Skill} from "./Skill";
 import {TAttribute} from "../../rules/TAttribute";
 
 export namespace CoreSkills {
-	export let Ambush = new Skill("/sk_ambush", {
+	export const Ambush = new Skill("/sk_ambush", {
 		name: "Ambush",
-		attr: TAttribute.PER
+		attr: TAttribute.PER,
+		description: "Used in exploration. Successful Ambush check gives you the initiative in the encounter."
 	});
-	export let Spot = new Skill("/sk_spot", {
-		name: "Spot" ,
-		attr: TAttribute.PER
+	export const Seduce = new Skill("/sk_seduce", {
+		name: "Seduce",
+		attr: TAttribute.CHA,
+		description: "Successful Seduce check makes enemy surrender."
 	});
-	export let Stealth = new Skill("/sk_stealth", {
+	export const Spot = new Skill("/sk_spot", {
+		name: "Spot",
+		attr: TAttribute.PER,
+		description: "Detect stealthy enemies, rolled vs enemy Stealth skill."
+	});
+	export const Stealth = new Skill("/sk_stealth", {
 		name: "Stealth",
-		attr: TAttribute.DEX
+		attr: TAttribute.DEX,
+		description: "Move undetected, rolled vs enemy Spot skill."
 	});
+
+	export const list = [
+		Ambush,
+		Seduce,
+		Spot,
+		Stealth
+	];
 }
