@@ -56,7 +56,33 @@ export class BattleActionsPanel extends DomComponent {
 
 	private actions: UIAction[] = [];
 
-	update(actions: CombatAction<any>[]) {
+	showFinishBattle() {
+		let aFinish:UIAction = {
+			label: "Finish",
+			// tooltip: "Finish battle", // TODO tooltip
+			hotkey: KeyCodes.ENTER,
+			callback: ()=>this.context.onBattleFinishClick(),
+		}
+		this.actions = [aFinish];
+		this.renderDpadActions([]);
+		render(<Button action={aFinish} className="-big"/>, this.refActions.current!)
+	}
+
+	private renderDpadActions(dpadActions:(UIAction|undefined)[]) {
+		render(dpadActions.map((a,i)=>
+			a
+				? <Button action={a} className="-big"/>
+				: <Button className="-big" disabled={true} hotkey={BattleActionsPanel.DPadHotkeys[i][0]}/>
+		), this.refDPad.current!);
+	}
+
+	private renderActions(actionList: UIAction[]) {
+		render(actionList.map(btn =>
+			<Button action={btn}/>
+		), this.refActions.current!)
+	}
+
+	showActions(actions: CombatAction<any>[], playerCanAct:boolean) {
 		// TODO group actions and favourites
 		let actionList:UIAction[] = [];
 		let dpadActions:(UIAction|undefined)[] = Array(9).fill(undefined);
@@ -73,7 +99,7 @@ export class BattleActionsPanel extends DomComponent {
 						hotkeys: BattleActionsPanel.DPadHotkeys[dirid],
 						label: a.dpadClass ? <span class={a.dpadClass}>{a.dpadLabel}</span> : a.dpadLabel,
 						// TODO tooltip
-						disabled: () => !a.isPossible(this.context.cc),
+						disabled: () => !playerCanAct || !a.isPossible(this.context.cc),
 						callback: () => this.context.execAction(a)
 					}
 					continue
@@ -87,7 +113,7 @@ export class BattleActionsPanel extends DomComponent {
 				hotkey: KeyCodes.DefaultHotkeys[actionList.length],
 				label: a.label,
 				// TODO tooltip
-				disabled: () => !a.isPossible(this.context.cc),
+				disabled: () => !playerCanAct || !a.isPossible(this.context.cc),
 				callback: () => this.context.execAction(a)
 			})
 		}
@@ -96,15 +122,8 @@ export class BattleActionsPanel extends DomComponent {
 			...actionList
 		];
 
-		render(dpadActions.map((a,i)=>
-			a
-				? <Button action={a} className="-big"/>
-				: <Button className="-big" disabled={true} hotkey={BattleActionsPanel.DPadHotkeys[i][0]}/>
-		), this.refDPad.current!);
-
-		render(actionList.map(btn =>
-			<Button action={btn}/>
-		), this.refActions.current!)
+		this.renderDpadActions(dpadActions);
+		this.renderActions(actionList);
 	}
 
 	onKeyboardEvent(event: KeyboardEvent) {

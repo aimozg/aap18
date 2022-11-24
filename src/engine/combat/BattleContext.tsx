@@ -22,22 +22,6 @@ import {BattleActionsPanel} from "../ui/panels/BattleActionsPanel";
 
 export let MillisPerRound = 1000;
 
-// TODO This should not be an action but a special button instead
-class FinishCombatAction extends CombatAction<void> {
-	constructor(public ctx:BattleContext) {
-		super(ctx.player);
-	}
-	protected disabledReason(cc: CombatController): string {
-		if (!this.ctx.cc.ended) return "Combat not ended"
-		return "";
-	}
-	label: string = "Finish";
-	tooltip: string = "Finish battle";
-	async perform(cc: CombatController): Promise<void> {
-		await this.ctx.onBattleFinishClick()
-	}
-}
-
 export interface BattleMapMapping {
 	tile: string;
 	spawn?: "party"|"enemy";
@@ -119,13 +103,10 @@ export class BattleContext implements GameContext {
 		}
 	}
 	private playerActions():CombatAction<any>[] {
-		if (this.cc.ended) return [new FinishCombatAction(this)];
 		return CombatRules.playerActions(this.player, this.cc);
 	}
 	async execAction(action:CombatAction<any>) {
-		if (action instanceof FinishCombatAction) {
-			await this.onBattleFinishClick()
-		} else if (this.playerCanAct) {
+		if (this.playerCanAct) {
 			await this.cc.performAction(action);
 		}
 	}
@@ -135,11 +116,17 @@ export class BattleContext implements GameContext {
 		if (!panel) return;
 		panel.animateValue(key, newValue, durationMs);
 	}
-	redraw() {
+	redraw(updateActions:boolean=true) {
 		if (this.state === "closed") return;
 		this.characterPanel.update()
 		this.enemyPanel.update()
-		this.battleActionsPanel.update(this.playerActions())
+		if (updateActions) {
+			if (this.state === "ended") {
+				this.battleActionsPanel.showFinishBattle();
+			} else {
+				this.battleActionsPanel.showActions(this.playerActions(), this.state === "pc")
+			}
+		}
 		this.battlePanel.update()
 	}
 	update() {
@@ -177,7 +164,8 @@ export class BattleContext implements GameContext {
 		this.enemyPanel.animationFrame(dt);
 	}
 	stateChanged(state:BattleState, oldState:BattleState) {
-		this.redraw();
+		let updateActions = state === "pc" || oldState === "pc" || oldState === "starting";
+		this.redraw(updateActions);
 		switch (state) {
 			case "closed":
 				this.characterPanel.collapsed = this.charPanelWasCollapsed;
