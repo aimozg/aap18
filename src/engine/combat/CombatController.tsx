@@ -22,10 +22,25 @@ import {CoreSkills} from "../objects/creature/CoreSkills";
 
 const logger = LogManager.loggerFor("engine.combat.CombatController")
 
-export interface CombatFlowResult {
-	type: CombatFlowResultType;
-	creature?: Creature;
-}
+/**
+ * * "starting" - preparing for battle
+ * * "flow" - ongoing, time flows
+ * * "animation" - animation in progress
+ * * "npc" - before NPC action
+ * * "pc" - waiting for player input
+ * * "ended" - battle ended, waiting for player to click [Finish] and take loot
+ * * "closed" - battle fully ended, loot given
+ */
+export type BattleState = "starting"|"flow"|"animation"|"npc"|"pc"|"ended"|"closed";
+
+/**
+ * * "victory" - player won
+ * * "defeat" - player lost
+ * * "retreat" - player ran away
+ * * "draw" - battle was interrupted by game event
+ * * "cancelled" - battle did not finish properly
+ */
+export type BattleResult = "victory"|"defeat"|"draw"|"retreat"|"cancelled";
 
 export const enum CombatFlowResultType {
 	NOTHING_HAPPENED,
@@ -87,8 +102,25 @@ export class CombatController {
 
 	public get rng() { return Game.instance.rng }
 
-	private _ended = false;
-	public get ended() { return this._ended }
+	public get ended() { return this.state === "ended" || this.state === "closed" }
+
+	private _state:BattleState = "starting";
+	get state(): BattleState { return this._state; }
+	private set state(value: BattleState) {
+		if (value !== this._state) {
+			let oldState = this._state;
+			logger.debug("state changed {} to {}",oldState,value);
+			this._state = value;
+			this.logbr();
+			this.ctx.stateChanged(value, oldState);
+		}
+	}
+
+	private nextActor:Creature|null = null;
+
+	private _result:BattleResult = "cancelled";
+	get result(): BattleResult { return this._result }
+	private set result(value: BattleResult) { this._result = value; }
 
 	public roundNo = 0;
 	public tickTime = 0;
@@ -118,25 +150,53 @@ export class CombatController {
 		}
 		this.roundNo = 0;
 		this.tickTime = TicksPerRound;
+		this.state = "flow"
 	}
 
 	battleEnd() {
-		if (this._ended) return
+		if (this.ended) throw new Error(`Cannot battleEnd() in ${this.state}`);
 		logger.info("battleEnd")
-		this._ended = true
+		this.state = "ended";
+		// TODO compute result
 		for (let p of this.participants) {
 			this.cleanupAfterCombat(p)
 		}
-		this.ctx.battleEnded()
 	}
 
-	advanceTime(maxDT: number): CombatFlowResult {
-		logger.trace("advanceTime {}.{} +{}", this.roundNo, this.tickTime, maxDT)
-		if (this.partyLost || this.enemiesLost) return {type: CombatFlowResultType.COMBAT_ENDED}
+	async battleClose() {
+		if (this.state !== "ended") throw new Error(`Cannot battleClose() in ${this.state}`)
+		logger.info("battleClose")
+		await this.awardLoot();
+		this.state = "closed";
+	}
+
+	/** End battle or switch to "flow" */
+	private flow() {
+		if (this.partyLost || this.enemiesLost) {
+			this.battleEnd();
+			return;
+		}
+		this.state = "flow";
+	}
+
+	async advanceTime(maxDT: number) {
+		logger.trace("advanceTime {} {}.{} +{}", this.state, this.roundNo, this.tickTime, maxDT)
+		if (this.state === "npc") {
+			await this.performAIAction(this.nextActor!);
+			return;
+		}
+		if (this.state !== "flow") {
+			throw new Error(`Cannot advanceTime() in ${this.state} state`)
+		}
+		if (this.partyLost || this.enemiesLost) {
+			this.battleEnd();
+			return
+		}
 		while (maxDT-- > 0) {
 			// check new round start
 			if (this.tickTime >= TicksPerRound) {
-				return {type: CombatFlowResultType.NEW_ROUND}
+				await this.nextRound();
+				return
 			}
 			// TODO execute scheduled events
 			// find actor
@@ -144,9 +204,13 @@ export class CombatController {
 			if (nextActor) {
 				if (nextActor instanceof PlayerCharacter) {
 					// TODO if player-controller, actually
-					return {type: CombatFlowResultType.PLAYER_ACTION, creature: nextActor}
+					this.state = "pc"
+					this.nextActor = nextActor
+					return
 				} else {
-					return {type: CombatFlowResultType.AI_ACTION, creature: nextActor}
+					this.nextActor = nextActor;
+					this.state = "npc";
+					return
 				}
 			}
 			// advance aps
@@ -154,30 +218,6 @@ export class CombatController {
 				if (c.isAlive) c.ap++
 			}
 			this.tickTime++
-		}
-		return {type: CombatFlowResultType.NOTHING_HAPPENED}
-	}
-
-	async applyFlowResult(fr: CombatFlowResult) {
-		if (fr.type === CombatFlowResultType.NOTHING_HAPPENED) {
-			// do nothing, call site should schedule advanceTime call
-			logger.trace("applyFlowResult {} {}", fr.type, fr.creature)
-			return
-		}
-		logger.debug("applyFlowResult {} {}", fr.type, fr.creature)
-		switch (fr.type) {
-			case CombatFlowResultType.PLAYER_ACTION:
-				// do nothing, call site should display player action menu
-				break;
-			case CombatFlowResultType.NEW_ROUND:
-				await this.nextRound()
-				break;
-			case CombatFlowResultType.AI_ACTION:
-				await this.performAIAction(fr.creature!)
-				break;
-			case CombatFlowResultType.COMBAT_ENDED:
-				this.battleEnd()
-				break;
 		}
 	}
 
@@ -251,8 +291,10 @@ export class CombatController {
 	// Combat messages //
 	/////////////////////
 
+	private logHasNoBr = false;
 	log(messageClass: string, message: ComponentChildren) {
 		logger.info("{}", message)
+		this.logHasNoBr = true;
 		/*if (this._logmsg > 0) {
 			this.ctx.logPanel.appendToLast(message)
 		} else {*/
@@ -273,7 +315,10 @@ export class CombatController {
 	 */
 
 	logbr() {
-		this.ctx.logPanel.append(<br/>)
+		if (this.logHasNoBr) {
+			this.logHasNoBr = false;
+			this.ctx.logPanel.append(<br/>)
+		}
 	}
 
 	logInfo(message: ComponentChildren) {
@@ -387,7 +432,9 @@ export class CombatController {
 
 	async performAction<T>(action: CombatAction<T>): Promise<T> {
 		logger.info("performAction {}", action)
-		return await action.perform(this)
+		let result = await action.perform(this);
+		this.flow()
+		return result
 	}
 
 	async doDamages(target: Creature, damage: Damage[], source: Creature | null) {
@@ -514,5 +561,4 @@ export class CombatController {
 			)
 		}
 	}
-
 }

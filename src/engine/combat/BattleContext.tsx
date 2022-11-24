@@ -6,7 +6,7 @@ import {GameContext} from "../state/GameContext";
 import {GameScreenLayout} from "../ui/screens/GameScreen";
 import {CreaturePanel, CreatureValueId} from "../../game/ui/CreaturePanel";
 import {Deferred} from "../utils/Deferred";
-import {CombatController, CombatFlowResultType} from "./CombatController";
+import {AnimationTime, BattleResult, BattleState, CombatController} from "./CombatController";
 import {milliTime} from "../utils/time";
 import {coerce} from "../math/utils";
 import {LogPanel} from "../ui/panels/LogPanel";
@@ -63,7 +63,6 @@ export interface BattleSettings {
 	grid: BattleGrid;
 	ambushed:'party'|'enemies'|undefined;
 }
-
 export class BattleContext implements GameContext {
 	constructor(
 		public settings: BattleSettings
@@ -77,22 +76,26 @@ export class BattleContext implements GameContext {
 		this.enemyPanel.collapse();
 	}
 
-	private charPanelWasCollapsed: boolean;
+	get state(): BattleState { return this.cc.state; }
+
+	get result():BattleResult { return this.cc.result }
+
+	private readonly charPanelWasCollapsed: boolean;
+
 	public get grid(): BattleGrid { return this.cc.grid };
+
 	public player: PlayerCharacter = this.settings.player;
-	playerCanAct = false
+
+	get playerCanAct():boolean { return this.state === "pc" || this.state === "ended"}
+
 	readonly cc: CombatController
-	get ended(): boolean { return this._promise.completed; }
+
 	private _promise = new Deferred<BattleContext>()
+	get ended(): boolean { return this._promise.completed; }
 	get promise(): Promise<BattleContext> { return this._promise }
-	battleEnded() {
-		this.playerCanAct = false
-	}
+
 	async onBattleFinishClick() {
-		await this.cc.awardLoot();
-		this.characterPanel.collapsed = this.charPanelWasCollapsed;
-		this._promise.resolve(this)
-		Game.instance.gameController.showGameScreen()
+		await this.cc.battleClose();
 	}
 	readonly characterPanel = Game.instance.screenManager.sharedPlayerPanel
 	readonly enemyPanel
@@ -115,7 +118,6 @@ export class BattleContext implements GameContext {
 			bottom: this.logPanel.astsx
 		}
 	}
-	private _redrawing = false
 	private playerActions():CombatAction<any>[] {
 		if (this.cc.ended) return [new FinishCombatAction(this)];
 		return CombatRules.playerActions(this.player, this.cc);
@@ -124,9 +126,7 @@ export class BattleContext implements GameContext {
 		if (action instanceof FinishCombatAction) {
 			await this.onBattleFinishClick()
 		} else if (this.playerCanAct) {
-			this.playerCanAct = false;
 			await this.cc.performAction(action);
-			this.scheduleTick()
 		}
 	}
 	animateValueChange(creature:Creature, key:CreatureValueId, newValue:number, durationMs:number) {
@@ -136,33 +136,32 @@ export class BattleContext implements GameContext {
 		panel.animateValue(key, newValue, durationMs);
 	}
 	redraw() {
-		if (this._redrawing) return
-		this._redrawing = true
-		setTimeout(()=>{
-			this._redrawing = false;
-			this.characterPanel.update()
-			this.enemyPanel.update()
-			this.battleActionsPanel.update(this.playerActions())
-			this.battlePanel.update()
-		}, 0)
+		if (this.state === "closed") return;
+		this.characterPanel.update()
+		this.enemyPanel.update()
+		this.battleActionsPanel.update(this.playerActions())
+		this.battlePanel.update()
 	}
 	update() {
-		this.checkBattleStatus()
-		this.redraw();
-	}
-	private _started = false
-	checkBattleStatus() {
-		if (!this._started) {
-			this._started = true
-			this.cc.battleStart()
+		switch (this.state) {
+			case "starting":
+				this.cc.battleStart()
+				break;
+			case "flow":
+				this.scheduleTick();
+				break;
+			case "animation":
+			case "pc":
+			case "npc":
+			case "ended":
+			case "closed":
+				this.redraw();
 		}
-		this.scheduleTick();
 	}
 	private _scheduled = false
 	private _t1 = milliTime()
 	scheduleTick() {
-		if (this._scheduled) return
-		this.playerCanAct = false;
+		if (this._scheduled) return;
 		this._t1 = milliTime()
 		this._scheduled = true
 	}
@@ -177,20 +176,38 @@ export class BattleContext implements GameContext {
 		this.characterPanel.animationFrame(dt);
 		this.enemyPanel.animationFrame(dt);
 	}
-	private async tick(dticks:number) {
-		this.playerCanAct = false
-		let fr = this.cc.advanceTime(dticks);
-		this.redraw()
-		await this.cc.applyFlowResult(fr)
-		if (fr.type === CombatFlowResultType.PLAYER_ACTION) {
-			this.playerCanAct = true
+	stateChanged(state:BattleState, oldState:BattleState) {
+		this.redraw();
+		switch (state) {
+			case "closed":
+				this.characterPanel.collapsed = this.charPanelWasCollapsed;
+				this._promise.resolve(this);
+				Game.instance.gameController.showGameScreen()
+				return;
+			case "flow":
+				this.scheduleTick();
+				break;
+			case "npc":
+				setTimeout(async ()=>{
+					await this.cc.advanceTime(0);
+				}, AnimationTime);
+				break;
+			default:
+				break;
 		}
-		if (fr.type !== CombatFlowResultType.COMBAT_ENDED && fr.type !== CombatFlowResultType.PLAYER_ACTION) {
-			this.scheduleTick()
+	}
+	private async tick(dticks:number) {
+		this._scheduled = false;
+		if (this.cc.state === "flow") {
+			await this.cc.advanceTime(dticks);
+			if (this.cc.state === "flow") {
+				this.redraw()
+				this.scheduleTick()
+			}
 		}
 	}
 	onKeyboardEvent(event: KeyboardEvent): void {
-		if (this.playerCanAct || this.cc.ended) {
+		if (this.playerCanAct) {
 			this.battleActionsPanel.onKeyboardEvent(event);
 		}
 	}
