@@ -14,6 +14,7 @@ import {CombatRoll} from "../../engine/combat/CombatRoll";
 import {Direction} from "../../engine/utils/gridutils";
 import {StepAction} from "../../engine/combat/actions/StepAction";
 import {CoreConditions} from "../../engine/objects/creature/CoreConditions";
+import {TeaseAction} from "../../engine/combat/actions/TeaseAction";
 
 export namespace CombatRules {
 
@@ -28,8 +29,10 @@ export namespace CombatRules {
 	export function playerActions(player:PlayerCharacter, cc:CombatController):CombatAction<any>[] {
 		let actions:CombatAction<any>[] = [];
 		actions.push(new SkipCombatAction(player));
-		// TODO targets
-		actions.push(new MeleeAttackAction(player, cc.enemies[0]))
+		for (let target of cc.enemies) {
+			actions.push(new MeleeAttackAction(player, target))
+			actions.push(new TeaseAction(player, target))
+		}
 		for (let dir of Direction.Steps) {
 			actions.push(new StepAction(player, dir.add(player.gobj!)))
 		}

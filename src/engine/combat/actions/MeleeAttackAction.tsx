@@ -4,6 +4,7 @@ import {CombatAction} from "../CombatAction";
 import {h} from "preact";
 import {CombatRoll} from "../CombatRoll";
 import {Direction} from "../../utils/gridutils";
+import {CombatActionGroups} from "../CombatActionGroups";
 
 export class MeleeAttackAction extends CombatAction<CombatRoll> {
 	constructor(
@@ -27,6 +28,7 @@ export class MeleeAttackAction extends CombatAction<CombatRoll> {
 		return "";
 	}
 	label = "Strike " + this.target.name
+	group = CombatActionGroups.AGMelee
 
 	get dpadLabel() { return "Strike" }
 	get dpadClass() { return "dpad-strike"}

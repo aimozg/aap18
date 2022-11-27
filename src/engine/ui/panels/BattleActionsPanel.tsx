@@ -1,14 +1,18 @@
 import {DomComponent} from "../DomComponent";
 import {BattleContext} from "../../combat/BattleContext";
-import {createRef, h, RefObject, render} from "preact";
+import {ComponentChildren, createRef, h, RefObject, render} from "preact";
 import {CombatAction} from "../../combat/CombatAction";
 import {KeyCodes} from "../KeyCodes";
 import {Button, execUIAction, UIAction, uiActionEnabled} from "../components/Button";
+import {CombatActionGroups} from "../../combat/CombatActionGroups";
+import {Fragment} from "preact/compat";
+import {removeChildren} from "../../utils/dom";
 
 export class BattleActionsPanel extends DomComponent {
 	private readonly refDPad: RefObject<HTMLDivElement>
-	private readonly refStarred: RefObject<HTMLDivElement>
 	private readonly refActions: RefObject<HTMLDivElement>
+	private refCurrentGroup: RefObject<HTMLDivElement>|null = null
+	private readonly refGroups: RefObject<HTMLDivElement>[] = CombatActionGroups.LIST.map(()=>createRef());
 	static DPadHotkeys = [
 		[KeyCodes.KEYQ, KeyCodes.NUMPAD7],
 		[KeyCodes.KEYW, KeyCodes.NUMPAD8],
@@ -20,32 +24,30 @@ export class BattleActionsPanel extends DomComponent {
 		[KeyCodes.KEYS, KeyCodes.KEYX, KeyCodes.NUMPAD2],
 		[KeyCodes.KEYC, KeyCodes.NUMPAD3],
 	];
+	static GroupHotkeys = [
+		KeyCodes.DIGIT1,
+		KeyCodes.DIGIT2,
+		KeyCodes.DIGIT3,
+		KeyCodes.DIGIT4,
+		KeyCodes.DIGIT5,
+		KeyCodes.DIGIT6,
+		KeyCodes.DIGIT7,
+		KeyCodes.DIGIT8,
+		KeyCodes.DIGIT9,
+		KeyCodes.DIGIT0,
+	];
 
 	constructor(public readonly context: BattleContext) {
 		let refDPad = createRef<HTMLDivElement>()
-		let refStarred = createRef<HTMLDivElement>()
 		let refActions = createRef<HTMLDivElement>()
 		super(<div className="combat-actions d-flex flex-column gap-4">
 			<div class="combat-dpad grid-3 grid-v3" ref={refDPad}>
 			</div>
-			<div class="combat-actions-starred grid-2 hidden" ref={refStarred}>
-				<Button hotkey={KeyCodes.DIGIT1}>Favourite 1</Button>
-				<Button hotkey={KeyCodes.DIGIT2}>Favourite 2</Button>
-				<Button hotkey={KeyCodes.DIGIT3}>Favourite 3</Button>
-				<Button hotkey={KeyCodes.DIGIT4}>Favourite 4</Button>
-				<Button hotkey={KeyCodes.DIGIT5}>Favourite 5</Button>
-				<Button hotkey={KeyCodes.DIGIT6}>Favourite 6</Button>
-				<Button hotkey={KeyCodes.DIGIT7}>Favourite 7</Button>
-				<Button hotkey={KeyCodes.DIGIT8}>Favourite 8</Button>
-				<Button hotkey={KeyCodes.DIGIT9}>Favourite 9</Button>
-				<Button hotkey={KeyCodes.DIGIT0}>Favourite 10</Button>
-			</div>
-			<div class="combat-actions-list d-flex flex-wrap gap-1" ref={refActions}>
+			<div class="combat-actions-list d-flex flex-column gap-2" ref={refActions}>
 
 			</div>
 		</div>);
 		this.refDPad = refDPad;
-		this.refStarred = refStarred;
 		this.refActions = refActions;
 	}
 
@@ -54,7 +56,16 @@ export class BattleActionsPanel extends DomComponent {
 		return undefined;
 	}
 
-	private actions: UIAction[] = [];
+	private combatActionsGrouped: UIAction[][] = [];
+	private allActions: UIAction[] = [];
+	private dpadActions: UIAction[] = [];
+	private currentGroup = -1
+	private actionsOpenGroup: UIAction[] = CombatActionGroups.LIST.map((name,i)=>({
+		label: name,
+		hotkey: BattleActionsPanel.GroupHotkeys[i],
+		disabled: ()=>(this.combatActionsGrouped[i]?.length??0) === 0,
+		callback: ()=>this.openActionGroup(i)
+	}))
 
 	showFinishBattle() {
 		let aFinish:UIAction = {
@@ -63,9 +74,14 @@ export class BattleActionsPanel extends DomComponent {
 			hotkey: KeyCodes.ENTER,
 			callback: ()=>this.context.onBattleFinishClick(),
 		}
-		this.actions = [aFinish];
+		this.allActions = [aFinish];
 		this.renderDpadActions([]);
 		render(<Button action={aFinish} className="-big"/>, this.refActions.current!)
+	}
+
+	private async execAction(a:CombatAction<any>) {
+		this.closeActionGroup();
+		await this.context.execAction(a);
 	}
 
 	private renderDpadActions(dpadActions:(UIAction|undefined)[]) {
@@ -76,21 +92,77 @@ export class BattleActionsPanel extends DomComponent {
 		), this.refDPad.current!);
 	}
 
-	private renderActions(actionList: UIAction[]) {
-		render(actionList.map(btn =>
-			<Button action={btn}/>
-		), this.refActions.current!)
+	private renderActionGroup(group:string, i:number, actions:UIAction[]): ComponentChildren {
+		let hotkey = BattleActionsPanel.GroupHotkeys[i];
+		return <Fragment>
+			{
+				actions.length === 0 && <Button label={group} hotkey={hotkey} disabled={true}/>
+			}
+			{
+				actions.length === 1 && <Button action={actions[0]} hotkey={hotkey}/>
+			}
+			{
+				actions.length > 1 && <Button action={this.actionsOpenGroup[i]}/>
+			}
+			<div class="combat-actions-sublist mx-4 d-flex flex-wrap gap-1" ref={this.refGroups[i]}/>
+		</Fragment>
+	}
+
+	private renderActions() {
+		render(
+			CombatActionGroups.LIST.map((group,i)=>
+				this.renderActionGroup(group, i, this.combatActionsGrouped[i]??[])
+			), this.refActions.current!)
+	}
+
+	openActionGroup(i:number) {
+		if (this.currentGroup === i) {
+			this.closeActionGroup();
+			return;
+		}
+		this.closeActionGroup();
+		let actions = this.combatActionsGrouped[i];
+		if (!actions) return;
+		if (actions.length === 1) {
+			actions[0].callback();
+			return;
+		}
+		this.currentGroup = i;
+		this.refCurrentGroup = this.refGroups[i];
+		render(
+			actions.map(
+				a => <Button action={a}/>
+			),
+		this.refCurrentGroup!.current!)
+	}
+	closeActionGroup() {
+		removeChildren(this.refCurrentGroup?.current)
+		this.refCurrentGroup = null
+		this.currentGroup = -1
 	}
 
 	showActions(actions: CombatAction<any>[], playerCanAct:boolean) {
-		// TODO group actions and favourites
-		let actionList:UIAction[] = [];
+		// TODO favourites
+		this.closeActionGroup();
+		this.combatActionsGrouped = [];
 		let dpadActions:(UIAction|undefined)[] = Array(9).fill(undefined);
-		this.actions = [];
+		this.allActions = [];
 
 		for (let a of actions) {
-			let enabled = a.isPossible(this.context.cc);
+			let groupId = CombatActionGroups.LIST.indexOf(a.group);
+			if (groupId >= 0) {
+				let group = this.combatActionsGrouped[groupId] ??= [];
+				group.push({
+					label: a.label,
+					hotkey: BattleActionsPanel.GroupHotkeys[group.length],
+					// TODO tooltip
+					disabled: () => !playerCanAct || !a.isPossible(this.context.cc),
+					callback: () => this.execAction(a)
+				});
+			}
+
 			if (a.direction) {
+				let enabled = a.isPossible(this.context.cc);
 				let dirid = a.direction.id;
 				let old = dpadActions[dirid];
 				let oldEnabled = old && uiActionEnabled(old);
@@ -100,33 +172,30 @@ export class BattleActionsPanel extends DomComponent {
 						label: a.dpadClass ? <span class={a.dpadClass}>{a.dpadLabel}</span> : a.dpadLabel,
 						// TODO tooltip
 						disabled: () => !playerCanAct || !a.isPossible(this.context.cc),
-						callback: () => this.context.execAction(a)
+						callback: () => this.execAction(a)
 					}
-					continue
-				}
-				if (!enabled) {
-					// If multiple actions on same directions, do not show disabled
-					continue
+				} else if (enabled && oldEnabled) {
+					(this.combatActionsGrouped[CombatActionGroups.LIST.indexOf(CombatActionGroups.AGOther)] ??= []).push({
+						label: a.label,
+						disabled: () => !playerCanAct || !a.isPossible(this.context.cc),
+						callback: () => this.execAction(a)
+					})
 				}
 			}
-			actionList.push({
-				hotkey: KeyCodes.DefaultHotkeys[actionList.length],
-				label: a.label,
-				// TODO tooltip
-				disabled: () => !playerCanAct || !a.isPossible(this.context.cc),
-				callback: () => this.context.execAction(a)
-			})
 		}
-		this.actions = [
+		this.allActions = [
 			...(dpadActions.filter(a=>!!a) as UIAction[]),
-			...actionList
+			...this.actionsOpenGroup
 		];
 
 		this.renderDpadActions(dpadActions);
-		this.renderActions(actionList);
+		this.renderActions();
 	}
 
 	onKeyboardEvent(event: KeyboardEvent) {
-		execUIAction(event, this.actions);
+		if (this.currentGroup >= 0) {
+			if (execUIAction(event, this.combatActionsGrouped[this.currentGroup])) return
+		}
+		execUIAction(event, this.allActions);
 	}
 }

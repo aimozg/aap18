@@ -30,6 +30,12 @@ export function uiActionEnabled(a:UIAction):boolean {
 	return true;
 }
 
+/**
+ * Find action that's bound to pressed key and execute it.
+ * @param event
+ * @param actions
+ * @return true if suitable non-disabled action was found
+ */
 export function execUIAction(event:KeyboardEvent, actions:UIAction[]):boolean {
 	let hk = KeyCodes.eventToHkString(event);
 	for (let action of actions) {

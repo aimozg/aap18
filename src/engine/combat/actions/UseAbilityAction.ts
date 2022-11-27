@@ -6,6 +6,7 @@ import {CombatAction} from "../CombatAction";
 import {Creature} from "../../objects/Creature";
 import {AbilityTargetType, AbstractCombatAbility} from "../AbstractCombatAbility";
 import {CombatController} from "../CombatController";
+import {CombatActionGroups} from "../CombatActionGroups";
 
 export class UseAbilityAction extends CombatAction<void>{
 
@@ -29,6 +30,7 @@ export class UseAbilityAction extends CombatAction<void>{
 	protected disabledReason(cc: CombatController): string {
 		return this.ability.disabledReason(this);
 	}
+	group = CombatActionGroups.AGAbilities
 	readonly label: string;
 	readonly target: AbilityTarget;
 	readonly tooltip: string;

@@ -68,20 +68,20 @@ declare module "../../engine/objects/creature/Character" {
 
 export function gdRegisterBodyParts(gd:GameDataBuilder) {
 	gd.logger.debug("gdRegisterBodyParts");
-	gd.addBodyPart("arms", ArmsRef);
-	gd.addBodyPart("breasts", BreastsRef);
-	gd.addBodyPart("coat", CoatRef);
-	gd.addBodyPart("ears", EarsRef);
-	gd.addBodyPart("eyes", EyesRef);
-	gd.addBodyPart("face", FaceRef);
-	gd.addBodyPart("hair", HairRef);
-	gd.addBodyPart("horns", HornsRef);
-	gd.addBodyPart("legs", LegsRef);
-	gd.addBodyPart("penis", PenisRef);
-	gd.addBodyPart("skin", SkinRef);
-	gd.addBodyPart("tail", TailRef);
-	gd.addBodyPart("vagina", VaginaRef);
-	gd.addBodyPart("wings", WingsRef);
+	gd.addBodyPart(ArmsRef, "arms");
+	gd.addBodyPart(BreastsRef, "breasts");
+	gd.addBodyPart(CoatRef, "coat");
+	gd.addBodyPart(EarsRef, "ears");
+	gd.addBodyPart(EyesRef, "eyes");
+	gd.addBodyPart(FaceRef, "face");
+	gd.addBodyPart(HairRef, "hair");
+	gd.addBodyPart(HornsRef, "horns");
+	gd.addBodyPart(LegsRef, "legs");
+	gd.addBodyPart(PenisRef, "penis");
+	gd.addBodyPart(SkinRef, "skin");
+	gd.addBodyPart(TailRef, "tail");
+	gd.addBodyPart(VaginaRef, "vagina");
+	gd.addBodyPart(WingsRef, "wings");
 	gd.addBodyMaterial("bmSkin", BodyMaterialTypes.SKIN)
 	gd.addBodyMaterial("bmHair", BodyMaterialTypes.HAIR)
 	gd.addBodyMaterial("bmFur", BodyMaterialTypes.FUR)

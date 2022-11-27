@@ -8,6 +8,7 @@ import {AnimationTimeFast, CombatController} from "../CombatController";
 import {Direction, GridPos} from "../../utils/gridutils";
 import {CombatRules} from "../../../game/combat/CombatRules";
 import {CoreConditions} from "../../objects/creature/CoreConditions";
+import {CombatActionGroups} from "../CombatActionGroups";
 
 export interface StepActionResult {
 	success: boolean;
@@ -27,6 +28,7 @@ export class StepAction extends CombatAction<StepActionResult> {
 
 	get dpadLabel(): string { return "Move"; }
 	get dpadClass() { return "dpad-move"}
+	group = CombatActionGroups.AGMove
 
 	tooltip: string
 	protected disabledReason(cc: CombatController): string {

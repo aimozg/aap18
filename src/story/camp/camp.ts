@@ -28,6 +28,15 @@ export function gdRegisterPlayerCamp(gd:GameDataBuilder) {
 			},
 			when: gc => gc.player.isAlive
 		}, {
+			name: "imps",
+			scene: async (ctx) => {
+				await ctx.ambush({
+					monsters: [new Imp(), new Imp()],
+					threatName: "two stray imps"
+				});
+			},
+			when: gc => gc.player.isAlive
+		}, {
 			name: "debug_item",
 			scene: async (ctx)=> {
 				let item = ConsumableLib.PotionHealingLesser.spawn();

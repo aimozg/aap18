@@ -6,6 +6,7 @@ $duration: 0.5s;
 
 .game-layout {
   display:flex;
+  max-height: 100vh;
   flex-direction: column;
   width: 1200px;
   gap: 1rem;

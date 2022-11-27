@@ -5,6 +5,7 @@
 import {Creature} from "../objects/Creature";
 import {CombatController} from "./CombatController";
 import {Direction} from "../utils/gridutils";
+import {CombatActionGroups} from "./CombatActionGroups";
 
 export abstract class CombatAction<RESULT> {
 	protected constructor(
@@ -18,6 +19,7 @@ export abstract class CombatAction<RESULT> {
 	/** Short label for a d-pad button */
 	get dpadLabel():string { return this.label }
 	get dpadClass():string { return "" }
+	public group:string = CombatActionGroups.AGOther
 
 	abstract perform(cc: CombatController): Promise<RESULT>
 	protected abstract disabledReason(cc: CombatController): string;

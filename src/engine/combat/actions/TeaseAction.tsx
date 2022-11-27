@@ -4,6 +4,7 @@ import {CombatController} from "../CombatController";
 import {CombatRules} from "../../../game/combat/CombatRules";
 import {Fragment} from "preact/compat";
 import {h} from "preact";
+import {CombatActionGroups} from "../CombatActionGroups";
 
 export interface TeaseResult {
 	hit: boolean;
@@ -26,7 +27,8 @@ export class TeaseAction extends CombatAction<TeaseResult> {
 		return "";
 	}
 	label = "Tease "+this.target.name
-	tooltip = "Attempt to seduce "+this.target.name+" with your body"
+	group = CombatActionGroups.AGTease
+	tooltip = "Attempt to arouse "+this.target.name+" with your body"
 	async perform(cc: CombatController): Promise<TeaseResult> {
 		let attacker = this.actor;
 		let target = this.target;

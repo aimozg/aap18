@@ -18,6 +18,7 @@ import {MaxLevel, XpPerLevel} from "../../game/xp";
 import {Loot} from "./Loot";
 import {CreatureCondition} from "./creature/CreatureCondition";
 import {Skill} from "./creature/Skill";
+import {CoreConditions} from "./creature/CoreConditions";
 
 let objectIdCounter = 0;
 
@@ -282,7 +283,9 @@ export class Creature {
 	//////////////////////
 	// Combat - Helpers //
 	//////////////////////
-	get isAlive():boolean { return this.hp > 0 }
+	get isAlive():boolean {
+		return !this.hasCondition(CoreConditions.Defeated) && !this.hasCondition(CoreConditions.Seduced)
+	}
 	hasCondition(condition:CreatureCondition):boolean {
 		return this.conditions.has(condition)
 	}

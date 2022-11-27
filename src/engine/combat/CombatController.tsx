@@ -36,11 +36,10 @@ export type BattleState = "starting"|"flow"|"animation"|"npc"|"pc"|"ended"|"clos
 /**
  * * "victory" - player won
  * * "defeat" - player lost
- * * "retreat" - player ran away
- * * "draw" - battle was interrupted by game event
+ * * "draw" - player ran away, both KO'd, or battle was interrupted
  * * "cancelled" - battle did not finish properly
  */
-export type BattleResult = "victory"|"defeat"|"draw"|"retreat"|"cancelled";
+export type BattleResult = "victory"|"defeat"|"draw"|"cancelled";
 
 export const enum CombatFlowResultType {
 	NOTHING_HAPPENED,
@@ -120,7 +119,6 @@ export class CombatController {
 
 	private _result:BattleResult = "cancelled";
 	get result(): BattleResult { return this._result }
-	private set result(value: BattleResult) { this._result = value; }
 
 	public roundNo = 0;
 	public tickTime = 0;
@@ -157,15 +155,23 @@ export class CombatController {
 		if (this.ended) throw new Error(`Cannot battleEnd() in ${this.state}`);
 		logger.info("battleEnd")
 		this.state = "ended";
-		// TODO compute result
-		for (let p of this.participants) {
-			this.cleanupAfterCombat(p)
+		if (this.partyLost && this.enemiesLost) {
+			this._result = "draw"
+		} else if (this.partyLost) {
+			this._result = "defeat"
+		} else if (this.enemiesLost) {
+			this._result = "victory"
+		} else {
+			this._result = "draw"
 		}
 	}
 
 	async battleClose() {
 		if (this.state !== "ended") throw new Error(`Cannot battleClose() in ${this.state}`)
 		logger.info("battleClose")
+		for (let p of this.participants) {
+			this.cleanupAfterCombat(p)
+		}
 		await this.awardLoot();
 		this.state = "closed";
 	}
@@ -496,6 +502,7 @@ export class CombatController {
 		let wasAlive = target.isAlive
 		this.ctx.animateValueChange(target, "hp", target.hp - damage, AnimationTime)
 		target.hp -= damage;
+		if (target.hp <= 0) target.setCondition(CoreConditions.Defeated);
 		if (wasAlive && !target.isAlive) {
 			// TODO consider handling death later, as an immediate follow-up event
 			await this.onDeath(target, source)
@@ -504,14 +511,13 @@ export class CombatController {
 
 	async increaseLP(target: Creature, change: number, source: Creature | null) {
 		logger.info("increaseLP {} {} {}", target, change, source)
-		// TODO do not instalose
-		let wasAlive = target.isAlive
+		//let wasAlive = target.isAlive
 		this.ctx.animateValueChange(target, "lp", target.lp + change, AnimationTime)
 		target.lp += change;
-		if (wasAlive && !target.isAlive) {
+		/*if (wasAlive && !target.isAlive) {
 			// TODO consider handling death later, as an immediate follow-up event
 			await this.onDeath(target, source)
-		}
+		}*/
 	}
 
 	/**
@@ -550,7 +556,7 @@ export class CombatController {
 		let loot = mergeLoot(this.enemies.map(e=>e.loot));
 		logger.info("awardLoot rolled money = {} items = {}", loot.money, loot.items);
 		let receiver = this.ctx.player;
-		// TODO +XXXX floatig number for gold
+		// TODO +XXXX floating number for gold
 		receiver.money += loot.money;
 		// TODO this isn't displayed properly!
 		this.logInfo(`You receive ${loot.money} gold.`);

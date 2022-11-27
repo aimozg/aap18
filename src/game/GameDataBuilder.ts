@@ -15,6 +15,7 @@ import {Color} from "../engine/objects/Color";
 import {PlayerCharacter} from "../engine/objects/creature/PlayerCharacter";
 import {SimpleTraitType, TraitType} from "../engine/rules/TraitType";
 import {Skill} from "../engine/objects/creature/Skill";
+import {KeysOfType} from "../engine/utils/types";
 
 /**
  * Essential game data (races, traits, items, ...)
@@ -85,11 +86,11 @@ export class GameDataBuilder {
 	// propname is key of CharacterBody
 	// and ref is body part reference to body part that's also CharacterBody[propname]
 	addBodyPart<
-		PROP extends keyof CharacterBody,
-		PART extends BodyPart<TYPE> & CharacterBody[PROP],
-		TYPE extends BodyPartType<PART>>(
-			propname: PROP,
-			ref: BodyPartReference<PART, TYPE>
+		PART extends BodyPart<TYPE>,
+		TYPE extends BodyPartType<PART>,
+		PROP extends KeysOfType<CharacterBody, PART>>(
+		ref: BodyPartReference<PART, TYPE>,
+		propname: PROP
 	): void {
 		const index = ref.index;
 		Object.defineProperty(CharacterBody.prototype, propname, {
@@ -101,7 +102,7 @@ export class GameDataBuilder {
 		})
 	}
 	addBodyMaterial<
-		PROP extends keyof CharacterBody,
+		PROP extends KeysOfType<CharacterBody, BodyMaterial>,
 		MATERIAL extends BodyMaterial & CharacterBody[PROP]>(
 		propname: PROP,
 		ref: BodyMaterialType
@@ -119,9 +120,9 @@ export class GameDataBuilder {
 	 * Create accessors for CharacterBody named {@param prop1} and {@param prop2} to access material {@param ref}'s color1 and color2, and readonly property {@param props} for composite color name.
 	 */
 	addBodyMaterialColor<
-		PROP1 extends keyof CharacterBody,
-		PROP2 extends keyof CharacterBody,
-		PROPS extends keyof CharacterBody>(
+		PROP1 extends KeysOfType<CharacterBody, Color>,
+		PROP2 extends KeysOfType<CharacterBody, Color>,
+		PROPS extends KeysOfType<CharacterBody, string>>(
 			prop1:PROP1,
 			prop2:PROP2,
 			props:PROPS,
