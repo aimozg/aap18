@@ -12,6 +12,7 @@ import {UseAbilityAction} from "../combat/actions/UseAbilityAction";
 import {AbilityTargetType} from "../combat/AbstractCombatAbility";
 import {StepAction} from "../combat/actions/StepAction";
 import {Direction} from "../utils/gridutils";
+import {SeduceAction} from "../combat/actions/SeduceAction";
 
 export abstract class MonsterAI {
 	constructor(readonly actor:Creature) {}
@@ -45,6 +46,8 @@ export class DefaultMonsterAI extends MonsterAI {
 				options.push(new StepAction(actor, dir.add(actor.gobj!)));
 			}
 			options.push(new TeaseAction(actor, target));
+			let seduce = new SeduceAction(actor, target);
+			if (seduce.toHit <= 20) options.push(seduce);
 		}
 
 		for (let a of actor.abilities) {

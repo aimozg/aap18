@@ -13,11 +13,17 @@ import {CoreStatusEffects} from "../objects/creature/CoreStatusEffects";
 import {Buff, BuffableStatId} from "../objects/creature/stats/BuffableStat";
 import {LogManager} from "../logging/LogManager";
 
-const HornyConditions: [StatusEffectType, number][] = [
-	[CoreStatusEffects.Horny100, 1.00],
-	[CoreStatusEffects.Horny75, 0.75],
-	[CoreStatusEffects.Horny50, 0.50],
-	[CoreStatusEffects.Horny25, 0.25],
+
+export interface HornyStage {
+	effect: StatusEffectType,
+	threshold: number,
+	seduceDC: number,
+}
+const HornyStages: HornyStage[] = [
+	{effect: CoreStatusEffects.Horny100, threshold: 1.00, seduceDC: -40},
+	{effect: CoreStatusEffects.Horny75, threshold: 0.75, seduceDC: -30},
+	{effect: CoreStatusEffects.Horny50, threshold: 0.50, seduceDC: -20},
+	{effect: CoreStatusEffects.Horny25, threshold: 0.25, seduceDC: -10},
 ];
 
 export class CreatureController {
@@ -168,6 +174,12 @@ export class CreatureController {
 		return this.wisMod
 	}
 
+	/** Seduction difficulty check */
+	get seductionDC(): number {
+		// TODO other sources (buffs)
+		return 50 + this.stats.level + this.willpower + (this.hornyStage()?.seduceDC ?? 0)
+	}
+
 	/** Universal damage reduction */
 	get dmgRedAll(): number {
 		let value = 0;
@@ -266,13 +278,17 @@ export class CreatureController {
 		}
 		// conditions
 		let lpratio = stats.lp / stats.lpMax;
-		let currentCondition = HornyConditions.find(c => this.creature.hasStatusEffect(c[0]))?.[0];
-		let newCondition = HornyConditions.find(c => lpratio >= c[1])?.[0];
-		if (currentCondition !== newCondition) {
-			if (currentCondition) this.removeStatusEffect(currentCondition);
+		let currentStage = this.hornyStage()?.effect;
+		let newCondition = HornyStages.find(c => lpratio >= c.threshold)?.effect;
+		if (currentStage !== newCondition) {
+			if (currentStage) this.removeStatusEffect(currentStage);
 			if (newCondition) this.createStatusEffect(newCondition);
 		}
 
+	}
+
+	hornyStage(): HornyStage|undefined {
+		return HornyStages.find(c => this.creature.hasStatusEffect(c.effect));
 	}
 
 	recoverStats() {

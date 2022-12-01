@@ -15,6 +15,7 @@ import {Direction} from "../../engine/utils/gridutils";
 import {StepAction} from "../../engine/combat/actions/StepAction";
 import {CoreConditions} from "../../engine/objects/creature/CoreConditions";
 import {TeaseAction} from "../../engine/combat/actions/TeaseAction";
+import {SeduceAction} from "../../engine/combat/actions/SeduceAction";
 
 export namespace CombatRules {
 
@@ -32,6 +33,7 @@ export namespace CombatRules {
 		for (let target of cc.enemies) {
 			actions.push(new MeleeAttackAction(player, target))
 			actions.push(new TeaseAction(player, target))
+			actions.push(new SeduceAction(player, target))
 		}
 		for (let dir of Direction.Steps) {
 			actions.push(new StepAction(player, dir.add(player.gobj!)))
