@@ -41,12 +41,13 @@ export function parseXmlEntity(entity: string): string {
 export function substitutePattern(
 	pattern: string,
 	substitutions: ((s: string) => string)
-		| Record<string, string | (() => string)>
+		| Record<string, string | (() => string) | number>
 ): string {
 	let replacer: (part: string) => string;
 	if (typeof substitutions === 'function') {
 		replacer = substitutions;
 	} else {
+		// TODO add format? {part;spec}
 		replacer = part => {
 			let v = substitutions[part];
 			return (typeof v === 'function') ? v() : String(v);

@@ -37,7 +37,7 @@ export function gdRegisterOrigins(gd: GameDataBuilder) {
 			"Good starting equipment. <b>(NOT IMPLEMENTED)</b></i>",
 		introText: "You're a knight who led the purge of a village of Notingnam, a dark village with foul traditions, buried deep in the wilds. After executing demon-worshipping heretics, you've discovered a portal to some kind of Demon Realm. You and your loyal followers entered it bravely...",
 		adjustPlayer: (pc)=>{
-			pc.xp += 1000;
+			pc.ctrl.addXp(pc.nextLevelXp()-pc.xp)
 		}
 	}, {
 		id: 'isekai',

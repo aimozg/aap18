@@ -7,3 +7,13 @@ export function createArray<T>(size:number, initializer: (i:number, array:T[])=>
 	for (let i = 0; i < size; i++) arr[i] = initializer(i, arr);
 	return arr;
 }
+
+export function obj2map<K extends string|number|symbol,V>(obj:{
+	[index in K]?:V
+}):Map<K,V> {
+	let map = new Map<K,V>();
+	for (let [k,v] of Object.entries(obj) as [K,V][]) {
+		map.set(k,v);
+	}
+	return map;
+}

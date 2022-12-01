@@ -58,12 +58,12 @@ export enum AbilityTargetType {
 	AREA
 }
 
-/** soft enum */
-export interface SEAbilityTags {
+/** soft enum - TODO document this */
+export interface SoftEnumAbilityTags {
 	"damaging": 1,
 	"healing": 1,
 	"teasing": 1,
 	"buff": 1,
 	"debuff": 1,
 }
-export type AbilityTag = keyof SEAbilityTags;
+export type AbilityTag = keyof SoftEnumAbilityTags;

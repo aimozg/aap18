@@ -439,6 +439,9 @@ export class CombatController {
 	async performAction<T>(action: CombatAction<T>): Promise<T> {
 		logger.info("performAction {}", action)
 		let result = await action.perform(this);
+		if (action.actor.hasCondition(CoreConditions.Stealth) && action.removeStealth) {
+			await this.noticeCreature(action.actor);
+		}
 		this.flow()
 		return result
 	}
@@ -493,15 +496,16 @@ export class CombatController {
 
 	async deduceEP(creature: Creature, value: number) {
 		logger.info("deduceEP {} {}", creature, value);
+		// TODO move animation to ctrl
 		this.ctx.animateValueChange(creature, "ep", creature.ep - value, AnimationTimeVeryFast);
-		creature.ep -= value;
+		creature.ctrl.modEp(-value);
 	}
 
 	async deduceHP(target: Creature, damage: number, source: Creature | null) {
 		logger.info("deduceHP {} {} {}", target, damage, source)
 		let wasAlive = target.isAlive
 		this.ctx.animateValueChange(target, "hp", target.hp - damage, AnimationTime)
-		target.hp -= damage;
+		target.ctrl.modHp(-damage);
 		if (target.hp <= 0) target.setCondition(CoreConditions.Defeated);
 		if (wasAlive && !target.isAlive) {
 			// TODO consider handling death later, as an immediate follow-up event
@@ -513,11 +517,7 @@ export class CombatController {
 		logger.info("increaseLP {} {} {}", target, change, source)
 		//let wasAlive = target.isAlive
 		this.ctx.animateValueChange(target, "lp", target.lp + change, AnimationTime)
-		target.lp += change;
-		/*if (wasAlive && !target.isAlive) {
-			// TODO consider handling death later, as an immediate follow-up event
-			await this.onDeath(target, source)
-		}*/
+		target.ctrl.modLp(change);
 	}
 
 	/**
@@ -547,7 +547,7 @@ export class CombatController {
 		if (xp > 0) {
 			this.logInfo("+" + xp + " XP.")
 			this.ctx.animateValueChange(player, "xp", player.xp + xp, AnimationTime)
-			player.xp += xp;
+			player.ctrl.addXp(xp);
 			this.ctx.redraw()
 		}
 	}

@@ -10,6 +10,9 @@ import {PartialRecord} from "../../engine/utils/types";
 import {LogManager} from "../../engine/logging/LogManager";
 import {Button} from "../../engine/ui/components/Button";
 import {CombatRules} from "../combat/CombatRules";
+import {TextIcon} from "../../engine/objects/creature/CreatureCondition";
+import {signValue} from "../../engine/utils/math";
+import {TAttribute, TAttributes} from "../../engine/rules/TAttribute";
 
 export interface CreaturePanelOptions {
 	collapsible: boolean;
@@ -53,6 +56,11 @@ interface CreatureValueAnimation {
 	x: number;
 	x2: number;
 	v: number;
+}
+interface ConditionOrEffect {
+	icon: TextIcon;
+	name: string;
+	description: string;
 }
 export class CreaturePanel extends DomComponent {
 	constructor(
@@ -206,22 +214,12 @@ export class CreaturePanel extends DomComponent {
 	private sectionAttributes():ComponentChildren {
 		let c = this.creature!;
 		return this.options.attributes && <div className="grid-8 text-center my-2">
-            <div className="text-s">STR</div>
-            <div className="text-s">DEX</div>
-            <div className="text-s">CON</div>
-            <div className="text-s">SPE</div>
-            <div className="text-s">PER</div>
-            <div className="text-s">INT</div>
-            <div className="text-s">WIS</div>
-            <div className="text-s">CHA</div>
-            <div>{c.str}</div>
-            <div>{c.dex}</div>
-            <div>{c.con}</div>
-            <div>{c.spe}</div>
-            <div>{c.per}</div>
-            <div>{c.int}</div>
-            <div>{c.wis}</div>
-            <div>{c.cha}</div>
+			{TAttributes.map(attr=>
+				<div class="text-s">{TAttribute[attr]}</div>
+			)}
+			{TAttributes.map(attr=>
+				<div class={signValue(c.attrBuffable(attr).value, 'text-negative','','text-positive')}>{c.attr(attr)}</div>
+			)}
         </div>
 	}
 	/** Combat stats - saving throws, attack, defense, DR */
@@ -261,13 +259,19 @@ export class CreaturePanel extends DomComponent {
             <div></div>
         </div>;
 	}
+	private conditionsAndStatusEffects():ConditionOrEffect[] {
+		let c = this.creature!;
+		return [
+			...c.conditions,
+			...c.statusEffects.values()
+		]
+	}
 	/** Status effects */
 	private sectionStatus():ComponentChildren {
-		let c = this.creature!;
 		// TODO tooltips
 		return this.options.conditions && <div class="my-2">
-			{[...c.conditions].map(cc=>
-				<div class="creature-condition" style={{
+			{this.conditionsAndStatusEffects().map(cc=>
+				<div class="creature-status-effect" style={{
 					color: cc.icon.fg,
 					background: cc.icon.bg
 				}}>{cc.name}</div>
@@ -335,11 +339,10 @@ export class CreaturePanel extends DomComponent {
 	}
 
 	private sectionStatusCompact():ComponentChildren {
-		let c = this.creature!;
 		// TODO tooltips
 		return this.options.conditions && <Fragment>
-			{[...c.conditions].map(cc=>
-				<div class="condition-icon" style={{
+			{this.conditionsAndStatusEffects().map(cc=>
+				<div class="status-effect-icon" style={{
 					color: cc.icon.fg,
 					background: cc.icon.bg
 				}}>{cc.icon.text}</div>

@@ -13,14 +13,14 @@ export class TutorialImp extends Character  {
 		this.rgroup = RacialGroups.DEMON;
 		this.name = "imp";
 
-		this.level = 1;
-		this.naturalAttrs = [
+		this.stats.level = 1;
+		this.stats.naturalAttrs = [
 			4, 4, 3, 3,
 			2, 2, 4, 5
 		];
-		this.baseHpPerLevel = 2;
-		this.baseEpPerLevel = 1;
-		this.baseLpMax = 25;
+		this.stats.baseHpPerLevel = 2;
+		this.stats.baseEpPerLevel = 1;
+		this.stats.baseLpMax = 25;
 
 		this.body.eyes.color = Game.instance.data.colorByName("red", "eyes");
 		this.setSex('m');

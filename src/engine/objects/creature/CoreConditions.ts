@@ -13,19 +13,19 @@ export namespace CoreConditions {
 			bg: "#822"
 		},
 		combatOnly: true
-	})
+	});
 	export let Seduced = new CreatureCondition("/cd_seduced", {
 		name: "Seduced",
 		description: "This creature was seduced and won't fight.",
 		icon: {
-			text: "Sd",
+			text: "X",
 			fg: "#a8a",
 			bg: "#822"
 		},
 		combatOnly: true
 	});
 	export let Stealth = new CreatureCondition("/cd_stealth", {
-		name: "Sneaking",
+		name: "Stealth",
 		description: "Invisible to enemies. Can perform sneak attack. This creature Stealth skill is checked vs enemies' Spot.",
 		icon: {
 			text: "Sn",

@@ -20,6 +20,7 @@ export abstract class CombatAction<RESULT> {
 	get dpadLabel():string { return this.label }
 	get dpadClass():string { return "" }
 	public group:string = CombatActionGroups.AGOther
+	public removeStealth = true
 
 	abstract perform(cc: CombatController): Promise<RESULT>
 	protected abstract disabledReason(cc: CombatController): string;

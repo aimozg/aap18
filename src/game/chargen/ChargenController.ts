@@ -308,11 +308,11 @@ export class ChargenController {
 		// Class
 		// TODO class
 		// Attributes
-		for (let i = 0; i < this.attrs.length; i++) this.player.naturalAttrs[i] = this.attrs[i];
+		for (let i = 0; i < this.attrs.length; i++) this.player.stats.naturalAttrs[i] = this.attrs[i];
 		// Stats
-		this.player.naturalLib = this.lib;
-		this.player.naturalPerv = this.perv;
-		this.player.cor = this.cor;
+		this.player.stats.naturalLib = this.lib;
+		this.player.stats.naturalPerv = this.perv;
+		this.player.stats.cor = this.cor;
 		// Skills
 		for (let [id, value] of Object.entries(this.skills)) {
 			this.player.naturalSkills[id] = value;
@@ -321,6 +321,7 @@ export class ChargenController {
 		if (this.traitObject) this.player.addTrait(this.traitObject);
 
 		this.player.origin.adjustPlayer?.(this.player);
+		this.player.updateStats();
 	}
 	createRandomPlayer() {
 		this.internalUpdate = true;

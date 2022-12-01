@@ -1,10 +1,9 @@
 /*
  * Created by aimozg on 10.07.2022.
  */
-import {TAttribute, TAttributes} from "../rules/TAttribute";
+import {TAttribute} from "../rules/TAttribute";
 import {defaultGender, SEX_NONE, TGender, TSex} from "../rules/gender";
 import {IPronouns, Pronouns} from "../../game/data/text/gender";
-import {coerce} from "../math/utils";
 import {NaturalWeaponLib} from "../../game/data/items/NaturalWeaponLib";
 import {RacialGroup} from "../rules/RacialGroup";
 import {Game} from "../Game";
@@ -18,9 +17,12 @@ import {MaxLevel, XpPerLevel} from "../../game/xp";
 import {Loot} from "./Loot";
 import {CreatureCondition} from "./creature/CreatureCondition";
 import {Skill} from "./creature/Skill";
-import {CoreConditions} from "./creature/CoreConditions";
-
-let objectIdCounter = 0;
+import {CreatureController} from "../rules/CreatureController";
+import {CreatureStats} from "./creature/CreatureStats";
+import {StatusEffect, StatusEffectType} from "./creature/StatusEffect";
+import {BuffableStat, BuffableStatId} from "./creature/stats/BuffableStat";
+import {obj2map} from "../utils/collections";
+import {PartialRecord} from "../utils/types";
 
 export class CreatureTexts {
 	constructor(public readonly creature: Creature) {}
@@ -36,6 +38,28 @@ export class CreatureTexts {
 			case "h": return "futanari";
 		}
 	}
+}
+
+// TODO this could be handled better...
+export const AttributeToBuffableStat:Record<TAttribute,BuffableStatId> = {
+	[TAttribute.STR]: "STR",
+	[TAttribute.DEX]: "DEX",
+	[TAttribute.CON]: "CON",
+	[TAttribute.SPE]: "SPE",
+	[TAttribute.PER]: "PER",
+	[TAttribute.INT]: "INT",
+	[TAttribute.WIS]: "WIS",
+	[TAttribute.CHA]: "CHA",
+}
+export const BuffableStatToAttribute:PartialRecord<BuffableStatId,TAttribute> = {
+	"STR": TAttribute.STR,
+	"DEX": TAttribute.DEX,
+	"CON": TAttribute.CON,
+	"SPE": TAttribute.SPE,
+	"PER": TAttribute.PER,
+	"INT": TAttribute.INT,
+	"WIS": TAttribute.WIS,
+	"CHA": TAttribute.CHA,
 }
 
 export class Creature {
@@ -61,56 +85,19 @@ export class Creature {
 	//////////////////////
 	// Main Stats - Data
 	//////////////////////
-	level: number = 1;
-	xp: number = 0;
+	stats = new CreatureStats(this)
 
-	private _hp: number = 1;
-	get hp():number {
-		this.updateStats();
-		return this._hp;
-	}
-	set hp(value:number) {
-		if (!isFinite(value)) throw new Error("HP must be finite")
-		this._hp = value;
-	}
-	private _hpMax: number = 1;
-	get hpMax():number {
-		this.updateStats();
-		return this._hpMax;
-	}
-	baseHpPerLevel: number = 10;
+	get level(): number { return this.stats.level }
+	get xp(): number { return this.stats.xp }
 
-	private _ep:number = 1;
-	get ep():number {
-		this.updateStats();
-		return this._ep;
-	}
-	set ep(value:number) {
-		if (!isFinite(value)) throw new Error("EP must be finite")
-		this._ep = value;
-	}
-	private _epMax: number = 1;
-	get epMax():number {
-		this.updateStats();
-		return this._epMax;
-	}
-	baseEpPerLevel: number = 10;
+	get hp():number { return this.stats.hp }
+	get hpMax():number { return this.stats.hpMax }
 
-	private _lp:number = 0;
-	get lp():number {
-		this.updateStats();
-		return this._lp;
-	}
-	set lp(value:number) {
-		if (!isFinite(value)) throw new Error("LP must be finite")
-		this._lp = value;
-	}
-	private _lpMax: number = 1;
-	get lpMax():number {
-		this.updateStats();
-		return this._lpMax;
-	}
-	baseLpMax: number = 100;
+	get ep():number { return this.stats.ep }
+	get epMax():number { return this.stats.epMax }
+
+	get lp():number { return this.stats.lp  }
+	get lpMax():number { return this.stats.lpMax }
 
 	/////////////////////////
 	// Main Stats - Helpers
@@ -130,26 +117,35 @@ export class Creature {
 	//////////////////////
 	// Attributes - Data
 	//////////////////////
-	naturalAttrs: number[] = Array(TAttributes.length).fill(5);
-	naturalLib: number = 0;
-	naturalPerv: number = 0;
-	cor: number = 0;
+	// TODO move to CreatureStats
+	buffableStats = obj2map<BuffableStatId, BuffableStat>({
+		// TODO This could be organized better
+		"STR": new BuffableStat("STR"),
+		"DEX": new BuffableStat("DEX"),
+		"CON": new BuffableStat("CON"),
+		"SPE": new BuffableStat("SPE"),
+		"PER": new BuffableStat("PER"),
+		"INT": new BuffableStat("INT"),
+		"WIS": new BuffableStat("WIS"),
+		"CHA": new BuffableStat("CHA"),
+	});
+
+	naturalAttr(attr:TAttribute):number { return this.stats.naturalAttrs[attr] }
+	get naturalLib(): number { return this.stats.naturalLib }
+	get naturalPerv(): number { return this.stats.naturalPerv }
+	get cor(): number { return this.stats.cor }
 
 	/////////////////////////
 	// Attributes - Helpers
 	/////////////////////////
 
-	get lib(): number {
-		return this.naturalLib + this.cor
-	}
-	get perv(): number {
-		return Math.max(this.naturalPerv, this.cor);
-	}
+	get lib(): number { return this.ctrl.lib }
+	get perv(): number { return this.ctrl.perv }
 
-	attr(id: TAttribute): number {
-		return this.naturalAttrs[id];
-	}
-	attrMod(id: TAttribute): number { return this.attr(id) - 5 }
+	attr(id: TAttribute): number {  return this.ctrl.attr(id) }
+	attrMod(id: TAttribute): number { return this.ctrl.attrMod(id) }
+
+	attrBuffable(id: TAttribute): BuffableStat { return this.buffableStats.get(AttributeToBuffableStat[id])!}
 
 	/** Strength */
 	get str(): number { return this.attr(TAttribute.STR) }
@@ -195,28 +191,13 @@ export class Creature {
 	// Derived Stats //
 	//---------------//
 	/** Universal fortitude */
-	get fortitude():number {
-		// TODO other sources (base value, buffs)
-		return this.conMod
-	}
+	get fortitude():number { return this.ctrl.fortitude }
 	/** Universal reflex saving throw */
-	get reflex():number {
-		// TODO other sources (base value, buffs)
-		return this.dexMod
-	}
+	get reflex():number { return this.ctrl.reflex }
 	/** Universal willpower saving throw */
-	get willpower():number {
-		// TODO other sources (base value, buffs)
-		return this.wisMod
-	}
+	get willpower():number { return this.ctrl.willpower }
 	/** Universal damage reduction */
-	get dmgRedAll():number {
-		let value = 0;
-		// TODO or natural armor
-		value += this.bodyArmor?.asArmor?.drBonus ?? 0;
-		// TODO other sources (equipment, buffs)
-		return value
-	}
+	get dmgRedAll():number { return this.ctrl.dmgRedAll }
 
 	//--------------//
 	// Items - Data //
@@ -278,28 +259,33 @@ export class Creature {
 
 	// TODO make these computable
 	abilities: AbstractCombatAbility[] = [];
+	// TODO conditions should be map to number (counter) or max-aggregated buffable stat
 	conditions: Set<CreatureCondition> = new Set();
+	statusEffects = new Map<StatusEffectType,StatusEffect>();
 
 	//////////////////////
 	// Combat - Helpers //
 	//////////////////////
-	get isAlive():boolean {
-		return !this.hasCondition(CoreConditions.Defeated) && !this.hasCondition(CoreConditions.Seduced)
+	get isAlive():boolean { return this.ctrl.isAlive }
+	hasCondition(condition:CreatureCondition):boolean { return this.conditions.has(condition) }
+	setCondition(condition:CreatureCondition):void { this.ctrl.setCondition(condition) }
+	removeCondition(condition:CreatureCondition):boolean { return this.ctrl.removeCondition(condition); }
+
+	findStat(id:BuffableStatId):BuffableStat|undefined {
+		return this.buffableStats.get(id);
 	}
-	hasCondition(condition:CreatureCondition):boolean {
-		return this.conditions.has(condition)
-	}
-	setCondition(condition:CreatureCondition):void {
-		this.conditions.add(condition);
-	}
-	removeCondition(condition:CreatureCondition):boolean {
-		return this.conditions.delete(condition)
-	}
+
+	findStatusEffect(type:StatusEffectType): StatusEffect|undefined { return this.statusEffects.get(type) }
+	hasStatusEffect(type:StatusEffectType):boolean { return !!this.findStatusEffect(type) }
+	// TODO duration
+	createStatusEffect(type:StatusEffectType, power:number = 1):StatusEffect { return this.ctrl.createStatusEffect(type, power) }
+	removeStatusEffect(type:StatusEffectType):boolean { return this.ctrl.removeStatusEffect(type) }
 
 	//---------------//
 	// Skills - Data //
 	//---------------//
 
+	// TODO move to CreatureStats
 	/** key: skill id */
 	naturalSkills: Record<string, number> = {};
 
@@ -310,6 +296,7 @@ export class Creature {
 	naturalSkillValue(skill: Skill):number {
 		return this.naturalSkills[skill.resId] ?? 0;
 	}
+	// TODO move to CreatureController
 	skillValue(skill: Skill):number {
 		return this.naturalSkillValue(skill) + (skill.attr >= 0 ? this.attrMod(skill.attr) : 0)
 	}
@@ -331,6 +318,7 @@ export class Creature {
 		if (typeof trait === 'string') trait = Game.instance.data.trait(trait);
 		return this.traits.has(trait);
 	}
+	// TODO move to CreatureController
 	addTrait(trait:TraitType):void {
 		this.traits.add(trait)
 	}
@@ -346,34 +334,7 @@ export class Creature {
 	////////////////////////////////////////////////////////////////////////////////
 
 	constructor() {}
+	public readonly ctrl = new CreatureController(this)
 
-	updateStats() {
-		// hp max
-		let oldHpMax = this._hpMax;
-		let newHpMax = Math.max(1, this.level * (this.baseHpPerLevel + this.conMod));
-		if (newHpMax !== oldHpMax) {
-			if (this._hp > 0) {
-				this._hp = coerce(1, Math.round(this._hp * newHpMax / oldHpMax), newHpMax);
-			}
-			this._hpMax = newHpMax;
-		}
-		// ep max
-		let oldEpMax = this._epMax;
-		let newEpMax = Math.max(1, this.level * (this.baseEpPerLevel + this.conMod));
-		if (newEpMax !== oldEpMax) {
-			if (this._ep > 0) {
-				this._ep = coerce(1, Math.round(this._ep * newEpMax / oldEpMax), newEpMax);
-			}
-			this._epMax = newEpMax;
-		}
-		// lp max
-		let oldLpMax = this._lpMax;
-		let newLpMax = Math.max(1, this.baseLpMax);
-		if (newLpMax !== oldLpMax) {
-			if (this._lp > 0) {
-				this._lp = coerce(1, Math.round(this._lp * newLpMax / oldLpMax), newLpMax);
-			}
-			this._lpMax = newLpMax;
-		}
-	}
+	updateStats() { this.ctrl.updateStats(); }
 }

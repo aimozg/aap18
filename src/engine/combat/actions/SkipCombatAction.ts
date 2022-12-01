@@ -20,6 +20,7 @@ export class SkipCombatAction extends CombatAction<void> {
 	get dpadClass() { return "dpad-skip" }
 	tooltip = "Skip your turn"
 	group = CombatActionGroups.AGMove
+	removeStealth = false
 	async perform(cc: CombatController): Promise<void> {
 		cc.logAction(this.actor, "does nothing.", " ");
 		await cc.deduceAP(this.actor, this.actor.ap);

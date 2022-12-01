@@ -17,7 +17,6 @@ import {BattleGrid} from "./combat/BattleGrid";
 import {GridPos} from "./utils/gridutils";
 import {PlaceContext} from "./place/PlaceContext";
 import {Creature} from "./objects/Creature";
-import {atMost} from "./math/utils";
 import {Item} from "./objects/Item";
 import {InteractiveTextOutput} from "./text/output/InteractiveTextOutput";
 import {Inventory} from "./objects/Inventory";
@@ -199,7 +198,7 @@ export class GameController {
 	async restoreHp(creature:Creature, amount:number, output?:TextOutput) {
 		if (amount <= 0) return;
 		// TODO animate hp bar
-		creature.hp = atMost(creature.hp+amount, creature.hpMax);
+		creature.ctrl.modHp(amount);
 		if (output) {
 			output.selectActor(creature);
 			output.print(`<hl>[You]</hl> [are] healed (<text-hp>${amount}</text-hp>). `);
@@ -209,9 +208,7 @@ export class GameController {
 
 	recoverPlayer() {
 		let player = this.player;
-		player.hp = player.hpMax;
-		player.ep = player.epMax;
-		player.lp = 0;
+		player.ctrl.recoverStats();
 	}
 
 	async unequipToInventory(creature:Creature, item:Item) {

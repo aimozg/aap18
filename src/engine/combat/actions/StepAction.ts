@@ -29,6 +29,7 @@ export class StepAction extends CombatAction<StepActionResult> {
 	get dpadLabel(): string { return "Move"; }
 	get dpadClass() { return "dpad-move"}
 	group = CombatActionGroups.AGMove
+	removeStealth = false
 
 	tooltip: string
 	protected disabledReason(cc: CombatController): string {

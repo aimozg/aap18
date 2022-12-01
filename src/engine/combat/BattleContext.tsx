@@ -110,6 +110,7 @@ export class BattleContext implements GameContext {
 			await this.cc.performAction(action);
 		}
 	}
+	// TODO move animation to ctrl
 	animateValueChange(creature:Creature, key:CreatureValueId, newValue:number, durationMs:number) {
 		// TODO wait for half of the animation time? so animations won't stack on top of each other
 		let panel = [this.characterPanel, this.enemyPanel].find(p=>p.creature === creature);

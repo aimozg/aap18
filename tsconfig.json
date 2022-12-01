@@ -9,6 +9,8 @@
     "jsx": "react",
     "jsxFactory": "h",
     "strictNullChecks": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   }
 }
