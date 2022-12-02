@@ -121,12 +121,10 @@ export class BattleContext implements GameContext {
 		if (this.state === "closed") return;
 		this.characterPanel.update()
 		this.enemyPanel.update()
-		if (updateActions) {
-			if (this.state === "ended") {
-				this.battleActionsPanel.showFinishBattle();
-			} else {
-				this.battleActionsPanel.showActions(this.playerActions(), this.state === "pc")
-			}
+		if (this.state === "ended") {
+			this.battleActionsPanel.showFinishBattle();
+		} else if (updateActions) {
+			this.battleActionsPanel.showActions(this.playerActions(), this.state === "pc")
 		}
 		this.battlePanel.update()
 	}

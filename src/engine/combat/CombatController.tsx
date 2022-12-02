@@ -41,25 +41,6 @@ export type BattleState = "starting"|"flow"|"animation"|"npc"|"pc"|"ended"|"clos
  */
 export type BattleResult = "victory"|"defeat"|"draw"|"cancelled";
 
-export const enum CombatFlowResultType {
-	NOTHING_HAPPENED,
-	NEW_ROUND,
-	PLAYER_ACTION,
-	AI_ACTION,
-	COMBAT_ENDED
-}
-
-export const enum AttackRollResult {
-	/** critical miss (rolled 1) */
-	CRITICAL_MISS,
-	/** ordinary miss */
-	MISS,
-	/** ordinary hit */
-	HIT,
-	/** critical hit, confirmed */
-	CRITICAL_HIT
-}
-
 export let TicksPerRound = 1000;
 export let ApToAct = 1000;
 export let AnimationTime = 500;

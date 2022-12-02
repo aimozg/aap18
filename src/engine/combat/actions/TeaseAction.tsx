@@ -24,6 +24,7 @@ export class TeaseAction extends CombatAction<TeaseResult> {
 	}
 	protected disabledReason(cc: CombatController): string {
 		// TODO impossible if actor has condition, or target is invulnerable/dead
+		if (this.target.lp >= this.target.lpMax) return "Already at max Lust"
 		return "";
 	}
 	label = "Tease "+this.target.name
@@ -39,11 +40,10 @@ export class TeaseAction extends CombatAction<TeaseResult> {
 			await cc.deduceAP(attacker, ap)
 		}
 		// TODO animations
-		// TODO preference&perversion-based results
+		// TODO success depends on preferences matching & perversion, damage depends on charisma & perversion
 		let attack = CombatRules.teaseAttackVs(attacker, target)
 		let defense = CombatRules.teaseDefenseVs(target, attacker)
 		let toHit = defense - attack
-		// TODO charisma
 		let attackRoll = cc.rng.d20()
 		let damage = CombatRules.teaseDamageVs(attacker, target)
 		let canCrit = true
