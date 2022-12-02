@@ -32,7 +32,7 @@ export class ResourceManager {
 		data.racialGroups.clear();
 		data.racialGroups.registerMany(idata.racialGroups)
 		data.scenes.clear();
-		for (let list of idata.scenes) data.scenes.registerMany(list);
+		data.scenes.registerMany(idata.scenes);
 		data.skills.clear();
 		data.skills.registerMany(CoreSkills.list);
 		data.skills.registerMany(idata.skills, true);

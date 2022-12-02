@@ -28,7 +28,7 @@ export interface ImportedGameData {
 	playerOrigins: GDPlayerOrigin[];
 	racialGroups: RacialGroup[];
 	rgHumanoid: RacialGroup;
-	scenes: Scene[][];
+	scenes: Scene[];
 	skills: Skill[];
 	tiles: GDTileType[];
 	traits: TraitType[];
@@ -162,6 +162,9 @@ export class GameDataBuilder {
 	addColors(colors:GDColor[]):void {
 		this.data.colors.push(...colors);
 	}
+	addPlace(place: Place): void {
+		this.data.places.push(place);
+	}
 	addPlaces(...places: Place[]): void {
 		this.data.places.push(...places);
 	}
@@ -171,8 +174,11 @@ export class GameDataBuilder {
 	addRacialGroups(...groups: RacialGroup[]): void {
 		this.data.racialGroups.push(...groups);
 	}
+	addScene(scene: Scene): void {
+		this.data.scenes.push(scene);
+	}
 	addScenes(scenes: Scene[]): void {
-		this.data.scenes.push(scenes);
+		this.data.scenes.push(...scenes);
 	}
 	addSkills(skills: Skill[]): void {
 		this.data.skills.push(...skills);
@@ -193,7 +199,27 @@ export class GameDataBuilder {
 	buildPlace(def: PlaceDef): void {
 		this.addPlaces(Place.build(def))
 	}
-	buildScenes(namespace: string, scenes: Record<string, SceneDef>): void {
-		this.addScenes(buildScenes(namespace, scenes))
+	buildScenes<NAMES extends string>(
+		namespace: string,
+		sceneDefs: Record<NAMES, SceneDef>
+	): Record<NAMES, Scene> {
+		let scenes = buildScenes(namespace, sceneDefs);
+		this.addScenes(Object.values(scenes));
+		return scenes;
 	}
+	addSceneLib(lib:ISceneLib) {
+		for (let v of Object.values(lib)) {
+			if (v instanceof Scene) {
+				this.addScene(v);
+			} else if (v instanceof Place) {
+				this.addPlace(v);
+			} else {
+				this.addSceneLib(v);
+			}
+		}
+	}
+}
+
+export interface ISceneLib {
+	[index:string]: Scene|Place|ISceneLib;
 }

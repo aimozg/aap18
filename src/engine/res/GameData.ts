@@ -40,14 +40,16 @@ export class GameData {
 	}
 
 	readonly places = new ResLib<Place>(Symbols.ResTypePlace, "Place");
-	place(id: string): Place { return this.places.get(id) }
+	place(place: string|Place): Place {
+		return place instanceof Place ? place : this.places.get(place)
+	}
 
 	readonly racialGroups = new ResLib<RacialGroup>(Symbols.ResTypeRacialGroup, "RacialGroup");
 	racialGroup(id: string): RacialGroup { return this.racialGroups.get(id) }
 
 	readonly scenes = new ResLib<Scene>(Symbols.ResTypeScene, "Scene");
 	scene(scene: string|Scene): Scene {
-		return typeof scene === 'string' ? this.scenes.get(scene) : scene
+		return scene instanceof Scene ? scene : this.scenes.get(scene)
 	}
 	sceneOrNull(id: string): Scene|null { return this.scenes.getOrNull(id) }
 

@@ -14,7 +14,7 @@ import {gdRegisterTiles} from "./data/tiles";
 import {gdRegisterSkills} from "./data/skills";
 
 export async function loadGameData():Promise<ImportedGameData> {
-	let startingSceneId = '/000_intro';
+	let startingSceneId = '/sc000_intro';
 
 	let gd = new GameDataBuilder({
 		startingSceneId

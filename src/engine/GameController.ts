@@ -129,11 +129,11 @@ export class GameController {
 
 	/**
 	 * Teleport player to specified location
-	 * @param placeId
+	 * @param placeRef
 	 */
-	placePlayer(placeId:string) {
-		logger.debug("placePlayer {}", placeId);
-		let place = this.game.data.place(placeId);
+	placePlayer(placeRef:string|Place) {
+		logger.debug("placePlayer {}", placeRef);
+		let place = this.game.data.place(placeRef);
 		this.player.place.onLeave();
 		this.player.place = place;
 		place.onEnter();

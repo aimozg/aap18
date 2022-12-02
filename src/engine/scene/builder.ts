@@ -40,8 +40,14 @@ export function buildScene(namespace: string, id: string, def: SceneDef): Scene 
 	return new Scene(namespace + "_" + id, sceneFn);
 }
 
-export function buildScenes(namespace:string, scenes:Record<string,SceneDef>): Scene[] {
-	return Object.entries(scenes).map(([id,def])=>{
-		return buildScene(namespace, id, def);
-	})
+export function buildScenes<NAMES extends string>(
+	namespace:string, sceneDefs:Record<NAMES,SceneDef>
+): Record<NAMES,Scene> {
+
+	let scenes = {} as Record<NAMES,Scene>;
+	for (let id in sceneDefs) {
+		let def = sceneDefs[id];
+		scenes[id] = buildScene(namespace, id, def)
+	}
+	return scenes;
 }

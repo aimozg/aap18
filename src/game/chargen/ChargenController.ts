@@ -322,6 +322,7 @@ export class ChargenController {
 
 		this.player.origin.adjustPlayer?.(this.player);
 		this.player.updateStats();
+		this.player.ctrl.recoverStats();
 	}
 	createRandomPlayer() {
 		this.internalUpdate = true;

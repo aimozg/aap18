@@ -15,7 +15,7 @@ export interface PlaceDef {
 	id: string;
 	name: string | ((gc: GameController) => string);
 	description: string | ((gc: GameController) => string);
-	scene: string | ((gc: GameController) => string);
+	scene: string | Scene | ((gc: GameController) => string);
 	encounters?: EncounterPoolDef|EncounterDef[]|string;
 	sidebar?: string | ((gc: GameController) => string | VNode);
 	onEnter?: (gc: GameController) => void;
@@ -100,9 +100,9 @@ export class Place implements IResource {
 		} else if (!def.encounters) {
 			encounters = null;
 		} else if (Array.isArray(def.encounters)) {
-			encounters = new EncounterPool("/$place"+def.id, def.encounters.map(e=>Encounter.build(e)));
+			encounters = new EncounterPool("/$place"+def.id, def.encounters.map(e=>Encounter.build(def.id, e)));
 		} else {
-			encounters = new EncounterPool(def.id, def.encounters.encounters.map(e=>Encounter.build(e)));
+			encounters = new EncounterPool(def.id, def.encounters.encounters.map(e=>Encounter.build(def.id, e)));
 		}
 
 		let props: PlaceProps = {
@@ -110,7 +110,7 @@ export class Place implements IResource {
 			displayName: wrapValue(def.name),
 			description: wrapValue(def.description),
 			sidebarDescription: wrapValueDef(def.sidebar, h("h1", null, def.name)),
-			scene: wrapValue(def.scene),
+			scene: wrapValue((def.scene instanceof Scene) ? def.scene.resId : def.scene),
 			onEnter: wrapFn(def.onEnter),
 			onLeave: wrapFn(def.onLeave),
 			onTime: wrapFn(def.onTime),
@@ -121,4 +121,8 @@ export class Place implements IResource {
 
 		return new Place(def.id, props);
 	}
+}
+
+export function buildPlace(def: PlaceDef): Place {
+	return Place.build(def);
 }
