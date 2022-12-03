@@ -30,7 +30,7 @@ export class Encounter {
 
 	static build(prefix:string, def: EncounterDef): Encounter {
 		let scene: Scene|string;
-		if (typeof def.scene === 'string') {
+		if (typeof def.scene === 'string' || def.scene instanceof Scene) {
 			scene = def.scene;
 		} else {
 			scene = buildScene(`${prefix}$encounters`, def.name, def.scene);
@@ -70,7 +70,7 @@ export interface EncounterDef {
 	name: string;
 	chance?: number;
 	when?: (gc: GameController) => boolean;
-	scene: SceneDef | string;
+	scene: Scene | SceneDef | string;
 }
 
 export interface EncounterPoolDef {

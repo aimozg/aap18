@@ -6,7 +6,7 @@ import {GameContext} from "../state/GameContext";
 import {GameScreenLayout} from "../ui/screens/GameScreen";
 import {CreaturePanel, CreatureValueId} from "../../game/ui/CreaturePanel";
 import {Deferred} from "../utils/Deferred";
-import {AnimationTime, BattleResult, BattleState, CombatController} from "./CombatController";
+import {AnimationTimeFast, BattleResult, BattleResultType, BattleState, CombatController} from "./CombatController";
 import {milliTime} from "../utils/time";
 import {coerce} from "../math/utils";
 import {LogPanel} from "../ui/panels/LogPanel";
@@ -19,6 +19,8 @@ import {BattleGrid} from "./BattleGrid";
 import {h} from "preact";
 import {Fragment} from "preact/compat";
 import {BattleActionsPanel} from "../ui/panels/BattleActionsPanel";
+import {Scene, SceneFn} from "../scene/Scene";
+import {CoreConditions} from "../objects/creature/CoreConditions";
 
 export let MillisPerRound = 1000;
 
@@ -31,6 +33,20 @@ export interface BattleMapOptions {
 	cells: string[];
 	mappings?: Record<string,BattleMapMapping>;
 }
+export type BattleVictoryOptions = {
+	victory: string|Scene;
+} | {
+	lustVictory: string|Scene;
+	hpVictory: string|Scene;
+}
+export type BattleDefeatOptions = {
+	defeat: string|Scene;
+} | {
+	lustDefeat: string|Scene;
+	hpDefeat: string|Scene;
+}
+export type BattleThenOptions = BattleVictoryOptions & BattleDefeatOptions;
+export type BattleThen = null | string | Scene | SceneFn | BattleThenOptions;
 export interface BattleOptions {
 	player?: PlayerCharacter;
 	party?: Creature[];
@@ -38,6 +54,14 @@ export interface BattleOptions {
 	ambushed?:'party'|'enemies';
 
 	map?: BattleMapOptions;
+	/**
+	 * After battle:
+	 * * `null` - do nothing, return to place menu
+	 * * `(ctx:SceneContext)=>{}` - play scene
+	 * * sceneId | Scene - play scene
+	 * * { victory, lustVictory, hpVictory, defeat, lustDefeat, hpDefeat } - play scene depending on battle result
+	 */
+	then: BattleThen;
 }
 export interface BattleSettings {
 	player: PlayerCharacter;
@@ -46,12 +70,13 @@ export interface BattleSettings {
 
 	grid: BattleGrid;
 	ambushed:'party'|'enemies'|undefined;
+	afterEnd: (battle:BattleContext)=>Promise<void>;
 }
 export class BattleContext implements GameContext {
 	constructor(
 		public settings: BattleSettings
 	) {
-		this.cc = new CombatController(this)
+		this.cc = new CombatController(this);
 		this.battlePanel.init();
 		this.enemyPanel = new CreaturePanel(this.cc.enemies[0]);
 		this.enemyPanel.options.money = false;
@@ -59,10 +84,23 @@ export class BattleContext implements GameContext {
 		this.characterPanel.collapse();
 		this.enemyPanel.collapse();
 	}
+	toString() { return `[BattleContext ${this.state} ${this.resultType}]`}
+
+	get party() { return this.cc.party }
+	get enemies() { return this.cc.enemies }
 
 	get state(): BattleState { return this.cc.state; }
 
 	get result():BattleResult { return this.cc.result }
+	get resultType():BattleResultType { return this.cc.result.type }
+
+	get isVictory() { return this.resultType === "victory" }
+	get isLustVictory() { return this.isVictory && this.result.lust }
+	get isHpVictory() { return this.isVictory && !this.result.lust }
+	get isDefeat() { return this.resultType === "defeat" }
+	get isLustDefeat() { return this.isDefeat && this.result.lust }
+	get isHpDefeat() { return this.isDefeat && !this.result.lust }
+	get isDraw() { return this.resultType === "draw" }
 
 	private readonly charPanelWasCollapsed: boolean;
 
@@ -169,15 +207,20 @@ export class BattleContext implements GameContext {
 			case "closed":
 				this.characterPanel.collapsed = this.charPanelWasCollapsed;
 				this._promise.resolve(this);
-				Game.instance.gameController.showGameScreen()
+				Game.instance.gameController.battleEnded(this);
 				return;
 			case "flow":
 				this.scheduleTick();
 				break;
 			case "npc":
-				setTimeout(async ()=>{
-					await this.cc.advanceTime(0);
-				}, AnimationTime);
+				if (this.cc.nextActor?.hasCondition(CoreConditions.Unaware) || !this.cc.nextActor?.canAct) {
+					this.scheduleTick()
+				} else {
+					// "thinking" pause
+					setTimeout(async () => {
+						await this.cc.advanceTime(0);
+					}, AnimationTimeFast);
+				}
 				break;
 			default:
 				break;

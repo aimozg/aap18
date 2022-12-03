@@ -16,6 +16,7 @@ import {KeyCodes} from "../ui/KeyCodes";
 import {Inventory} from "../objects/Inventory";
 import {Item} from "../objects/Item";
 import {InteractiveTextOutput} from "../text/output/InteractiveTextOutput";
+import {Creature} from "../objects/Creature";
 
 export interface ChoiceOptions {
 	/** Button text */
@@ -68,21 +69,19 @@ const logger = LogManager.loggerFor("engine.scene.SceneContext");
 
 export class SceneContext implements GameContext {
 	constructor(
-		sceneId: string,
+		private _sceneId: string,
+		private _sceneFn: SceneFn,
 		public output: InteractiveTextOutput
 	) {
-		this._scene = this.game.data.scene(sceneId);
 	}
 
 	toString() { return `SceneContext(${this.sceneId})`}
 
+	// TODO do we need it? the original intent was to invoke a dialogue and use its result
 	lastValue: string = '';
 	readonly characterPanel = Game.instance.screenManager.sharedPlayerPanel;
 
-	public get sceneId(): string { return this.scene.resId }
-
-	private _scene: Scene;
-	public get scene(): Scene { return this._scene }
+	public get sceneId(): string { return this._sceneId }
 
 	private _ended = false;
 	private nextButtons: InternalChoiceData[] = [];
@@ -169,7 +168,9 @@ export class SceneContext implements GameContext {
 
 	async play(scene: string | Scene, append: boolean = false): Promise<string> {
 		logger.debug("play {}", scene);
-		this._scene = this.game.data.scene(scene);
+		scene = this.game.data.scene(scene);
+		this._sceneId = scene.resId;
+		this._sceneFn = scene.sceneFn.bind(scene);
 		return this.playCurrentScene(append);
 	}
 
@@ -177,7 +178,7 @@ export class SceneContext implements GameContext {
 		this._dirty = true;
 
 		await this.beginScreen(append);
-		await this.scene.execute(this);
+		await this._sceneFn(this);
 		await this.flush();
 
 		return this.promise;
@@ -187,6 +188,16 @@ export class SceneContext implements GameContext {
 		logger.trace("clear")
 		this._dirty = true;
 		this.output.flip();
+	}
+
+	/**
+	 * Set parser actor (the object described by tags). Previously selected actor can be restored with `deselectActor`
+	 */
+	selectActor(actor:Creature) {
+		this.output.selectActor(actor);
+	}
+	deselectActor() {
+		this.output.deselectActor();
 	}
 
 	say(text: string, parseTags: boolean = true) {
@@ -283,6 +294,7 @@ export class SceneContext implements GameContext {
 		})
 	}
 
+	// TODO make it return AmbushResult
 	async ambush(def: AmbushDef) {
 		await AmbushRules.doAmbush(def, this)
 	}
@@ -295,6 +307,10 @@ export class SceneContext implements GameContext {
 			await this.flipPage("Transfer");
 			await this.gc.openTransferMenu(Inventory.wrap(items));
 		}
+	}
+
+	impossible() {
+		this.say("<text-error>This should never happen. Report a bug.</text-error>");
 	}
 
 	endNow(value?: string) {
@@ -321,6 +337,15 @@ export class SceneContext implements GameContext {
 			}
 		})
 	}
+
+	get lastBattle() { return this.state.lastBattle }
+	get lastBattleResult() { return this.state.lastBattle?.result ?? {type:"draw",lust:false} }
+	get lastBattleVictory() { return this.state.lastBattle?.isVictory }
+	get lastBattleLustVictory() { return this.state.lastBattle?.isLustVictory }
+	get lastBattleHpVictory() { return this.state.lastBattle?.isHpVictory }
+	get lastBattleDefeat() { return this.state.lastBattle?.isDefeat }
+	get lastBattleLustDefeat() { return this.state.lastBattle?.isLustDefeat }
+	get lastBattleHpDefeat() { return this.state.lastBattle?.isHpDefeat }
 
 	async startBattleAndContinue(options: BattleOptions): Promise<BattleContext> {
 		logger.info("startBattleAndContinue {}", options);
@@ -350,5 +375,7 @@ export class SceneContext implements GameContext {
 
 	get rng(): Random { return this.gc.rng }
 
+	d6(): number { return this.rng.d6() }
 	d20(): number { return this.rng.d20() }
+	either<T>(...options:T[]):T { return this.rng.either(...options) }
 }

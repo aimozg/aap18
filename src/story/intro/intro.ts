@@ -42,11 +42,11 @@ export let IntroScenes = buildScenes(namespace, {
 		if (ctx.player.originId === "champion") {
 			ctx.say("There is no return portal, as if the one you went through was one-way. ")
 		}
-		ctx.say("[pg] You notice a ruined stone building nearby. Far away, you see mountiains to the north and dense forest to the west. To your east and south you see nothing but scarce vegetation until the horizon. ")
+		ctx.say("[pg] You notice a ruined stone building nearby. Far away, you see mountains to the north and dense forest to the west. To your east and south you see nothing but scarce vegetation until the horizon. ")
 
 		await ctx.flipPage("Check the ruins");
 
-		ctx.say("You cautiously approach the building. It appears to be three-story tower, destroyed many years ago. There is some noise inside. ");
+		ctx.say("You cautiously approach the building. It appears to be a three-story tower, destroyed many years ago. There is some noise inside. ");
 
 		ctx.say("<p class='help-block'>When you enter a room with monster(s), an Ambush skill check is rolled. If you succeed, you can choose an action against an unaware enemy. If you fail, you fight. If you fail by 10 or more, you're the one ambushed! </p>")
 
@@ -99,6 +99,20 @@ export let IntroScenes = buildScenes(namespace, {
 									'1': {tile: '/floor', spawn: 'enemy'},
 									'2': {tile: '/floor', spawn: 'party'},
 								}
+							},
+							then(ctx) {
+								// TODO
+								ctx.say(`TODO write post tutorial battle content.
+								[pg]
+								battle result is: ${JSON.stringify(ctx.lastBattleResult)}
+								
+								victory=${ctx.lastBattleVictory}
+								lustVictory=${ctx.lastBattleLustVictory}
+								hpVictory=${ctx.lastBattleHpVictory}
+								defeat=${ctx.lastBattleDefeat}
+								lustDefeat=${ctx.lastBattleLustDefeat}
+								hpDefeat=${ctx.lastBattleHpDefeat}`);
+								ctx.endButton()
 							}
 						})
 					}

@@ -39,7 +39,11 @@ export type BattleState = "starting"|"flow"|"animation"|"npc"|"pc"|"ended"|"clos
  * * "draw" - player ran away, both KO'd, or battle was interrupted
  * * "cancelled" - battle did not finish properly
  */
-export type BattleResult = "victory"|"defeat"|"draw"|"cancelled";
+export type BattleResultType = "victory"|"defeat"|"draw"|"cancelled";
+export interface BattleResult {
+	type: BattleResultType;
+	lust:boolean;
+}
 
 export let TicksPerRound = 1000;
 export let ApToAct = 1000;
@@ -96,9 +100,10 @@ export class CombatController {
 		}
 	}
 
-	private nextActor:Creature|null = null;
+	private _nextActor:Creature|null = null;
+	get nextActor(): Creature | null { return this._nextActor; }
 
-	private _result:BattleResult = "cancelled";
+	private _result:BattleResult = {type:"cancelled", lust:false};
 	get result(): BattleResult { return this._result }
 
 	public roundNo = 0;
@@ -137,13 +142,15 @@ export class CombatController {
 		logger.info("battleEnd")
 		this.state = "ended";
 		if (this.partyLost && this.enemiesLost) {
-			this._result = "draw"
+			this._result.type = "draw"
 		} else if (this.partyLost) {
-			this._result = "defeat"
+			this._result.type = "defeat"
+			this._result.lust = this.party.every(p=>p.hasCondition(CoreConditions.Seduced));
 		} else if (this.enemiesLost) {
-			this._result = "victory"
+			this._result.type = "victory"
+			this._result.lust = this.enemies.every(p=>p.hasCondition(CoreConditions.Seduced));
 		} else {
-			this._result = "draw"
+			this._result.type = "draw"
 		}
 	}
 
@@ -169,7 +176,7 @@ export class CombatController {
 	async advanceTime(maxDT: number) {
 		logger.trace("advanceTime {} {}.{} +{}", this.state, this.roundNo, this.tickTime, maxDT)
 		if (this.state === "npc") {
-			await this.performAIAction(this.nextActor!);
+			await this.performAIAction(this._nextActor!);
 			return;
 		}
 		if (this.state !== "flow") {
@@ -192,10 +199,10 @@ export class CombatController {
 				if (nextActor instanceof PlayerCharacter) {
 					// TODO if player-controller, actually
 					this.state = "pc"
-					this.nextActor = nextActor
+					this._nextActor = nextActor
 					return
 				} else {
-					this.nextActor = nextActor;
+					this._nextActor = nextActor;
 					this.state = "npc";
 					return
 				}
@@ -267,9 +274,7 @@ export class CombatController {
 
 	async performAIAction(actor: Creature) {
 		logger.debug("performAIAction {}", actor.name)
-		let action = actor.hasCondition(CoreConditions.Unaware)
-			? new SkipCombatAction(actor)
-			: actor.ai.performAI(this);
+		let action = actor.canAct ? actor.ai.performAI(this) : new SkipCombatAction(actor);
 		await this.performAction(action);
 		logger.debug("/performAIAction {}", actor.name)
 	}

@@ -4,6 +4,7 @@
 import {PlayerCharacter} from "../objects/creature/PlayerCharacter";
 import {LogManager} from "../logging/LogManager";
 import {GameContext, NullGameContext} from "./GameContext";
+import {BattleContext} from "../combat/BattleContext";
 
 const logger = LogManager.loggerFor("engine.state.StateManager");
 
@@ -22,6 +23,7 @@ export class StateManager {
 	private _player: PlayerCharacter;
 	get player(): PlayerCharacter { return this._player; }
 	private _gcStack: GameContext[] = [ new NullGameContext() ];
+	lastBattle: BattleContext|null = null;
 
 	//////////////////
 	// Mass managers
@@ -31,6 +33,7 @@ export class StateManager {
 		logger.info("clearGameState");
 		this._player = new PlayerCharacter();
 		this._gcStack = [new NullGameContext()];
+		this.lastBattle = null;
 	}
 
 	importGameState(data: object) {

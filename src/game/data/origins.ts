@@ -18,9 +18,10 @@ export function gdRegisterOrigins(gd: GameDataBuilder) {
 		name: 'Native',
 		shortDesc: "a native to this world",
 		description:
-			"You're an orphan, native to this world who spend their early life in a poor village. Your first attempt to scavenge a magical ruin for riches went badly, and you've triggered some kind of teleportation trap. You don't recognize the new landscape and even the stars and seasons seem to be off." +
+			"You're an orphan, native to this world who spent their early life in a poor village. Your first attempt to scavenge a magical ruin for riches went badly, and you've triggered some kind of teleportation trap. You don't recognize the new landscape and even the stars and seasons seem to be off." +
 			"\n\n" +
-			"<i>Extra starting races: Halfkins and Beastkins. <b>(NOT IMPLEMENTED)</b><br/>" +
+			"<i>" +
+			// "Extra starting races: Halfkins and Beastkins. <b>(NOT IMPLEMENTED)</b><br/>" +
 			"Can start as a futanari. <br/>" +
 			"Bonus starting skills. <b>(NOT IMPLEMENTED)</b><br/>" +
 			"Basic starting items. <b>(NOT IMPLEMENTED)</b></i>",
@@ -30,9 +31,10 @@ export function gdRegisterOrigins(gd: GameDataBuilder) {
 		name: 'Champion',
 		shortDesc: "a champion from other world",
 		description:
-			"You're a knight who led the purge of a village of Notingnam, a dark village with foul traditions, buried deep in the wilds. After executing demon-worshipping heretics, you've discovered a portal to some kind of Demon Realm. You and your loyal followers entered it bravely, but you were the only one who passed through. " +
+			"You're a knight who led the purge of a village of Notingnam, a dark village with foul traditions, buried deep in the wilds. After executing demon-worshiping heretics, you've discovered a portal to some kind of Demon Realm. You and your loyal followers entered it bravely, but you were the only one who passed through. " +
 			"\n\n" +
-			"<i>Extra starting races: Elf, Half-Elf, Dwarf. <b>(NOT IMPLEMENTED)</b><br/>" +
+			"<i>" +
+			// "Extra starting races: Elf, Half-Elf, Dwarf. <b>(NOT IMPLEMENTED)</b><br/>" +
 			"Bonus XP: start at level 2.<br/>" +
 			"Good starting equipment. <b>(NOT IMPLEMENTED)</b></i>",
 		introText: "You're a knight who led the purge of a village of Notingnam, a dark village with foul traditions, buried deep in the wilds. After executing demon-worshipping heretics, you've discovered a portal to some kind of Demon Realm. You and your loyal followers entered it bravely...",

@@ -4,9 +4,10 @@
 
 import {Creature} from "../objects/Creature";
 import {ChoiceData, SceneContext} from "./SceneContext";
-import {SceneFn} from "./Scene";
+import {Scene, SceneFn} from "./Scene";
 import {substitutePattern} from "../utils/string";
 import {CoreSkills} from "../objects/creature/CoreSkills";
+import {CombatController} from "../combat/CombatController";
 
 export interface EAmbushTags {
 	// Target types
@@ -46,6 +47,13 @@ export interface AmbushDef {
 
 	/** Threat name (ex. "a stray demon") to be used in auto-generated texts*/
 	threatName?: string;
+
+	/** If there was a battle, call after it's ended (no matter result) */
+	onCombatEnd?: (cc:CombatController)=>Promise<void>;
+	/** If there was a battle and player won */
+	victory?: Scene|SceneFn;
+	/** If there was a battle and player lost */
+	defeat?: Scene|SceneFn;
 
 	// For custom texts/events:
 
@@ -157,8 +165,9 @@ export namespace AmbushRules {
 	}
 	export async function defaultSuccessSneakAttack(def: AmbushDef, ctx:SceneContext) {
 		ctx.endNowAndBattle({
-			enemies:def.monsters,
-			ambushed: "enemies"
+			enemies: def.monsters,
+			ambushed: "enemies",
+			then: ctx=>postBattle(def, ctx)
 		})
 	}
 	export async function defaultSuccessLeave(def: AmbushDef, ctx:SceneContext) {
@@ -178,8 +187,29 @@ export namespace AmbushRules {
 	export async function doAmbushFail(def: AmbushDef, ctx: SceneContext, critFail: boolean) {
 		ctx.endAndBattle({
 			enemies:def.monsters,
-			ambushed: critFail ? "party" : undefined
+			ambushed: critFail ? "party" : undefined,
+			then: ctx=>postBattle(def, ctx)
 		});
+	}
+
+	export async function postBattle(def: AmbushDef, ctx:SceneContext) {
+		if (ctx.lastBattleVictory) {
+			await playScene(ctx, def.victory)
+		} else if (ctx.lastBattleDefeat) {
+			await playScene(ctx, def.defeat)
+		}
+		// TODO if retreat
+	}
+
+	async function playScene(ctx: SceneContext, scene:Scene|SceneFn|undefined) {
+		if (scene) {
+			if (scene instanceof Scene) {
+				await ctx.play(scene)
+			} else {
+				await scene(ctx)
+			}
+		}
+		ctx.endNow()
 	}
 
 	export async function doAmbush(def: AmbushDef, ctx: SceneContext) {
@@ -202,7 +232,7 @@ export namespace AmbushRules {
 		} else {
 			resultType = "critFail"
 			if (!def.silent) ctx.say(`<p class='text-roll-skill text-roll-critfail'>\\[${rollText}: Critical Failure\\]</p>`)
-			result = def.fail ?? defaultCritFailText(def, ctx);
+			result = def.critFail ?? def.fail ?? defaultCritFailText(def, ctx);
 		}
 
 		if (typeof result === "function") {
@@ -210,7 +240,9 @@ export namespace AmbushRules {
 			await result(ctx);
 		} else {
 			// Print text and apply default result
+			if (def.monsters.length > 0) ctx.selectActor(def.monsters[0]);
 			ctx.say(result);
+			if (def.monsters.length > 0) ctx.deselectActor();
 			if (resultType === 'success') {
 				await doAmbushSuccess(def, ctx)
 			} else {

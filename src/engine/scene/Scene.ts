@@ -12,7 +12,7 @@ export class Scene implements IResource {
 
 	constructor(
 		public readonly resId: string,
-		private sceneFn: SceneFn
+		public readonly sceneFn: SceneFn
 	) {}
 
 	async execute(context:SceneContext) {

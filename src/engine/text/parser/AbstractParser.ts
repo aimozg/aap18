@@ -21,7 +21,7 @@ const LA_ENTITY = /^&(?:\w+|#x[a-fA-F\d]+|#\d+);/;
 /** Escaped control char */
 const LA_ESCAPED = /^\\./;
 /**
- * Simple `[parsertag]` or `[tag arguments]`.
+ * Simple `[parsertag]` or `[tag:arguments]`.
  * Group 1 = tag name, group 2 = tag arguments (including any leading whitespace)
  */
 const LA_SIMPLETAG = /^\[([\w-]+:?)([^\]]*)\]/;

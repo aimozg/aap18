@@ -21,6 +21,7 @@ import {Item} from "./objects/Item";
 import {InteractiveTextOutput} from "./text/output/InteractiveTextOutput";
 import {Inventory} from "./objects/Inventory";
 import {InventoryScreen, InventoryScreenOptions} from "./ui/screens/InventoryScreen";
+import {Scene, SceneFn} from "./scene/Scene";
 
 const logger = LogManager.loggerFor("engine.GameController");
 
@@ -72,9 +73,16 @@ export class GameController {
 		this.showGameScreen()
 	}
 
-	async playScene(scene:string):Promise<string> {
-		logger.info("playScene {}", scene);
-		let context:SceneContext = new SceneContext(scene, new InteractiveTextOutput(new ScenePanel()));
+	async playScene(scene:string|Scene):Promise<string> {
+		scene = this.game.data.scene(scene);
+		return this.playSceneImpl(scene.resId, scene.sceneFn);
+	}
+	async playSceneFn(fn:SceneFn):Promise<string> {
+		return this.playSceneImpl("<ephemeral scene>", fn)
+	}
+	private async playSceneImpl(sceneId:string, sceneFn:SceneFn):Promise<string> {
+		logger.info("playSceneFn {}", sceneId);
+		let context:SceneContext = new SceneContext(sceneId, sceneFn, new InteractiveTextOutput(new ScenePanel()));
 		this.state.pushGameContext(context);
 		this.showGameScreen();
 		return context.promise;
@@ -110,6 +118,7 @@ export class GameController {
 			return;
 		}
 		if (context instanceof PlaceContext) {
+			this.state.lastBattle = null;
 			if (context.place === Place.Limbo) {
 				// TODO rescue?
 				throw new Error("Player stuck in limbo")
@@ -182,17 +191,54 @@ export class GameController {
 			// TODO generate random grid here
 		}
 
+		let afterEnd = async (battle:BattleContext)=>{
+			logger.debug("battle {} afterEnd",battle)
+			let then = options.then;
+			if (!then) return;
+			if (typeof then === 'string' || then instanceof Scene) {
+				await this.playScene(then);
+			} else if (typeof then === 'function') {
+				await this.playSceneFn(then);
+			} else {
+				if (battle.isDefeat) {
+					if ('defeat' in then) {
+						await this.playScene(then.defeat)
+					} else if (battle.isLustDefeat) {
+						await this.playScene(then.lustDefeat)
+					} else {
+						await this.playScene(then.hpDefeat)
+					}
+				} else {
+					// TODO retreat, draw
+					if ('victory' in then) {
+						await this.playScene(then.victory)
+					} else if (battle.isLustDefeat) {
+						await this.playScene(then.lustVictory)
+					} else {
+						await this.playScene(then.hpVictory)
+					}
+				}
+			}
+		}
 		let settings: BattleSettings = {
 			player: options.player ?? this.player,
 			party: party,
 			enemies: enemies,
 			grid,
-			ambushed: options.ambushed
+			ambushed: options.ambushed,
+			afterEnd
 		}
 		let ctx = new BattleContext(settings);
+		this.state.lastBattle = ctx;
 		this.state.pushGameContext(ctx);
 		this.showGameScreen();
 		return ctx;
+	}
+
+	battleEnded(battle:BattleContext) {
+		battle.settings.afterEnd(battle).then(()=>{
+			this.showGameScreen();
+		});
 	}
 
 	async restoreHp(creature:Creature, amount:number, output?:TextOutput) {

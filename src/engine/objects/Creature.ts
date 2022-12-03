@@ -76,6 +76,13 @@ export class Creature {
 	}
 	rgroup: RacialGroup = Game.instance.idata.rgHumanoid;
 
+	mf<T>(masculine:T, feminine:T):T {
+		return this.gender === 'm' ? masculine : feminine;
+	}
+	mfx<T>(masculine:T, feminine:T, other:T):T {
+		return this.gender === 'm' ? masculine : this.gender === 'f' ? feminine : other;
+	}
+
 	/////////////////////////
 	// Body Stats - Helpers
 	/////////////////////////
@@ -267,6 +274,7 @@ export class Creature {
 	// Combat - Helpers //
 	//////////////////////
 	get isAlive():boolean { return this.ctrl.isAlive }
+	get canAct():boolean { return this.ctrl.canAct }
 	hasCondition(condition:CreatureCondition):boolean { return this.conditions.has(condition) }
 	setCondition(condition:CreatureCondition):void { this.ctrl.setCondition(condition) }
 	removeCondition(condition:CreatureCondition):boolean { return this.ctrl.removeCondition(condition); }

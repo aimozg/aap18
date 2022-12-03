@@ -10,7 +10,7 @@ export class PlaceContext extends SceneContext {
 	readonly sidebarRef = createRef<PlaceSidebar>();
 
 	constructor(public place: Place) {
-		super(place.sceneId, new InteractiveTextOutput(new ScenePanel()));
+		super(place.sceneId, place.scene.sceneFn, new InteractiveTextOutput(new ScenePanel()));
 	}
 
 	async display(): Promise<void> {

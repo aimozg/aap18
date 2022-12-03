@@ -1,7 +1,7 @@
 /*
  * Created by aimozg on 18.07.2022.
  */
-import {Imp} from "../monsters/Imp";
+import {Imp, ImpScenes} from "../common/Imp";
 import {ConsumableLib} from "../../game/data/items/ConsumableLib";
 import {buildScene} from "../../engine/scene/builder";
 import {buildPlace} from "../../engine/place/Place";
@@ -19,18 +19,18 @@ export namespace CampScenes {
 		scene: CampScene,
 		encounters: [{
 			name: "imp",
-			scene: async (ctx) => {
-				await ctx.ambush({
-					monsters: [new Imp()],
-					threatName: "a stray imp"
-				});
-			},
+			scene: ImpScenes.encounter,
 			when: gc => gc.player.isAlive
 		}, {
 			name: "imps",
+			chance: 0.5,
 			scene: async (ctx) => {
+				let monsters = [
+					new Imp(ctx.either('m','f')),
+					new Imp(ctx.either('m','f'))
+				];
 				await ctx.ambush({
-					monsters: [new Imp(), new Imp()],
+					monsters: monsters,
 					threatName: "two stray imps"
 				});
 			},

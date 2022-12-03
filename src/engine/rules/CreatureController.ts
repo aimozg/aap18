@@ -193,6 +193,13 @@ export class CreatureController {
 		return !this.creature.hasCondition(CoreConditions.Defeated) && !this.creature.hasCondition(CoreConditions.Seduced)
 	}
 
+	/**
+	 * This is a condition check, not AP check
+	 */
+	get canAct(): boolean {
+		return this.isAlive && !this.creature.hasCondition(CoreConditions.Unaware);
+	}
+
 	//------------------//
 	// Complex updaters //
 	//------------------//

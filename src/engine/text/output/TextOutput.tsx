@@ -32,7 +32,7 @@ export class TextOutput {
 	}
 
 	selectActor(actor: Creature) {
-		this.parser.setTarget(actor);
+		this.parser.selectActor(actor);
 	}
 
 	deselectActor() {
