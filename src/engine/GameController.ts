@@ -111,12 +111,7 @@ export class GameController {
 			this.showGameScreen();
 			return;
 		}
-		if (context instanceof SceneContext) {
-			context.output = new InteractiveTextOutput(new ScenePanel());
-			gameScreen.applyLayout(context.layout);
-			context.playCurrentScene().then(()=>this.showGameScreen());
-			return;
-		}
+		// PlaceContext inherits SceneContext, this check should be first
 		if (context instanceof PlaceContext) {
 			this.state.lastBattle = null;
 			if (context.place === Place.Limbo) {
@@ -125,6 +120,12 @@ export class GameController {
 			}
 			gameScreen.applyLayout(context.layout);
 			context.display().then(()=>this.showGameScreen());
+			return;
+		}
+		if (context instanceof SceneContext) {
+			context.output = new InteractiveTextOutput(new ScenePanel());
+			gameScreen.applyLayout(context.layout);
+			context.playCurrentScene().then(()=>this.showGameScreen());
 			return;
 		}
 		if (context instanceof BattleContext) {

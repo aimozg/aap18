@@ -3,78 +3,12 @@
  */
 
 import {RGBColor} from "../../objects/Color";
-import * as tinycolor from "tinycolor2";
-import {coerce, lint} from "../../math/utils";
 import {milliTime} from "../../utils/time";
-
-export interface GlyphAnimatedColor1 {
-	fx: "brighten" | "darken";
-	speed: "normal" | "fast" | "blink" | "fblink" | "slow";
-	color: RGBColor;
-}
-
-export interface GlyphAnimatedColor2 {
-	fx: "tween";
-	speed: "normal" | "fast" | "slow";
-	colors: RGBColor[]
-}
-
-export type GlyphColor = string | RGBColor | GlyphAnimatedColor1 | GlyphAnimatedColor2;
-
-export function glyphColorToRGB(color: GlyphColor, phase: number): RGBColor {
-	if (color instanceof tinycolor) {
-		return color;
-	}
-	if (typeof color === 'string') {
-		return tinycolor(color);
-	}
-	switch (color.speed) {
-		case "normal":
-			// phase = phase
-			break;
-		case "fast":
-			phase = phase * 2;
-			break;
-		case "slow":
-			phase = phase / 2;
-			break;
-		case "blink":
-			phase = (phase - Math.floor(phase)) > 0.75 ? 0.5 : 0;
-			break;
-		case "fblink":
-			phase = phase * 2;
-			phase = (phase - Math.floor(phase)) > 0.75 ? 0.5 : 0;
-			break;
-	}
-	phase = coerce(phase, 0, 1);
-	switch (color.fx) {
-		case "tween":
-			if (color.colors.length === 0) throw new Error(`No colors specified`)
-			if (color.colors.length === 1) return color.colors[0];
-			// 0..1 -> 0..N
-			phase = color.colors.length;
-			let i = Math.floor(phase), f = phase - i;
-			if (f === 0) return color.colors[i];
-			let color1 = color.colors[i].toRgb(), color2 = color.colors[i].toRgb();
-			return tinycolor({
-				r: lint(f, color1.r, color2.r),
-				g: lint(f, color1.g, color2.g),
-				b: lint(f, color1.b, color2.b),
-				a: lint(f, color1.a, color2.a),
-			})
-		case "brighten":
-			// a /\ graph between (0,0), (0.5,1) and (1,0)
-			phase = 1 - Math.abs(phase - 0.5) * 2;
-			return color.color.brighten(phase * 10);
-		case "darken":
-			phase = 1 - Math.abs(phase - 0.5) * 2;
-			return color.color.darken(phase * 10);
-	}
-}
+import {AnimatedColor, animatedColorToRGB} from "../../utils/canvas";
 
 export interface GlyphData {
 	ch: string;
-	fg: GlyphColor;
+	fg: AnimatedColor;
 	bg?: RGBColor | null;
 }
 
@@ -88,18 +22,6 @@ export interface GlyphSource {
 }
 
 export type GlyphCanvasSizing = "force" | "fit"
-
-export function createCanvas(w: number, h: number, fill?: string): CanvasRenderingContext2D {
-	let c = document.createElement("canvas");
-	c.width = w;
-	c.height = h;
-	let c2d = c.getContext('2d')!;
-	if (fill) {
-		c2d.fillStyle = fill;
-		c2d.fillRect(0, 0, w, h);
-	}
-	return c2d;
-}
 
 export interface ICanvasOverlay {
 	hide?: boolean;
@@ -175,11 +97,11 @@ export class GlyphCanvas {
 	renderGlyph(glyph: GlyphData, x: number, y: number) {
 		const c2d = this.c2d;
 		if (glyph.bg) {
-			c2d.fillStyle = glyphColorToRGB(glyph.bg, this.phase).toString();
+			c2d.fillStyle = animatedColorToRGB(glyph.bg, this.phase).toString();
 			c2d.fillRect(x, y, this.cellWidth, this.cellHeight)
 		}
 		if (glyph.ch && glyph.ch !== ' ') {
-			c2d.fillStyle = glyphColorToRGB(glyph.fg, this.phase).toString();
+			c2d.fillStyle = animatedColorToRGB(glyph.fg, this.phase).toString();
 			c2d.fillText(glyph.ch, this.x0 + x, y + this.y0 + this.cellHeight)
 		}
 	}

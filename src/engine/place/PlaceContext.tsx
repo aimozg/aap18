@@ -7,7 +7,7 @@ import {createRef, h} from "preact";
 import {InteractiveTextOutput} from "../text/output/InteractiveTextOutput";
 
 export class PlaceContext extends SceneContext {
-	readonly sidebarRef = createRef<PlaceSidebar>();
+	private readonly sidebarRef = createRef<PlaceSidebar>();
 
 	constructor(public place: Place) {
 		super(place.sceneId, place.scene.sceneFn, new InteractiveTextOutput(new ScenePanel()));
@@ -20,9 +20,10 @@ export class PlaceContext extends SceneContext {
 	}
 
 	get layout(): GameScreenLayout {
-		return Object.assign(super.layout, {
+		return {
+			...super.layout,
 			right: <PlaceSidebar context={this} ref={this.sidebarRef}/>
-		})
+		}
 	}
 
 	canRest(): boolean {
