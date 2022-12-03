@@ -214,7 +214,7 @@ export class BattleContext implements GameContext {
 				break;
 			case "npc":
 				if (this.cc.nextActor?.hasCondition(CoreConditions.Unaware) || !this.cc.nextActor?.canAct) {
-					this.scheduleTick()
+					this.cc.advanceTime(0).then();
 				} else {
 					// "thinking" pause
 					setTimeout(async () => {

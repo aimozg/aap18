@@ -12,6 +12,9 @@ import {KeyCodes} from "./KeyCodes";
 import {CreaturePanel} from "../../game/ui/CreaturePanel";
 import {milliTime} from "../utils/time";
 import {Game} from "../Game";
+import {ComponentChildren, createRef, h} from "preact";
+import {renderAppend} from "../utils/dom";
+import {Tooltip} from "./components/Tooltip";
 
 const logger = LogManager.loggerFor("engine.ui.ScreenManager");
 
@@ -20,11 +23,42 @@ export class ScreenManager {
 	gameScreen: GameScreen = new GameScreen();
 
 	sharedPlayerPanel: CreaturePanel = new CreaturePanel(null);
+	private tooltip: Tooltip|null = null;
 
 	constructor(
 		private screenHolder: HTMLElement
 	) {
 		this.addTop(new EmptyScreen());
+	}
+
+	showTooltip(x:number, y:number, content:ComponentChildren) {
+		this.hideTooltip();
+		let ref = createRef<Tooltip>()
+		renderAppend(<Tooltip ref={ref}
+		                      x={x}
+		                      y={y}
+		                      maxWidth={this.screenHolder.clientWidth}
+		                      maxHeight={this.screenHolder.clientHeight}>{content}</Tooltip>, this.screenHolder)
+		ref.current!.resize();
+		this.tooltip = ref.current!;
+	}
+	showTooltipAt(origin:MouseEvent|HTMLElement, content:ComponentChildren) {
+		let rect = this.screenHolder.getBoundingClientRect();
+		let x,y;
+		if (origin instanceof HTMLElement) {
+			let rect = origin.getBoundingClientRect();
+			// TODO show relative to the the rect
+			x = rect.x + rect.width/2;
+			y = rect.y + rect.height;
+		} else {
+			x = origin.clientX + 8;
+			y = origin.clientY + 8;
+		}
+		this.showTooltip(x - rect.x, y - rect.y, content);
+	}
+	hideTooltip() {
+		this.tooltip?.remove();
+		this.tooltip = null;
 	}
 
 	get top(): AbstractScreen {

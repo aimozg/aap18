@@ -125,12 +125,12 @@ export class SceneContext implements GameContext {
 		this.characterPanel.update();
 		this._dirty = false;
 		this.checkDeadEnd();
-		// TODO tooltip
 		this.output.appendAction(<div class="choices">{this.nextButtons.map(btn =>
 			<div class="choice">
 				<Button label={btn.label}
 				        disabled={btn.disabled}
 				        hotkey={btn.hotkey}
+				        tooltip={btn.tooltip}
 				        className={"-link" + (btn.default ? " -default" : "")}
 				        onClick={() => this.buttonClick(btn)}/>
 				{btn.hint && <span className="choice-hint">{btn.hint}</span>}

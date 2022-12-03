@@ -70,7 +70,7 @@ export class BattleActionsPanel extends DomComponent {
 	showFinishBattle() {
 		let aFinish:UIAction = {
 			label: "Finish",
-			// tooltip: "Finish battle", // TODO tooltip
+			tooltip: "Finish battle",
 			hotkey: KeyCodes.ENTER,
 			callback: ()=>this.context.onBattleFinishClick(),
 		}
@@ -155,7 +155,7 @@ export class BattleActionsPanel extends DomComponent {
 				group.push({
 					label: a.label,
 					hotkey: BattleActionsPanel.GroupHotkeys[group.length],
-					// TODO tooltip
+					tooltip: a.tooltip,
 					disabled: () => !playerCanAct || !a.isPossible(this.context.cc),
 					callback: () => this.execAction(a)
 				});
@@ -170,7 +170,7 @@ export class BattleActionsPanel extends DomComponent {
 					dpadActions[dirid] = {
 						hotkeys: BattleActionsPanel.DPadHotkeys[dirid],
 						label: a.dpadClass ? <span class={a.dpadClass}>{a.dpadLabel}</span> : a.dpadLabel,
-						// TODO tooltip
+						tooltip: a.tooltip,
 						disabled: () => !playerCanAct || !a.isPossible(this.context.cc),
 						callback: () => this.execAction(a)
 					}

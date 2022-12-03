@@ -27,7 +27,7 @@ export class SeduceAction extends CombatAction<SeduceResult> {
 	toHit = this.dc - this.bonus
 	label = "Seduce "+this.target.name+" ("+CommonText.skillDcHint(this.toHit)+")"
 	group = CombatActionGroups.AGSkills
-	tooltip = "Attempt to make "+this.target.name+" give up to their lust"
+	tooltip = "Persuade "+this.target.name+" to surrender and have fun."
 
 	protected disabledReason(cc: CombatController): string {
 		// TODO if target has seduction immunity

@@ -43,3 +43,10 @@ $iconBtnSize: 32px;
 button, .button {
   @include button;
 }
+
+.button-container {
+  display: inline-block;
+  button, .button {
+    width: 100%;
+  }
+}

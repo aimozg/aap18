@@ -1,0 +1,10 @@
+@use "../utils/uibox";
+
+.tooltip {
+  position: absolute;
+  display: block;
+
+  @include uibox.uibox;
+
+  font-size: small;
+}
