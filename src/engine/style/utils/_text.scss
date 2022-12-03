@@ -32,6 +32,13 @@ u, .text-u {
   }
 }
 
+.text-nowrap {
+  white-space: nowrap;
+}
+.text-pre {
+  white-space: pre;
+}
+
 .text-hl {
   color: var(--tc-hl);
 }

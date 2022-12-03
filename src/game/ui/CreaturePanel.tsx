@@ -13,6 +13,7 @@ import {CombatRules} from "../combat/CombatRules";
 import {TextIcon} from "../../engine/objects/creature/CreatureCondition";
 import {signValue} from "../../engine/utils/math";
 import {TAttribute, TAttributes} from "../../engine/rules/TAttribute";
+import {WithTooltip} from "../../engine/ui/components/WithTooltip";
 
 export interface CreaturePanelOptions {
 	collapsible: boolean;
@@ -271,10 +272,12 @@ export class CreaturePanel extends DomComponent {
 		// TODO tooltips
 		return this.options.conditions && <div class="my-2">
 			{this.conditionsAndStatusEffects().map(cc=>
-				<div class="creature-status-effect" style={{
-					color: cc.icon.fg,
-					background: cc.icon.bg
-				}}>{cc.name}</div>
+				<WithTooltip tooltip={cc.description}>
+					<div class="creature-status-effect" style={{
+						color: cc.icon.fg,
+						background: cc.icon.bg
+					}}>{cc.name}</div>
+				</WithTooltip>
 			)}
         </div>
 	}
@@ -339,13 +342,20 @@ export class CreaturePanel extends DomComponent {
 	}
 
 	private sectionStatusCompact():ComponentChildren {
-		// TODO tooltips
 		return this.options.conditions && <Fragment>
 			{this.conditionsAndStatusEffects().map(cc=>
-				<div class="status-effect-icon" style={{
-					color: cc.icon.fg,
-					background: cc.icon.bg
-				}}>{cc.icon.text}</div>
+				<WithTooltip tooltip={
+					<Fragment>
+						<div class="text-bold my-2">{cc.name}</div>
+						{cc.description}
+					</Fragment>
+				}>
+					<div class="status-effect-icon"
+						 style={{
+						color: cc.icon.fg,
+						background: cc.icon.bg
+					}}>{cc.icon.text}</div>
+				</WithTooltip>
 			)}
 		</Fragment>
 	}

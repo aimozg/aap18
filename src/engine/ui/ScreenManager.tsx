@@ -31,6 +31,7 @@ export class ScreenManager {
 		this.addTop(new EmptyScreen());
 	}
 
+	// TODO move to something like TooltipManager so UI components won't need reference Game?
 	showTooltip(x:number, y:number, content:ComponentChildren) {
 		this.hideTooltip();
 		let ref = createRef<Tooltip>()

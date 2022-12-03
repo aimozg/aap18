@@ -234,7 +234,7 @@ export class CreatureController {
 		let effect = this.creature.statusEffects.get(type);
 		if (!effect) return false;
 		effect.type.onRemove?.(effect);
-		effect.currentBuffs?.forEach(b => b.remove());
+		effect.currentBuffs.forEach(b => b.remove());
 		this.creature.statusEffects.delete(type);
 		return true;
 	}
@@ -249,7 +249,7 @@ export class CreatureController {
 			value: power,
 			text: source.name
 		});
-		(source.currentBuffs ??= []).push(buff);
+		source.currentBuffs.push(buff);
 		return buff
 	}
 

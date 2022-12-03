@@ -101,22 +101,28 @@ export class Button extends Component<ButtonProps, ButtonState> {
 
 	render(props: RenderableProps<ButtonProps>, state: Readonly<ButtonState>, context: any): ComponentChild {
 		let hotkey = props.hotkey ?? props.action?.hotkey ?? props.action?.hotkeys?.[0];
-		let disabled = props.disabled ?? (props.action && !uiActionEnabled(props.action));
+		let disabled = !!(props.disabled ?? (props.action && !uiActionEnabled(props.action)));
 		let hk = hotkey ? <span class="--hk">{KeyCodes.hkLongToShort(hotkey)}</span> : null
 		let tooltip = props.tooltip ?? props.action?.tooltip;
-		return <div
-			class="button-container"
+
+		let button = <button
+			type="button"
+			className={props.className ?? ""}
+			disabled={disabled}
 			onMouseEnter={tooltip?this.onMouseEnter.bind(this):undefined}
 			onMouseLeave={(props.hold||tooltip)?this.onMouseLeave.bind(this):undefined}
-		>
-			<button
-				type="button"
-				class={props.className??""}
-				disabled={!!disabled}
-				onMouseDown={props.hold?this.onMouseDown.bind(this):undefined}
-				onMouseUp={props.hold?this.onMouseUp.bind(this):undefined}
-				onClick={this.onClick.bind(this)}>{hk}{props.children}{props.label??props.action?.label}</button>
-		</div>
+			onMouseDown={props.hold ? this.onMouseDown.bind(this) : undefined}
+			onMouseUp={props.hold ? this.onMouseUp.bind(this) : undefined}
+			onClick={this.onClick.bind(this)}>{hk}{props.children}{props.label ?? props.action?.label}</button>
+		if (disabled && tooltip) {
+			return <div
+				class="button-container"
+				onMouseEnter={tooltip?this.onMouseEnter.bind(this):undefined}
+				onMouseLeave={(props.hold||tooltip)?this.onMouseLeave.bind(this):undefined}
+			>{button}</div>
+		} else {
+			return button
+		}
 	}
 
 }

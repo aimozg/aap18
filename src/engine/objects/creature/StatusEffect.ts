@@ -32,7 +32,7 @@ export class StatusEffectType {
 			options.id,
 			options.name,
 			options.icon,
-			options.description ?? "",
+			options.description ?? "{buffs}",
 			options.onAdd,
 			options.onUpdate,
 			options.onRemove,
@@ -54,10 +54,11 @@ export class StatusEffect {
 	get description():string {
 		return substitutePattern(this.type.descriptionPattern, {
 			// TODO duration
-			"power": this.power
+			"power": this.power,
+			"buffs": this.currentBuffs.map(b=>`${b.stat.name}\xA0${b.value.signed()}`).join(", ")
 		})
 	}
 	get icon():TextIcon { return this.type.icon }
-	currentBuffs:Buff[]|null = null;
+	currentBuffs:Buff[] = [];
 }
 

@@ -17,7 +17,7 @@ export interface TooltipState {
 
 const PADDING = 0;
 const RATIO = 4/3;
-const MIN_WIDTH = 100;
+const MIN_WIDTH = 150;
 
 const logger = LogManager.loggerFor("engine.ui.components.Tooltip")
 
