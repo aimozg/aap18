@@ -1,11 +1,12 @@
 {
   "name": "aap18",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack --watch",
-    "build": "webpack"
+    "build": "webpack",
+    "packageWin": "node scripts/package-win.js"
   },
   "devDependencies": {
     "@types/tinycolor2": "^1.4.3",
