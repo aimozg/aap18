@@ -1,6 +1,6 @@
 import {Component, ComponentChild, ComponentChildren, h, RenderableProps} from "preact";
 import {KeyCodes} from "../KeyCodes";
-import {Game} from "../../Game";
+import {TooltipManager} from "./Tooltip";
 
 export interface ButtonProps {
 	label?: string;
@@ -76,11 +76,11 @@ export class Button extends Component<ButtonProps, ButtonState> {
 	}
 	private onMouseEnter(ev: MouseEvent) {
 		let tooltip = this.props.tooltip ?? this.props.action?.tooltip;
-		if (tooltip) Game.instance.screenManager.showTooltipAt(this.base as HTMLElement, tooltip);
+		if (tooltip) TooltipManager.showTooltip({origin: this.base as HTMLElement, content: tooltip});
 		this.clear();
 	}
 	private onMouseLeave() {
-		Game.instance.screenManager.hideTooltip();
+		TooltipManager.hideTooltip();
 		this.clear();
 	}
 	private onMouseUp(ev: MouseEvent) {
@@ -95,7 +95,7 @@ export class Button extends Component<ButtonProps, ButtonState> {
 	}
 
 	componentWillUnmount() {
-		Game.instance.screenManager.hideTooltip();
+		TooltipManager.hideTooltip();
 		this.clear();
 	}
 

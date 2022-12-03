@@ -1,5 +1,5 @@
 import {Component, ComponentChild, ComponentChildren, createRef, h, RenderableProps} from "preact";
-import {Game} from "../../Game";
+import {TooltipManager} from "./Tooltip";
 
 export interface WithTooltipProps {
 	className?: string;
@@ -13,18 +13,18 @@ export class WithTooltip extends Component<WithTooltipProps, any>{
 	ref = createRef()
 	showTooltip() {
 		if (!this.ref.current) return;
-		Game.instance.screenManager.showTooltipAt(this.ref.current as HTMLElement, this.props.tooltip)
+		TooltipManager.showTooltip({origin: this.ref.current as HTMLElement, content: this.props.tooltip});
 	}
 	hideTooltip() {
-		Game.instance.screenManager.hideTooltip();
+		TooltipManager.hideTooltip();
 	}
 
 	componentWillUnmount() {
-		Game.instance.screenManager.hideTooltip();
+		TooltipManager.hideTooltip();
 	}
 
 	render({className,inline,children}: RenderableProps<WithTooltipProps>): ComponentChild {
-		Game.instance.screenManager.hideTooltip();
+		TooltipManager.hideTooltip();
 		return <div
 			ref={this.ref}
 			class={className}

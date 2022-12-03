@@ -1,6 +1,7 @@
-import {Component, ComponentChild, h, RenderableProps} from "preact";
+import {Component, ComponentChild, ComponentChildren, createRef, h, RenderableProps} from "preact";
 import {coerce} from "../../math/utils";
 import {LogManager} from "../../logging/LogManager";
+import {renderAppend} from "../../utils/dom";
 
 export interface TooltipProps {
 	x: number;
@@ -20,6 +21,52 @@ const RATIO = 4/3;
 const MIN_WIDTH = 150;
 
 const logger = LogManager.loggerFor("engine.ui.components.Tooltip")
+
+export interface ShowTooltipOptions {
+	origin:HTMLElement|MouseEvent|{x:number,y:number};
+	content: ComponentChildren;
+	// TODO make it work
+	placement?:'top'|'bottom'|'left'|'right';
+}
+export namespace TooltipManager {
+	let container = document.body;
+	let tooltip = createRef<Tooltip>()
+
+	export function setContainer(tooltipContainer:HTMLElement) {
+		hideTooltip();
+		container = tooltipContainer;
+	}
+	export function showTooltipAtXY(x:number, y:number, content:ComponentChildren) {
+		hideTooltip();
+		renderAppend(<Tooltip ref={tooltip}
+		                      x={x}
+		                      y={y}
+		                      maxWidth={container.clientWidth}
+		                      maxHeight={container.clientHeight}>{content}</Tooltip>, container)
+		tooltip.current!.resize();
+	}
+	export function showTooltip({origin,content,placement}:ShowTooltipOptions) {
+		let rect = container.getBoundingClientRect();
+		let x,y;
+		if (origin instanceof HTMLElement) {
+			let rect = origin.getBoundingClientRect();
+			// TODO show relative to the the rect
+			x = rect.x + rect.width/2;
+			y = rect.y + rect.height;
+		} else if (origin instanceof MouseEvent) {
+			x = origin.clientX + 8;
+			y = origin.clientY + 8;
+		} else {
+			x = origin.x;
+			y = origin.y;
+		}
+		showTooltipAtXY(x - rect.x, y - rect.y, content);
+	}
+	export function hideTooltip() {
+		tooltip.current?.remove();
+		tooltip.current = null;
+	}
+}
 
 export class Tooltip extends Component<TooltipProps, any> {
 	constructor() {super();}

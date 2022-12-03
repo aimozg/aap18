@@ -64,8 +64,7 @@ export class Game {
 	}
 
 	async applicationStart() {
-		this.screenManager.setupKeyboardInput();
-		this.screenManager.setupAnimations();
+		this.screenManager.setup();
 		await this.resourceManager.loadEssentialResources();
 		await this.screenManager.replaceTop(new MainMenuScreen(), 'fade');
 	}
