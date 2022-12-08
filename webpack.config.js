@@ -1,12 +1,15 @@
 const path = require('path');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+let packageJson = require('./package.json');
 module.exports = {
 	mode: "development",
 	entry: ['./src/extensions.ts', './src/index.tsx'],
 	output: {
 		filename: 'main.js',
 		path: path.resolve(__dirname, 'dist'),
+		clean: true
 	},
 	module: {
 		rules: [
@@ -26,8 +29,15 @@ module.exports = {
 	},
 	plugins: [
 		new webpack.DefinePlugin({
-			PACKAGE_VERSION: JSON.stringify(require('./package.json').version)
-		})
+			PACKAGE_VERSION: JSON.stringify(packageJson.version)
+		}),
+		new HtmlWebpackPlugin({
+			title: packageJson.config.title,
+			template: "src/index.html",
+			templateParameters: {
+
+			}
+		}),
 	],
 	resolve: {
 		extensions: ['.tsx', '.ts', '.js'],

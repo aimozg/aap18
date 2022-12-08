@@ -74,9 +74,10 @@ export class BattleActionsPanel extends DomComponent {
 			hotkey: KeyCodes.ENTER,
 			callback: ()=>this.context.onBattleFinishClick(),
 		}
+		this.currentGroup = -1;
 		this.allActions = [aFinish];
-		this.renderDpadActions([]);
-		render(<Button action={aFinish} className="-big"/>, this.refActions.current!)
+		removeChildren(this.refActions.current);
+		render(<Button action={aFinish} className="-big"/>, this.refDPad.current!)
 	}
 
 	private async execAction(a:CombatAction<any>) {

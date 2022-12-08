@@ -5,6 +5,8 @@
 import {RGBColor} from "../../objects/Color";
 import {milliTime} from "../../utils/time";
 import {AnimatedColor, animatedColorToRGB} from "../../utils/canvas";
+import {LogManager} from "../../logging/LogManager";
+import {getComputedBoxes} from "../../utils/dom";
 
 export interface GlyphData {
 	ch: string;
@@ -130,21 +132,26 @@ export class GlyphCanvas {
 				if (canvas.width < this.width) canvas.width = this.width;
 				if (canvas.height < this.height) canvas.height = this.height;
 				break;
-			case "fit":
-				if (this.width !== canvas.clientWidth || this.height !== canvas.clientHeight) {
+			case "fit": {
+				let {width, height} = getComputedBoxes(canvas).content;
+				width |= 0;
+				height |= 0;
+				if (this.width !== width || this.height !== height) {
+					logger.debug("resizing from ({}, {}) to ({}, {})", this.width, this.height, width, height)
 					// adjust scroll maintaining center position
-					this.scrollX += (this.width - canvas.clientWidth) / this.cellWidth / 2;
-					this.scrollY += (this.height - canvas.clientHeight) / this.cellHeight / 2;
+					this.scrollX += (this.width - width) / this.cellWidth / 2;
+					this.scrollY += (this.height - height) / this.cellHeight / 2;
 					this.scrollX |= 0;
 					this.scrollY |= 0;
-					this.width = canvas.width = canvas.clientWidth;
-					this.height = canvas.height = canvas.clientHeight;
+					this.width = canvas.width = width;
+					this.height = canvas.height = height;
 				}
 				break;
+			}
 		}
 
 		c2d.fillStyle = this.background;
-		c2d.fillRect(0, 0, this.width, this.height);
+		c2d.fillRect(0, 0, this.width | 0, this.height | 0);
 		c2d.font = this.font;
 
 		let maxRow = Math.min(source.height, this.scrollY + this.windowHeight)
@@ -168,3 +175,5 @@ export class GlyphCanvas {
 		this.afterRender?.();
 	}
 }
+
+const logger = LogManager.loggerFor("engine.ui.components.GlyphCanvas")

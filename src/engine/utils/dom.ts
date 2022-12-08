@@ -32,3 +32,58 @@ export function render1<T extends Node>(v:VNode):T {
 	return tmp.firstChild as Node as T
 }
 
+export interface ComputedBoxes {
+	padding: {
+		left: number;
+		right: number;
+		top: number;
+		bottom: number;
+	};
+	margin: {
+		left: number;
+		right: number;
+		top: number;
+		bottom: number;
+	};
+	border: {
+		left: number;
+		right: number;
+		top: number;
+		bottom: number;
+	};
+	content: {
+		width: number;
+		height: number;
+	};
+	boxSizing: 'border-box'|'content-box'|string;
+}
+export function getComputedBoxes(e:Element):ComputedBoxes {
+	const style = getComputedStyle(e);
+	let cw = e.clientWidth, ch = e.clientHeight;
+	let padding = {
+		left: parseFloat(style.paddingLeft),
+		right: parseFloat(style.paddingRight),
+		top: parseFloat(style.paddingTop),
+		bottom: parseFloat(style.paddingBottom),
+	}
+	let margin = {
+		left: parseFloat(style.marginLeft),
+		right: parseFloat(style.marginRight),
+		top: parseFloat(style.marginTop),
+		bottom: parseFloat(style.marginBottom),
+	}
+	let border = {
+		left: parseFloat(style.borderLeftWidth),
+		right: parseFloat(style.borderRightWidth),
+		top: parseFloat(style.borderTopWidth),
+		bottom: parseFloat(style.borderBottomWidth),
+	}
+	let boxSizing = style.boxSizing;
+	return {
+		padding,margin,border,boxSizing,
+		content: {
+			width: cw - padding.left - padding.right,
+			height: ch - padding.top - padding.bottom
+		}
+	}
+}
