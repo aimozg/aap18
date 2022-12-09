@@ -23,8 +23,6 @@ export interface GlyphSource {
 	overlays?(): CanvasOverlay[];
 }
 
-export type GlyphCanvasSizing = "force" | "fit"
-
 export interface ICanvasOverlay {
 	hide?: boolean;
 	row: number;
@@ -44,8 +42,7 @@ export interface CanvasOverlayImage extends ICanvasOverlay {
 export type CanvasOverlay = CanvasOverlayGlyph | CanvasOverlayImage;
 
 export class GlyphCanvas {
-	constructor(private readonly c2d: CanvasRenderingContext2D,
-	            public sizing: GlyphCanvasSizing) {
+	constructor(private readonly c2d: CanvasRenderingContext2D) {
 	}
 
 	// TODO move to config
@@ -59,8 +56,8 @@ export class GlyphCanvas {
 	// Empty space
 	padding = 0
 	// Canvas size in cells
-	windowWidth = 28
-	windowHeight = 20
+	visibleCols = 28
+	visibleRows = 20
 	background = "#333333"
 
 	// TODO make it pixels
@@ -73,22 +70,54 @@ export class GlyphCanvas {
 	beforeRender: (() => void) | null = null;
 	afterRender: (() => void) | null = null;
 
+	get scale() {
+		return window.devicePixelRatio || 1
+	}
 	get width() {
-		return this.windowWidth * this.cellWidth + this.padding * 2
+		return (this.visibleCols * this.cellWidth + this.padding * 2) * this.scale
 	}
 
 	set width(value: number) {
-		if (this.sizing === "force") return;
-		this.windowWidth = (value - this.padding * 2) / this.cellWidth;
+		this.visibleCols = (value/this.scale - this.padding * 2) / this.cellWidth;
 	}
 
 	get height() {
-		return this.windowHeight * this.cellHeight + this.padding * 2
+		return (this.visibleRows * this.cellHeight + this.padding * 2) * this.scale
 	}
 
 	set height(value: number) {
-		if (this.sizing === "force") return;
-		this.windowHeight = (value - this.padding * 2) / this.cellHeight;
+		this.visibleRows = (value/this.scale - this.padding * 2) / this.cellHeight;
+	}
+
+	fitToSize(width:number, height:number) {
+		if (width === 0 || height === 0) {
+			logger.warn("fitToSize({}, {})",width, height)
+			return;
+		}
+
+		const canvas = this.c2d.canvas;
+		let scale = this.scale;
+		if (this.width !== width || this.height !== height) {
+			logger.debug("resizing from ({}, {}) to ({}, {})", this.width, this.height, width, height)
+			// adjust scroll maintaining center position
+			this.scrollX += (this.width - width) / (this.cellWidth * scale) / 2;
+			this.scrollY += (this.height - height) / (this.cellHeight * scale) / 2;
+			this.scrollX |= 0;
+			this.scrollY |= 0;
+			this.width = canvas.width = width;
+			this.height = canvas.height = height;
+			canvas.style.width = `${width/scale}px`;
+			canvas.style.height = `${height/scale}px`;
+		}
+	}
+	fitToParentSize() {
+		let parent = this.c2d.canvas.parentElement;
+		if (!parent) {
+			logger.warn("fitToParentSize() with no parent")
+			return;
+		}
+		let {width,height} = getComputedBoxes(parent).content;
+		this.fitToSize(width*this.scale, height*this.scale);
 	}
 
 	scroll(dx: number, dy: number) {
@@ -127,35 +156,17 @@ export class GlyphCanvas {
 		this.phase = this.animationSpeed * milliTime() / 1000;
 		const c2d = this.c2d;
 		const canvas = c2d.canvas;
-		switch (this.sizing) {
-			case "force":
-				if (canvas.width < this.width) canvas.width = this.width;
-				if (canvas.height < this.height) canvas.height = this.height;
-				break;
-			case "fit": {
-				let {width, height} = getComputedBoxes(canvas).content;
-				width |= 0;
-				height |= 0;
-				if (this.width !== width || this.height !== height) {
-					logger.debug("resizing from ({}, {}) to ({}, {})", this.width, this.height, width, height)
-					// adjust scroll maintaining center position
-					this.scrollX += (this.width - width) / this.cellWidth / 2;
-					this.scrollY += (this.height - height) / this.cellHeight / 2;
-					this.scrollX |= 0;
-					this.scrollY |= 0;
-					this.width = canvas.width = width;
-					this.height = canvas.height = height;
-				}
-				break;
-			}
-		}
+		if (canvas.width < this.width) canvas.width = this.width;
+		if (canvas.height < this.height) canvas.height = this.height;
 
 		c2d.fillStyle = this.background;
 		c2d.fillRect(0, 0, this.width | 0, this.height | 0);
 		c2d.font = this.font;
+		c2d.save();
+		c2d.scale(this.scale, this.scale);
 
-		let maxRow = Math.min(source.height, this.scrollY + this.windowHeight)
-		let maxCol = Math.min(source.width, this.scrollX + this.windowWidth)
+		let maxRow = Math.min(source.height, this.scrollY + this.visibleRows)
+		let maxCol = Math.min(source.width, this.scrollX + this.visibleCols)
 		let y = this.padding
 		for (let row = this.scrollY; row < maxRow; row++) {
 			let x = this.padding
@@ -173,6 +184,7 @@ export class GlyphCanvas {
 		}
 
 		this.afterRender?.();
+		c2d.restore();
 	}
 }
 

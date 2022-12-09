@@ -10,6 +10,7 @@
     "watch": "webpack --watch",
     "build": "webpack --config webpack.prod.js",
     "build-dev": "webpack",
+    "package-win": "npm run build && node scripts/package-win.js",
     "package-dev-win": "npm run build-dev && node scripts/package-win.js"
   },
   "devDependencies": {

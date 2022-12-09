@@ -2,6 +2,7 @@
  * Created by aimozg on 04.07.2022.
  */
 import {VNode} from "preact";
+import {isPlainObject} from "../utils/types";
 
 export abstract class Logger {
 	protected constructor(public level:LogLevel) {
@@ -57,7 +58,7 @@ export abstract class Logger {
 			}
 			return "["+x.map(c=>Logger.toString(c)).join(", ")+"]"
 		}
-		let s = String(x);
+		let s = isPlainObject(x) ? safeStringify(x) : String(x);
 		if (s === '[object Object]') s = '[object '+Object.getPrototypeOf(x).constructor.name+']';
 		return s
 	}
@@ -67,6 +68,14 @@ export abstract class Logger {
 			return Logger.toString(x);
 		});
 		return [s,rest];
+	}
+}
+
+function safeStringify(o:any):string {
+	try {
+		return JSON.stringify(o);
+	} catch (e) {
+		return String(o);
 	}
 }
 

@@ -9,3 +9,8 @@ export type KeysOfType<OBJ, TYPE> = keyof {
 export type PartialRecord<K extends keyof any, T> =  Partial<Record<K, T>>
 
 export type ReadonlyRecord<K extends keyof any, T> = Readonly<Record<K, T>>
+
+const PlainObjectPrototype = Object.getPrototypeOf({});
+export function isPlainObject(o:any):boolean {
+	return o !== null && typeof o === "object" && Object.getPrototypeOf(o) === PlainObjectPrototype;
+}
