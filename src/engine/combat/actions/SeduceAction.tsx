@@ -45,7 +45,7 @@ export class SeduceAction extends CombatAction<SeduceResult> {
 		let roll = cc.rng.d20()
 		let successIsGood = cc.party.includes(actor);
 		let success = roll >= toHit;
-		cc.logSkillCheck(roll,bonus,dc,successIsGood, <Fragment>{logref(actor)} Seduce {logref(target)}</Fragment>);
+		cc.logSkillCheck(roll,bonus,dc,<Fragment>{logref(actor)} Seduce {logref(target)}</Fragment>);
 		if (success) {
 			// TODO animate successful seduction
 			target.setCondition(CoreConditions.Seduced);

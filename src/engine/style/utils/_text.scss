@@ -74,6 +74,10 @@ u, .text-u {
 .text-roll-success {
   color: var(--tc-plus);
 }
+.text-roll-critsuccess {
+  font-weight: bold;
+  color: var(--tc-plus);
+}
 .text-roll-fail {
   color: var(--tc-minus);
 }

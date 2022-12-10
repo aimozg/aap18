@@ -68,14 +68,6 @@ export interface AmbushDef {
 	successOptions?: ChoiceData[];
 }
 
-export type AmbushResultType = 'success'|'fail'|'critFail';
-
-export interface AmbushResult {
-	type: AmbushResultType;
-	battle: boolean;
-	victory?: boolean;
-}
-
 export namespace AmbushRules {
 
 	export function getAreaName(def:AmbushDef, ctx:SceneContext):string {
@@ -213,40 +205,34 @@ export namespace AmbushRules {
 	}
 
 	export async function doAmbush(def: AmbushDef, ctx: SceneContext) {
-		let roll = def.roll ?? ctx.d20();
-		let bonus = ctx.player.skillValue(CoreSkills.Ambush);
-		let dc = def.dc ?? calcAmbushDc(def);
-		let diff = roll + bonus - dc;
-		let resultType:AmbushResultType;
-		let result:string|SceneFn;
+		let result = ctx.useSkill({
+			skill: CoreSkills.Ambush,
+			dc: def.dc ?? calcAmbushDc(def),
+			roll: def.roll,
+			crit: "diff"
+		})
+		let resultScene:string|SceneFn;
 
-		let rollText = def.silent ? "" : `Ambush check ${roll}${bonus.signed()} vs DC ${dc}`
-		if (diff >= 0) {
-			resultType = "success"
-			if (!def.silent) ctx.say(`<p class='text-roll-skill text-roll-success'>\\[${rollText}: Success\\]</p>`)
-			result = def.success ?? defaultSuccessText(def, ctx);
-		} else if (diff > -10) {
-			resultType = "fail"
-			if (!def.silent) ctx.say(`<p class='text-roll-skill text-roll-fail'>\\[${rollText}: Failure\\]</p>`)
-			result = def.fail ?? defaultFailText(def, ctx);
+		if (result.success) {
+			resultScene = def.success ?? defaultSuccessText(def, ctx);
+		} else if (!result.crit) {
+			resultScene = def.fail ?? defaultFailText(def, ctx);
 		} else {
-			resultType = "critFail"
-			if (!def.silent) ctx.say(`<p class='text-roll-skill text-roll-critfail'>\\[${rollText}: Critical Failure\\]</p>`)
-			result = def.critFail ?? def.fail ?? defaultCritFailText(def, ctx);
+			resultScene = def.critFail ?? def.fail ?? defaultCritFailText(def, ctx);
 		}
 
-		if (typeof result === "function") {
+		if (typeof resultScene === "function") {
 			// Override default behaviour
-			await result(ctx);
+			await resultScene(ctx);
 		} else {
 			// Print text and apply default result
 			if (def.monsters.length > 0) ctx.selectActor(def.monsters[0]);
-			ctx.say(result);
+			ctx.say(resultScene);
 			if (def.monsters.length > 0) ctx.deselectActor();
-			if (resultType === 'success') {
+			if (result.success) {
 				await doAmbushSuccess(def, ctx)
 			} else {
-				await doAmbushFail(def, ctx, resultType === 'critFail')
+				await doAmbushFail(def, ctx, result.crit)
 			}
 		}
 	}

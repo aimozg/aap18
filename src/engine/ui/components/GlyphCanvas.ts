@@ -111,6 +111,7 @@ export class GlyphCanvas {
 		}
 	}
 	fitToParentSize() {
+		if (!document.contains(this.c2d.canvas)) return;
 		let parent = this.c2d.canvas.parentElement;
 		if (!parent) {
 			logger.warn("fitToParentSize() with no parent")

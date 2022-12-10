@@ -61,22 +61,22 @@ export function getComputedBoxes(e:Element):ComputedBoxes {
 	const style = getComputedStyle(e);
 	let cw = e.clientWidth, ch = e.clientHeight;
 	let padding = {
-		left: parseFloat(style.paddingLeft),
-		right: parseFloat(style.paddingRight),
-		top: parseFloat(style.paddingTop),
-		bottom: parseFloat(style.paddingBottom),
+		left: parseFloat(style.paddingLeft || "0"),
+		right: parseFloat(style.paddingRight || "0"),
+		top: parseFloat(style.paddingTop || "0"),
+		bottom: parseFloat(style.paddingBottom || "0"),
 	}
 	let margin = {
-		left: parseFloat(style.marginLeft),
-		right: parseFloat(style.marginRight),
-		top: parseFloat(style.marginTop),
-		bottom: parseFloat(style.marginBottom),
+		left: parseFloat(style.marginLeft || "0"),
+		right: parseFloat(style.marginRight || "0"),
+		top: parseFloat(style.marginTop || "0"),
+		bottom: parseFloat(style.marginBottom || "0"),
 	}
 	let border = {
-		left: parseFloat(style.borderLeftWidth),
-		right: parseFloat(style.borderRightWidth),
-		top: parseFloat(style.borderTopWidth),
-		bottom: parseFloat(style.borderBottomWidth),
+		left: parseFloat(style.borderLeftWidth || "0"),
+		right: parseFloat(style.borderRightWidth || "0"),
+		top: parseFloat(style.borderTopWidth || "0"),
+		bottom: parseFloat(style.borderBottomWidth || "0"),
 	}
 	let boxSizing = style.boxSizing;
 	return {

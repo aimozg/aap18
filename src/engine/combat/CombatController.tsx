@@ -226,9 +226,7 @@ export class CombatController {
 		let dc = 10 + stealthSkill;
 		// TODO critical success/failure?
 		let success = roll + bonus >= dc
-		let successIsGood = this.ownSide(sneaker) !== this.party;
-		this.logSkillCheck(roll, bonus, dc, successIsGood,
-			<Fragment>
+		this.logSkillCheck(roll, bonus, dc, <Fragment>
 				{logref(spotter)}{' '}Spot vs {logref(sneaker)}{' '}Stealth check
 			</Fragment>);
 		if (success) {
@@ -331,9 +329,9 @@ export class CombatController {
 			<span className="--action">{action}</span>
 		</Fragment>)
 	}
-	logSkillCheck(roll:number,bonus:number,dc:number,successIsGood:boolean,name:ComponentChildren) {
+	logSkillCheck(roll:number,bonus:number,dc:number,name:ComponentChildren) {
 		let success = roll + bonus >= dc
-		let className = (success === successIsGood) ? "text-roll-success" : "text-roll-fail";
+		let className = success ? "text-roll-success" : "text-roll-fail";
 		this.log("-check", <Fragment>
 			[{name}: <span class={className}>{success?"Success":"Failure"} ({roll}{bonus.signed()} vs {dc})</span>]
 		</Fragment>)
