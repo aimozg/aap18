@@ -1,9 +1,9 @@
 import {Fragment, h, VNode} from "preact";
-import {Button} from "../../engine/ui/components/Button";
+import {Button} from "../ui/components/Button";
 import {ChargenStep} from "./ChargenStep";
 import {ChargenController} from "./ChargenController";
-import {Parse} from "../../engine/text/ParseTag";
-import {signValue} from "../../engine/utils/math";
+import {Parse} from "../text/ParseTag";
+import {signValue} from "../utils/math";
 
 export class ChargenStepStats extends ChargenStep {
 

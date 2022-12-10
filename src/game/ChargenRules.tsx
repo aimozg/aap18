@@ -1,5 +1,5 @@
-import {BreastSizeTiers} from "../data/body/Breasts";
-import {PenisSizeTiers} from "../data/body/Penis";
+import {BreastSizeTiers} from "./data/body/Breasts";
+import {PenisSizeTiers} from "./data/body/Penis";
 
 export const ChargenRules = {
 	minAttr: 2,

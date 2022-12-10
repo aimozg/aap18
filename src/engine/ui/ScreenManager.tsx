@@ -9,7 +9,7 @@ import {GameScreen} from "./screens/GameScreen";
 import {LogManager} from "../logging/LogManager";
 import {animateTransition, TransitionAnimationName} from "./animations";
 import {KeyCodes} from "./KeyCodes";
-import {CreaturePanel} from "../../game/ui/CreaturePanel";
+import {CreaturePanel} from "./panels/CreaturePanel";
 import {milliTime} from "../utils/time";
 import {Game} from "../Game";
 import {h} from "preact";

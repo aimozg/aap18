@@ -1,20 +1,20 @@
-import {AbstractScreen} from "../../engine/ui/AbstractScreen";
+import {AbstractScreen} from "../ui/AbstractScreen";
 import {h, VNode} from "preact";
-import {Button} from "../../engine/ui/components/Button";
-import {ButtonMenu} from "../../engine/ui/components/ButtonMenu";
-import {ChargenStepOrigin} from "../chargen/ChargenStepOrigin";
-import {ChargenStepIdentity} from "../chargen/ChargenStepIdentity";
-import {ChargenStepRace} from "../chargen/ChargenStepRace";
-import {ChargenStepStats} from "../chargen/ChargenStepStats";
-import {ChargenStepClass} from "../chargen/ChargenStepClass";
-import {ChargenStepTraits} from "../chargen/ChargenStepTraits";
-import {ChargenStepAppearance} from "../chargen/ChargenStepAppearance";
-import {ChargenStepFinalize} from "../chargen/ChargenStepFinalize";
-import {ChargenStep} from "../chargen/ChargenStep";
-import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
-import {ChargenStepAttrs} from "../chargen/ChargenStepAttrs";
-import {ChargenController} from "../chargen/ChargenController";
-import {ChargenStepSkills} from "../chargen/ChargenStepSkills";
+import {Button} from "../ui/components/Button";
+import {ButtonMenu} from "../ui/components/ButtonMenu";
+import {ChargenStepOrigin} from "./ChargenStepOrigin";
+import {ChargenStepIdentity} from "./ChargenStepIdentity";
+import {ChargenStepRace} from "./ChargenStepRace";
+import {ChargenStepStats} from "./ChargenStepStats";
+import {ChargenStepClass} from "./ChargenStepClass";
+import {ChargenStepTraits} from "./ChargenStepTraits";
+import {ChargenStepAppearance} from "./ChargenStepAppearance";
+import {ChargenStepFinalize} from "./ChargenStepFinalize";
+import {ChargenStep} from "./ChargenStep";
+import {PlayerCharacter} from "../objects/creature/PlayerCharacter";
+import {ChargenStepAttrs} from "./ChargenStepAttrs";
+import {ChargenController} from "./ChargenController";
+import {ChargenStepSkills} from "./ChargenStepSkills";
 
 export class NewGameScreen extends AbstractScreen {
 

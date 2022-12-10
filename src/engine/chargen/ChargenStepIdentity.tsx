@@ -1,9 +1,9 @@
-import {ButtonMenu, ButtonMenuItem} from "../../engine/ui/components/ButtonMenu";
-import {TSex} from "../../engine/rules/gender";
+import {ButtonMenu, ButtonMenuItem} from "../ui/components/ButtonMenu";
+import {TSex} from "../rules/gender";
 import {Fragment, h, VNode} from "preact";
 import {ChargenStep} from "./ChargenStep";
-import {TextInput} from "../../engine/ui/components/TextInput";
-import {Button} from "../../engine/ui/components/Button";
+import {TextInput} from "../ui/components/TextInput";
+import {Button} from "../ui/components/Button";
 import {ChargenController} from "./ChargenController";
 
 export class ChargenStepIdentity extends ChargenStep {

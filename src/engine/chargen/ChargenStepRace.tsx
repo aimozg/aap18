@@ -1,4 +1,4 @@
-import {ButtonMenu} from "../../engine/ui/components/ButtonMenu";
+import {ButtonMenu} from "../ui/components/ButtonMenu";
 import {Fragment, h, VNode} from "preact";
 import {ChargenStep} from "./ChargenStep";
 import {ChargenController} from "./ChargenController";

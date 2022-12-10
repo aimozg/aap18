@@ -2,7 +2,7 @@
  * Created by aimozg on 03.07.2022.
  */
 import {Game} from "./Game";
-import {NewGameScreen} from "../game/ui/NewGameScreen";
+import {NewGameScreen} from "./chargen/NewGameScreen";
 import {LogManager} from "./logging/LogManager";
 import {SceneContext} from "./scene/SceneContext";
 import {TextOutput} from "./text/output/TextOutput";

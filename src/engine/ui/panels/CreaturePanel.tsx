@@ -1,19 +1,19 @@
-import {DomComponent} from "../../engine/ui/DomComponent";
+import {DomComponent} from "../DomComponent";
 import {ComponentChildren, h, VNode} from "preact";
-import {Creature} from "../../engine/objects/Creature";
+import {Creature} from "../../objects/Creature";
 import {Fragment, render} from "preact/compat";
-import {Bar} from "../../engine/ui/components/Bar";
-import {removeChildren} from "../../engine/utils/dom";
-import {stripedBackground} from "../../engine/utils/css";
-import {CommonText} from "../../engine/text/CommonText";
-import {PartialRecord} from "../../engine/utils/types";
-import {LogManager} from "../../engine/logging/LogManager";
-import {Button} from "../../engine/ui/components/Button";
-import {CombatRules} from "../combat/CombatRules";
-import {TextIcon} from "../../engine/objects/creature/CreatureCondition";
-import {signValue} from "../../engine/utils/math";
-import {TAttribute, TAttributes} from "../../engine/rules/TAttribute";
-import {WithTooltip} from "../../engine/ui/components/WithTooltip";
+import {Bar} from "../components/Bar";
+import {removeChildren} from "../../utils/dom";
+import {stripedBackground} from "../../utils/css";
+import {CommonText} from "../../text/CommonText";
+import {PartialRecord} from "../../utils/types";
+import {LogManager} from "../../logging/LogManager";
+import {Button} from "../components/Button";
+import {CombatRules} from "../../../game/combat/CombatRules";
+import {TextIcon} from "../../objects/creature/CreatureCondition";
+import {signValue} from "../../utils/math";
+import {TAttribute, TAttributes} from "../../rules/TAttribute";
+import {WithTooltip} from "../components/WithTooltip";
 
 export interface CreaturePanelOptions {
 	collapsible: boolean;

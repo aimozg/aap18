@@ -2,9 +2,9 @@ import {ChargenStep} from "./ChargenStep";
 import {h, VNode} from "preact";
 import {ChargenController} from "./ChargenController";
 import {Fragment} from "preact/compat";
-import {Button} from "../../engine/ui/components/Button";
-import {AttrMetadata} from "../data/stats";
-import {signValue} from "../../engine/utils/math";
+import {Button} from "../ui/components/Button";
+import {AttrMetadata} from "../../game/data/stats";
+import {signValue} from "../utils/math";
 
 export class ChargenStepSkills extends ChargenStep {
 

@@ -1,8 +1,8 @@
 import {Fragment, h, VNode} from "preact";
 import {ChargenStep} from "./ChargenStep";
 import {ChargenController} from "./ChargenController";
-import {ButtonMenu} from "../../engine/ui/components/ButtonMenu";
-import {Parse} from "../../engine/text/ParseTag";
+import {ButtonMenu} from "../ui/components/ButtonMenu";
+import {Parse} from "../text/ParseTag";
 
 export class ChargenStepTraits extends ChargenStep {
 

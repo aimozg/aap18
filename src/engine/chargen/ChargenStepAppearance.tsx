@@ -1,11 +1,11 @@
 import {Fragment, h, VNode} from "preact";
 import {ChargenStep} from "./ChargenStep";
-import {Parser} from "../../engine/text/parser/Parser";
-import {Appearance} from "../data/text/Appearance";
-import {ListColorPicker} from "../../engine/ui/components/ListColorPicker";
-import {Color} from "../../engine/objects/Color";
-import {ButtonMenu} from "../../engine/ui/components/ButtonMenu";
-import {HairLengthTier} from "../data/body/Hair";
+import {Parser} from "../text/parser/Parser";
+import {Appearance} from "../../game/data/text/Appearance";
+import {ListColorPicker} from "../ui/components/ListColorPicker";
+import {Color} from "../objects/Color";
+import {ButtonMenu} from "../ui/components/ButtonMenu";
+import {HairLengthTier} from "../../game/data/body/Hair";
 import {ChargenController} from "./ChargenController";
 
 export class ChargenStepAppearance extends ChargenStep {

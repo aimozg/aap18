@@ -1,5 +1,5 @@
 import {VNode} from "preact";
-import {Game} from "../../engine/Game";
+import {Game} from "../Game";
 import {ChargenController} from "./ChargenController";
 
 export abstract class ChargenStep {

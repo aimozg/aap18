@@ -4,12 +4,12 @@
 
 import {ChargenStep} from "./ChargenStep";
 import {Fragment, h, VNode} from "preact";
-import {Button} from "../../engine/ui/components/Button";
+import {Button} from "../ui/components/Button";
 import {ChargenController} from "./ChargenController";
-import {TAttribute} from "../../engine/rules/TAttribute";
-import {AttrMetadata, IAttrMetadata} from "../data/stats";
-import {Parse} from "../../engine/text/ParseTag";
-import {Game} from "../../engine/Game";
+import {TAttribute} from "../rules/TAttribute";
+import {AttrMetadata, IAttrMetadata} from "../../game/data/stats";
+import {Parse} from "../text/ParseTag";
+import {Game} from "../Game";
 
 export class ChargenStepAttrs extends ChargenStep {
 

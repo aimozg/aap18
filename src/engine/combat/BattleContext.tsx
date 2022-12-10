@@ -4,7 +4,7 @@
 import {Creature} from "../objects/Creature";
 import {GameContext} from "../state/GameContext";
 import {GameScreenLayout} from "../ui/screens/GameScreen";
-import {CreaturePanel, CreatureValueId} from "../../game/ui/CreaturePanel";
+import {CreaturePanel, CreatureValueId} from "../ui/panels/CreaturePanel";
 import {Deferred} from "../utils/Deferred";
 import {AnimationTimeFast, BattleResult, BattleResultType, BattleState, CombatController} from "./CombatController";
 import {milliTime} from "../utils/time";

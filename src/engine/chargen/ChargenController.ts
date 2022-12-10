@@ -2,25 +2,25 @@
  * Created by aimozg on 14.07.2022.
  */
 
-import {PlayerCharacter} from "../../engine/objects/creature/PlayerCharacter";
-import {ChargenRules} from "./ChargenRules";
-import {TAttribute, TAttributes} from "../../engine/rules/TAttribute";
-import fxrng from "../../engine/math/fxrng";
-import {defaultGender, TSex} from "../../engine/rules/gender";
-import {NewGameScreen} from "../ui/NewGameScreen";
-import {CharacterBody} from "../../engine/objects/creature/Character";
-import {BreastSizeTier, BreastSizeTiers} from "../data/body/Breasts";
-import {randomName} from "../data/text/names";
-import {ButtonMenuItem} from "../../engine/ui/components/ButtonMenu";
-import {Color} from "../../engine/objects/Color";
-import {HumanEyeColorNames, HumanHairColorNames, HumanSkinColorNames} from "../data/colors";
-import {Game} from "../../engine/Game";
-import {IStatMetadata, StatMetadata} from "../data/stats";
-import {CharacterClass} from "../../engine/rules/classes/CharacterClass";
-import {PenisSizeTier, PenisSizeTiers} from "../data/body/Penis";
-import {GdStartingTraits} from "../data/traits/starting";
-import {TraitType} from "../../engine/rules/TraitType";
-import {Skill} from "../../engine/objects/creature/Skill";
+import {PlayerCharacter} from "../objects/creature/PlayerCharacter";
+import {ChargenRules} from "../../game/ChargenRules";
+import {TAttribute, TAttributes} from "../rules/TAttribute";
+import fxrng from "../math/fxrng";
+import {defaultGender, TSex} from "../rules/gender";
+import {NewGameScreen} from "./NewGameScreen";
+import {CharacterBody} from "../objects/creature/Character";
+import {BreastSizeTier, BreastSizeTiers} from "../../game/data/body/Breasts";
+import {randomName} from "../../game/data/text/names";
+import {ButtonMenuItem} from "../ui/components/ButtonMenu";
+import {Color} from "../objects/Color";
+import {HumanEyeColorNames, HumanHairColorNames, HumanSkinColorNames} from "../../game/data/colors";
+import {Game} from "../Game";
+import {IStatMetadata, StatMetadata} from "../../game/data/stats";
+import {CharacterClass} from "../rules/classes/CharacterClass";
+import {PenisSizeTier, PenisSizeTiers} from "../../game/data/body/Penis";
+import {GdStartingTraits} from "../../game/data/traits/starting";
+import {TraitType} from "../rules/TraitType";
+import {Skill} from "../objects/creature/Skill";
 
 interface IChargenSecondaryStat {
 	key: keyof ChargenController;
