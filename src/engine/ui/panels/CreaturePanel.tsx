@@ -16,6 +16,7 @@ import {TAttribute, TAttributes} from "../../rules/TAttribute";
 import {WithTooltip} from "../components/WithTooltip";
 
 export interface CreaturePanelOptions {
+	cssclass: string;
 	collapsible: boolean;
 
 	ap: boolean;
@@ -67,7 +68,7 @@ export class CreaturePanel extends DomComponent {
 	constructor(
 		creature: Creature|null,
 		options:Partial<CreaturePanelOptions> = {}) {
-		super(<div class="creature-panel"></div>);
+		super(<div class={"creature-panel "+(options.cssclass??"")}></div>);
 		this._creature = creature;
 		this.options = Object.assign({}, CreaturePanel.DefaultOptions, options);
 	}
@@ -105,6 +106,7 @@ export class CreaturePanel extends DomComponent {
 	options: CreaturePanelOptions;
 	static DefaultOptions: CreaturePanelOptions = {
 		collapsible: true,
+		cssclass: "",
 
 		ap: true,
 

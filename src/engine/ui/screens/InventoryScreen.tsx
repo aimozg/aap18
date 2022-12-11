@@ -1,15 +1,13 @@
-import {AbstractScreen} from "../AbstractScreen";
 import {Fragment, h, VNode} from "preact";
 import {Creature} from "../../objects/Creature";
 import {Button, execUIAction, UIAction} from "../components/Button";
-import {Game} from "../../Game";
 import {KeyCodes} from "../KeyCodes";
 import {CommonText} from "../../text/CommonText";
 import {Item} from "../../objects/Item";
-import {Deferred} from "../../utils/Deferred";
 import {Inventory} from "../../objects/Inventory";
 import {TextOutput} from "../../text/output/TextOutput";
 import {TextPages} from "../panels/TextPages";
+import {AbstractModalScreen} from "../AbstractModalScreen";
 
 type ItemAction = UIAction & { longLabel: string, position: number }
 
@@ -43,7 +41,7 @@ function unhotkey(a: UIAction): UIAction {
 	return Object.assign({}, a, {hotkey: undefined})
 }
 
-export class InventoryScreen extends AbstractScreen {
+export class InventoryScreen extends AbstractModalScreen<void> {
 
 	/**
 	 * If `other` is null, manage `creature`'s equipment.
@@ -68,25 +66,13 @@ export class InventoryScreen extends AbstractScreen {
 	readonly options: InventoryScreenOptions;
 	private isEquipmentScreen = !this.other;
 	readonly main = this.creature.inventory;
-	readonly promise = new Deferred<void>();
-
-	async showModal() {
-		await this.game.screenManager.addOnTop(this, 'fade-fast');
-		await this.promise;
-	}
-
-	async close() {
-		await Game.instance.screenManager.closeTop("fade-fast");
-		this.promise.resolve();
-	}
 
 	onActivate() {
-		if (this.promise.completed) throw new Error("Cannot re-add InventoryScreen");
 		super.onActivate();
 		this.update();
 	}
 
-	// TODO store category & position instead
+// TODO store category & position instead
 	selectedItem: Item | null = null;
 	private textOutput: TextOutput = new TextOutput(new TextPages())
 	private mainInvMenus: ItemMenu[] = [];

@@ -314,8 +314,12 @@ export class ChargenController {
 		this.player.stats.naturalPerv = this.perv;
 		this.player.stats.cor = this.cor;
 		// Skills
+		if (this.skillPointsSpent > this.skillPointsTotal()) {
+			this.skillPointsSpent = 0;
+			this.skills = {};
+		}
 		for (let [id, value] of Object.entries(this.skills)) {
-			this.player.naturalSkills[id] = value;
+			this.player.stats.naturalSkills[id] = value;
 		}
 		// Traits
 		if (this.traitObject) this.player.addTrait(this.traitObject);

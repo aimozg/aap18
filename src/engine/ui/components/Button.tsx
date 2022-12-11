@@ -3,7 +3,7 @@ import {KeyCodes} from "../KeyCodes";
 import {TooltipManager} from "./Tooltip";
 
 export interface ButtonProps {
-	label?: string;
+	label?: ComponentChildren;
 	action?: UIAction;
 	className?: string;
 	onClick?: (e: MouseEvent) => void;

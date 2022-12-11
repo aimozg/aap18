@@ -78,7 +78,7 @@ export class ChargenStepAttrs extends ChargenStep {
 				        hold
 				        onClick={() => this.cc.attrDec(meta.id)}
 				        label="-"/>
-				<div style="min-width:2rem" class="text-center">{this.player.attr(meta.id)}</div>
+				<div class="attr-value">{this.player.attr(meta.id)}</div>
 				<Button disabled={!this.cc.canIncAttr(meta.id)}
 				        hold
 				        onClick={() => this.cc.attrInc(meta.id)}

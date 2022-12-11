@@ -1,10 +1,11 @@
-import {Component, ComponentChild, h, RenderableProps} from "preact";
+import {Component, ComponentChild, ComponentChildren, h, RenderableProps} from "preact";
 import {Button} from "./Button";
 
 export interface ButtonMenuItem<V> {
-	label: string;
+	label: ComponentChildren;
 	value: V;
 	disabled?: boolean;
+	hotkey?: string;
 	className?: string;
 }
 
@@ -32,11 +33,12 @@ export class ButtonMenu<V> extends Component<ButtonMenuProps<V>, ButtonMenuState
 
 	render(props: RenderableProps<ButtonMenuProps<V>>, state: Readonly<ButtonMenuState>, context: any): ComponentChild {
 		return props.items.map(item =>
-			<Button label={props.selected === item.value ? '<' + item.label + '>' : ('\xA0' + item.label + '\xA0')}
+			<Button label={item.label}
 			        className={
 				        (item.className ?? '') + ' ' +
 				        (props.className ?? '') + ' ' +
-				        (props.selected === item.value ? '-default' : '')}
+				        (props.selected === item.value ? '-selected-item' : '')}
+			        hotkey={item.hotkey}
 			        disabled={item.disabled}
 			        onClick={(e) => this.click(e, item.value)}/>
 		)

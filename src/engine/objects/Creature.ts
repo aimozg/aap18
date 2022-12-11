@@ -13,7 +13,7 @@ import {DefaultMonsterAI, MonsterAI} from "./MonsterAI";
 import {AbstractCombatAbility} from "../combat/AbstractCombatAbility";
 import {GOCreature} from "../combat/BattleGrid";
 import {Inventory} from "./Inventory";
-import {MaxLevel, XpPerLevel} from "../../game/xp";
+import {MaxLevel, SkillXpPerLevel, XpPerLevel} from "../../game/xp";
 import {Loot} from "./Loot";
 import {CreatureCondition} from "./creature/CreatureCondition";
 import {Skill} from "./creature/Skill";
@@ -96,6 +96,8 @@ export class Creature {
 
 	get level(): number { return this.stats.level }
 	get xp(): number { return this.stats.xp }
+	get attrPoints(): number { return this.stats.attrPoints }
+	get skillPoints(): number { return this.stats.skillPoints }
 
 	get hp():number { return this.stats.hp }
 	get hpMax():number { return this.stats.hpMax }
@@ -289,24 +291,26 @@ export class Creature {
 	createStatusEffect(type:StatusEffectType, power:number = 1):StatusEffect { return this.ctrl.createStatusEffect(type, power) }
 	removeStatusEffect(type:StatusEffectType):boolean { return this.ctrl.removeStatusEffect(type) }
 
-	//---------------//
-	// Skills - Data //
-	//---------------//
-
-	// TODO move to CreatureStats
-	/** key: skill id */
-	naturalSkills: Record<string, number> = {};
-
 	//------------------//
 	// Skills - Helpers //
 	//------------------//
 
 	naturalSkillValue(skill: Skill):number {
-		return this.naturalSkills[skill.resId] ?? 0;
+		return this.stats.naturalSkills[skill.resId] ?? 0;
 	}
 	// TODO move to CreatureController
 	skillValue(skill: Skill):number {
 		return this.naturalSkillValue(skill) + (skill.attr >= 0 ? this.attrMod(skill.attr) : 0)
+	}
+	get maxNaturalSkill():number { return this.ctrl.maxNaturalSkill }
+	skillXp(skill: Skill):number {
+		return this.stats.skillXp[skill.resId] ?? 0;
+	}
+	/** can be Infinity */
+	nextSkillLevelXp(skill:Skill):number {
+		let level = this.naturalSkillValue(skill);
+		if (level >= this.maxNaturalSkill) return Infinity;
+		return SkillXpPerLevel[level];
 	}
 
 	///////////////////

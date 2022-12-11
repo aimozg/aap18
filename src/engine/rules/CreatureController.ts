@@ -12,6 +12,7 @@ import {StatusEffect, StatusEffectType} from "../objects/creature/StatusEffect";
 import {CoreStatusEffects} from "../objects/creature/CoreStatusEffects";
 import {Buff, BuffableStatId} from "../objects/creature/stats/BuffableStat";
 import {LogManager} from "../logging/LogManager";
+import {Skill} from "../objects/creature/Skill";
 
 
 export interface HornyStage {
@@ -90,6 +91,21 @@ export class CreatureController {
 	get cha(): number { return this.attr(TAttribute.CHA) }
 
 	get chaMod(): number { return this.attrMod(TAttribute.CHA) }
+
+	spendAttributePoint(attr:TAttribute) {
+		// TODO log
+		if (this.stats.attrPoints <= 0) throw new Error("No attrPoints to spend");
+		this.stats.attrPoints--;
+		this.stats.naturalAttrs[attr]++;
+		this.updateStats();
+	}
+	spendSkillPoint(skill:Skill) {
+		// TODO log
+		if (this.stats.skillPoints <= 0) throw new Error("No skillPoints to spend");
+		if (this.stats.naturalSkills[skill.resId] >= this.maxNaturalSkill) throw new Error("Skill capped");
+		this.stats.skillPoints--;
+		this.stats.naturalSkills[skill.resId]++;
+	}
 
 	//-----------//
 	// Resources //
@@ -198,6 +214,13 @@ export class CreatureController {
 	 */
 	get canAct(): boolean {
 		return this.isAlive && !this.creature.hasCondition(CoreConditions.Unaware);
+	}
+
+	//--------//
+	// Skills //
+	//--------//
+	get maxNaturalSkill():number {
+		return this.stats.level + 3;
 	}
 
 	//------------------//

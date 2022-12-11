@@ -28,25 +28,27 @@ export class PlaceSidebar extends Component<PlaceSidebarProps, PlaceSidebarState
 
 	static HkRest = KeyCodes.KEYR;
 	static HkInventory = KeyCodes.KEYI;
-	static HkLevelUp = KeyCodes.KEYP;
+	static HkCharacter = KeyCodes.KEYP;
 	static HkExplore = KeyCodes.KEYE;
 
 	private aRest: UIAction = {
+		label: "Rest",
 		disabled: () => this.state.disabled || !this.props.context.canRest(),
 		hotkey: PlaceSidebar.HkRest,
 		callback: () => this.props.context.onRestClick()
 	}
 
 	private aInventory: UIAction = {
+		label: "Inventory",
 		disabled: () => this.state.disabled || !this.props.context.canManageInventory(),
 		hotkey: PlaceSidebar.HkInventory,
 		callback: () => this.props.context.onInventoryClick()
 	}
 
-	private aLevelup: UIAction = {
-		disabled: () => this.state.disabled || !this.props.context.canLevelUp(),
-		hotkey: PlaceSidebar.HkLevelUp,
-		callback: () => this.props.context.onLevelUpClick()
+	private aCharacterMenu: UIAction = {
+		disabled: () => this.state.disabled,
+		hotkey: PlaceSidebar.HkCharacter,
+		callback: () => this.props.context.onCharacterClick()
 	}
 
 	private aExplore: UIAction = {
@@ -55,7 +57,7 @@ export class PlaceSidebar extends Component<PlaceSidebarProps, PlaceSidebarState
 		callback: () => this.props.context.onExploreClick()
 	}
 
-	private actions = [this.aRest, this.aInventory, this.aLevelup, this.aExplore];
+	private actions = [this.aRest, this.aInventory, this.aCharacterMenu, this.aExplore];
 
 	handleKeyboardEvent(e: KeyboardEvent): boolean {
 		return execUIAction(e, this.actions);
@@ -69,18 +71,18 @@ export class PlaceSidebar extends Component<PlaceSidebarProps, PlaceSidebarState
 				<div className="place-description text-small">{pc.place.description()}</div>
 			</div>
 			<div class="place-actions d-flex flex-column ai-stretch gap-2 ma-2">
-				<Button label="Rest"
-				        className="-big"
-				        action={this.aRest}/>
-				<Button label="Inventory"
-				        className="-big"
-				        action={this.aInventory}/>
-				<Button label="Level Up"
-				        className="-big"
-				        action={this.aLevelup}/>
 				<Button label="Explore"
 				        className="-big"
 				        action={this.aExplore}/>
+				<Button label="Rest"
+				        className="-big"
+				        action={this.aRest}/>
+				<Button label="Character"
+				        className="-big"
+				        action={this.aCharacterMenu}/>
+				<Button label="Inventory"
+				        className="-big"
+				        action={this.aInventory}/>
 			</div>
 		</div>;
 	}

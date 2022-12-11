@@ -5,6 +5,7 @@ import {GameScreenLayout} from "../ui/screens/GameScreen";
 import {PlaceSidebar} from "../ui/panels/PlaceSidebar";
 import {createRef, h} from "preact";
 import {InteractiveTextOutput} from "../text/output/InteractiveTextOutput";
+import {PlayerMenuScreen} from "../ui/screens/PlayerMenuScreen";
 
 export class PlaceContext extends SceneContext {
 	private readonly sidebarRef = createRef<PlaceSidebar>();
@@ -54,9 +55,9 @@ export class PlaceContext extends SceneContext {
 		return this.place.canLevelUp() && this.player.canLevelUp();
 	}
 
-	onLevelUpClick() {
-		this.say("This feature is not implemented yet...");
-		// TODO implement levelup menu
+	async onCharacterClick() {
+		let screen = new PlayerMenuScreen(this.player, this.place.canLevelUp())
+		await screen.showModal()
 	}
 
 	canExplore(): boolean {

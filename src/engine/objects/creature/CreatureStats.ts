@@ -1,5 +1,7 @@
 import {Creature} from "../Creature";
 import {TAttribute, TAttributes} from "../../rules/TAttribute";
+import {createRecord} from "../../utils/collections";
+import {Game} from "../../Game";
 
 export class CreatureStats {
 
@@ -12,6 +14,9 @@ export class CreatureStats {
 
 	level: number = 1;
 	xp: number = 0;
+
+	attrPoints: number = 0;
+	skillPoints: number = 0;
 
 	//-----------//
 	// Resources //
@@ -44,7 +49,18 @@ export class CreatureStats {
 	get naturalWis() { return this.naturalAttrs[TAttribute.WIS]; }
 	get naturalCha() { return this.naturalAttrs[TAttribute.CHA]; }
 
+	//-----------------//
+	// Secondary stats //
+	//-----------------//
+
 	naturalLib: number = 0;
 	naturalPerv: number = 0;
 	cor: number = 0;
+
+	//--------//
+	// Skills //
+	//--------//
+
+	naturalSkills: Record<string,number> = createRecord(Game.instance.data.skills.keys().map(id=>[id,0]));
+	skillXp: Record<string,number> = createRecord(Game.instance.data.skills.keys().map(id=>[id,0]));
 }

@@ -11,7 +11,7 @@ import {Parse} from "../../../engine/text/ParseTag";
 
 // TODO Diversify descriptions - "You have DESC TYPE" | "Your TYPE is DESC" | "CUSTOMDESC"
 export namespace Appearance {
-	export function characterAppearance(pc: Character, parser: Parser): ComponentChild {
+	export function characterAppearance(pc: Character, parser: Parser = new Parser()): ComponentChild {
 		parser.setTarget(pc)
 		return <Parse parser={parser}>
 			<p>{/*Intro*/}{/*TODO feet/inches*/}

@@ -31,6 +31,10 @@ u, .text-u {
     font-size: $sz;
   }
 }
+.th {
+  font-weight: bold;
+  text-align: center;
+}
 
 .text-nowrap {
   white-space: nowrap;
@@ -115,9 +119,11 @@ $sizes: (
         "xxs": 50%,
         "xs": 67%,
         "s": 80%,
+        "sm": 80%,
         "small": 80%,
         "normal": 100%,
         "large": 125%,
+        "lg": 125%,
         "l": 125%,
         "xl": 150%,
         "xxl": 200%,

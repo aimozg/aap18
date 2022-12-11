@@ -6,6 +6,12 @@
   display: inline-grid;
 }
 
+/* todo move out */
+$screen-sizes: (
+        xl: 1280px,
+        lg: 1024px,
+        md: 767px,
+);
 $grid-sizes: (2, 3, 4, 6, 8, 10, 12);
 @each $i in $grid-sizes {
   .grid-#{$i} {
@@ -15,6 +21,18 @@ $grid-sizes: (2, 3, 4, 6, 8, 10, 12);
   .grid-v#{$i} {
     display: grid;
     grid-template-rows: repeat(#{$i}, 1fr);
+  }
+  @each $ssprefix, $ssvalue in $screen-sizes {
+    @media(min-width: $ssvalue) {
+      .grid-#{$ssprefix}-#{$i} {
+        display: grid;
+        grid-template-columns: repeat(#{$i}, 1fr);
+      }
+      .grid-#{$ssprefix}-v#{$i} {
+        display: grid;
+        grid-template-rows: repeat(#{$i}, 1fr);
+      }
+    }
   }
 }
 

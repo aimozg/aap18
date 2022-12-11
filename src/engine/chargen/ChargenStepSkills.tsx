@@ -26,7 +26,7 @@ export class ChargenStepSkills extends ChargenStep {
 			}} class="d-grid gap-2 ai-start">
 				<b class="text-center">Name</b>
 				<b class="cols-3 text-center">Natural</b>
-				<b class="cols-2 text-center">Bonus</b>
+				<b class="cols-2 text-center">Attribute</b>
 				<b></b>
 				<b class="text-center">Total</b>
 				<b class="text-center">Description</b>
@@ -35,24 +35,29 @@ export class ChargenStepSkills extends ChargenStep {
 					<div class="text-hl">{skill.name}</div>
 					<Button disabled={!this.cc.canDecSkill(skill)}
 					        hold
-					        onClick={()=>this.cc.skillDec(skill)}
+					        onClick={() => this.cc.skillDec(skill)}
 					        label="-"/>
 					<div style="min-width:2rem" class="text-center">
 						{this.cc.skillNatural(skill)}
 					</div>
 					<Button disabled={!this.cc.canIncSkill(skill)}
 					        hold
-					        onClick={()=>this.cc.skillInc(skill)}
+					        onClick={() => this.cc.skillInc(skill)}
 					        label="+"/>
-					<div>
-						{skill.attr >= 0 && AttrMetadata[skill.attr].abbr}
-					</div>
-					<div class={skill.attr >= 0 ?
-						signValue(this.cc.attrMod(skill.attr),'text-negative','','text-positive'): ''}>
-						{skill.attr >= 0 && this.cc.attrMod(skill.attr).signed()}
-					</div>
+					{skill.attr >= 0
+						? <Fragment>
+							<div>({AttrMetadata[skill.attr].abbr})</div>
+							<div
+								className={signValue(this.cc.attrMod(skill.attr), 'text-negative', '', 'text-positive')}>
+								{this.cc.attrMod(skill.attr).signed()}
+							</div>
+						</Fragment>
+						: <div className="cols-2"/>
+					}
+
 					<div>=</div>
-					<div class={"mx-2" + signValue(this.cc.skillTotal(skill) - this.cc.skillNatural(skill), ' text-negative', '',' text-positive')}>
+					<div
+						class={"mx-2" + signValue(this.cc.skillTotal(skill) - this.cc.skillNatural(skill), ' text-negative', '', ' text-positive')}>
 						{this.cc.skillTotal(skill)}
 					</div>
 					<div>
@@ -69,7 +74,8 @@ export class ChargenStepSkills extends ChargenStep {
 				<div class="cols-6"></div>
 			</div>
 			<p>
-				You raise your skills by using them, and with level-up points. Your character level affects your maximum skill value.
+				You raise your skills by using them, and with level-up points. Your character level affects your maximum
+				skill value.
 			</p>
 
 		</Fragment>

@@ -34,6 +34,7 @@
 
 .creature-panel {
   @include uibox.uibox;
+  max-width: 400px;
   &:not(.-collapsed).-collapsible {
     // stick collapser button to panel bottom
     padding-bottom: 0;

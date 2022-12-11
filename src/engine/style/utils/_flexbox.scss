@@ -17,6 +17,12 @@
   .as-#{$align} {
     align-self: $align;
   }
+  .js-#{$align} {
+    justify-self: $align;
+  }
+  .ji-#{$align} {
+    justify-items: $align;
+  }
 }
 @each $align in center, start, end, left, right, flex-start, flex-end, stretch, space-around, space-between, space-evenly {
   .jc-#{$align} {
@@ -27,6 +33,11 @@
 @for $i from 0 to 16 {
   .gap-#{$i} {
     gap: ($i*0.25em);
+  }
+  @for $j from 0 to 16 {
+    .gap-#{$i}-#{$j} {
+      gap: ($i*0.25em) ($j*0.25em);
+    }
   }
 }
 

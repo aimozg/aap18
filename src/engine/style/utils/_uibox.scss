@@ -1,5 +1,7 @@
 @mixin uibox {
-  border: 1px solid var(--theme-ctrl-fg);
+  &:not(.-noborder) {
+    border: 1px solid var(--theme-ctrl-fg);
+  }
   background: var(--theme-bg);
   padding: 0.5rem;
 

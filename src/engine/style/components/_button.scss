@@ -4,6 +4,9 @@ $iconBtnSize: 32px;
 
 @mixin button {
   @include inputs.control;
+  &:not(.-link, .-wrap) {
+    white-space: nowrap;
+  }
   &.-icon {
     width: $iconBtnSize;
     height: $iconBtnSize;
@@ -32,6 +35,16 @@ $iconBtnSize: 32px;
       }
     }
     font-weight: bold;
+  }
+  &.-selected-item {
+    border-color: var(--theme-ctrl-default);
+    color: var(--tc-bold);
+    &::before {
+      content: '<'
+    }
+    &::after {
+      content: '>'
+    }
   }
 
   &:not(:disabled):hover {
