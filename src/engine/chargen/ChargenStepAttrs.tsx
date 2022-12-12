@@ -10,6 +10,7 @@ import {TAttribute} from "../rules/TAttribute";
 import {AttrMetadata, IAttrMetadata} from "../../game/data/stats";
 import {Parse} from "../text/ParseTag";
 import {Game} from "../Game";
+import {LevelRules} from "../rules/LevelRules";
 
 export class ChargenStepAttrs extends ChargenStep {
 
@@ -87,8 +88,8 @@ export class ChargenStepAttrs extends ChargenStep {
 				<div><Parse>{meta.description}<br/>{this.explainStat(meta)}</Parse></div>
 			</Fragment>)}
 			<div class="cols-6">
-				You have {this.cc.attrPoints} points to allocate.
-				You get +1 to the attribute of your choice every 4 levels.
+				You have {this.cc.attrPoints} attribute points.
+				You get +{LevelRules.AttrPointsGain} attribute points every {LevelRules.AttrPointsGainEveryNthLevel} levels.
 			</div>
 			<h3 className="cols-6">
 				Derived stats

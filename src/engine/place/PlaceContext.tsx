@@ -51,13 +51,10 @@ export class PlaceContext extends SceneContext {
 		await this.gc.openTransferMenu(null);
 	}
 
-	canLevelUp(): boolean {
-		return this.place.canLevelUp() && this.player.canLevelUp();
-	}
-
 	async onCharacterClick() {
 		let screen = new PlayerMenuScreen(this.player, this.place.canLevelUp())
 		await screen.showModal()
+		this.sidebarRef.current?.forceUpdate()
 	}
 
 	canExplore(): boolean {

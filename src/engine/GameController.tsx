@@ -22,7 +22,7 @@ import {InventoryScreen, InventoryScreenOptions} from "./ui/screens/InventoryScr
 import {Scene, SceneFn} from "./scene/Scene";
 import {ComponentChildren, h} from "preact";
 import {Skill} from "./objects/creature/Skill";
-import {SkillXp} from "../game/xp";
+import {LevelRules} from "./rules/LevelRules";
 
 const logger = LogManager.loggerFor("engine.GameController");
 
@@ -70,13 +70,16 @@ export class GameController {
 		let ss = this.game.screenManager.gameScreen;
 		await this.game.screenManager.replaceTop(ss, 'fade-fast');
 		this.game.screenManager.sharedPlayerPanel.creature = this.player;
+		this.game.screenManager.sharedTextPanel.clear();
 		await this.playScene(this.game.idata.startingSceneId);
 		this.showGameScreen()
 	}
 
-	displayMessage(message:ComponentChildren) {
+	displayMessage(message:string, msgClass?:string):void;
+	displayMessage(message:ComponentChildren):void;
+	displayMessage(message:ComponentChildren, msgClass?:string) {
 		if (typeof message === "string") {
-			this.game.screenManager.sharedTextPanel.append(<div class="text-hl">{message}</div>)
+			this.game.screenManager.sharedTextPanel.append(<div class={msgClass??"text-hl"}>{message}</div>)
 		} else {
 			this.game.screenManager.sharedTextPanel.append(message)
 		}
@@ -333,7 +336,8 @@ export class GameController {
 		let dc = options.dc;
 		let diff = roll+bonus - dc;
 		let critType = options.crit ?? "no";
-		let xp = options.xp ?? SkillXp.NORMAL;
+		let xp = options.xp ?? LevelRules.SkillXp.NORMAL;
+		xp *= LevelRules.XpGainFactor;
 
 		let result:SkillCheckResult = {success:false,crit:false};
 		result.success = diff >= 0;

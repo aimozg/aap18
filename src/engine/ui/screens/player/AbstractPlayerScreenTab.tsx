@@ -5,7 +5,7 @@ export abstract class AbstractPlayerScreenTab {
 // noinspection TypeScriptAbstractClassConstructorCanBeMadeProtected
 	constructor(public readonly screen:PlayerMenuScreen) {}
 	protected readonly player = this.screen.player;
-	protected readonly canLevelUp = this.screen.canLevelUp;
+	protected readonly interactive = this.screen.interactive;
 
 	abstract readonly label:ComponentChildren;
 	abstract node(): VNode;

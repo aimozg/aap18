@@ -17,6 +17,7 @@ export class CreatureStats {
 
 	attrPoints: number = 0;
 	skillPoints: number = 0;
+	perkPoints: number = 0;
 
 	//-----------//
 	// Resources //

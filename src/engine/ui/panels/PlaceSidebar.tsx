@@ -1,5 +1,5 @@
 import {PlaceContext} from "../../place/PlaceContext";
-import {Component, ComponentChild, h, RenderableProps} from "preact";
+import {Component, ComponentChild, Fragment, h, RenderableProps} from "preact";
 import {Button, execUIAction, UIAction} from "../components/Button";
 import {KeyCodes} from "../KeyCodes";
 
@@ -77,7 +77,11 @@ export class PlaceSidebar extends Component<PlaceSidebarProps, PlaceSidebarState
 				<Button label="Rest"
 				        className="-big"
 				        action={this.aRest}/>
-				<Button label="Character"
+				<Button label={
+					<Fragment>Character{pc.place.canLevelUp()
+						&& (pc.player.canLevelUpNow() || pc.player.skillPoints > 0 || pc.player.attrPoints > 0 || pc.player.perkPoints > 0)
+						&& <span class="text-elevated text-hl">+</span>}</Fragment>
+				}
 				        className="-big"
 				        action={this.aCharacterMenu}/>
 				<Button label="Inventory"

@@ -26,6 +26,11 @@ u, .text-u {
   vertical-align: super;
   font-size: smaller;
 }
+.text-elevated {
+  display: inline-block;
+  font-size: 80%;
+  transform: translate(0, -33%)
+}
 @each $sz in small, smaller, x-small, big, bigger, x-big {
   .text-#{$sz} {
     font-size: $sz;
@@ -93,6 +98,17 @@ u, .text-u {
 }
 .text-help {
   font-style: italic;
+}
+.text-xp {
+  color: var(--tc-xp);
+}
+.text-levelup {
+  color: var(--tc-xp-up);
+  font-weight: bold;
+}
+.text-maxlevel {
+  color: var(--tc-xp-max);
+  font-weight: bold;
 }
 
 .help-block {

@@ -8,9 +8,8 @@ import {signClass} from "../../../utils/math";
 
 export class PlayerSkillsTab extends AbstractPlayerScreenTab {
 	get label() {
-		if (this.canLevelUp && this.player.skillPoints > 0) return <div class="d-ib text-nowrap">
-			Skills<span class="d-ib text-hl text-xs"
-			                style="transform: translate(0, -33%)">(+{this.player.skillPoints})</span>
+		if (this.interactive && this.player.skillPoints > 0) return <div class="d-ib text-nowrap">
+			Skills<span class="text-hl text-elevated">(+{this.player.skillPoints})</span>
 		</div>
 		return "Skills"
 	}
@@ -19,7 +18,7 @@ export class PlayerSkillsTab extends AbstractPlayerScreenTab {
 		return <Fragment>
 			<h3>Skills</h3>
 			<p>
-				You have {numberOfThings(this.player.skillPoints, "skill point", "skill points")}. Maximum skill level
+				You have {numberOfThings(this.player.skillPoints, "skill point")}. Maximum skill level
 				is {this.player.maxNaturalSkill}.
 			</p>
 			<div class="d-igrid ai-start gap-2 text-center" style="grid-template-columns: repeat(8, max-content) 1fr">
@@ -35,7 +34,7 @@ export class PlayerSkillsTab extends AbstractPlayerScreenTab {
 					<div class="text-right">
 						{skill.naturalLevel}<span className="text-xs">,{skill.isMaxed ? '00' : skill.xpProgress.format('02d%')}</span>
 					</div>
-					{this.canLevelUp
+					{this.interactive
 						? <Button disabled={!this.screen.canIncSkill(skill)}
 						          onClick={() => this.screen.incSkill(skill)}
 						          label="+"/>

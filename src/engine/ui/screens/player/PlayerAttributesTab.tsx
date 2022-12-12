@@ -5,10 +5,11 @@ import {Button} from "../../components/Button";
 import {signClass} from "../../../utils/math";
 import {Parse} from "../../../text/ParseTag";
 import {numberOfThings} from "../../../text/utils";
+import {LevelRules} from "../../../rules/LevelRules";
 
 export class PlayerAttributesTab extends AbstractPlayerScreenTab {
 	get label() {
-		if (this.canLevelUp && this.player.attrPoints > 0) return <div class="d-ib text-nowrap">
+		if (this.interactive && this.player.attrPoints > 0) return <div class="d-ib text-nowrap">
 			Attributes<span class="d-ib text-hl text-xs"
 			                style="transform: translate(0, -33%)">(+{this.player.attrPoints})</span>
 		</div>
@@ -21,8 +22,8 @@ export class PlayerAttributesTab extends AbstractPlayerScreenTab {
 		return <Fragment>
 			<h3>Attributes</h3>
 			<p>
-				You have {numberOfThings(this.player.attrPoints,'attribute point','attribute points')}.
-				You get +1 to attribute of your choice every 4 levels.
+				You have {numberOfThings(this.player.attrPoints,'attribute point')}.
+				You get +{numberOfThings(LevelRules.AttrPointsGain,'attribute point')} every {LevelRules.AttrPointsGainEveryNthLevel} levels.
 			</p>
 			<div class="d-igrid ai-start gap-2" style="grid-template-columns: repeat(5, max-content) 1fr">
 				<div class="th">Attribute</div>
@@ -34,7 +35,7 @@ export class PlayerAttributesTab extends AbstractPlayerScreenTab {
 					<div class="text-hl">{meta.name}</div>
 					<div class="attr-value">{this.player.naturalAttr(meta.id)}</div>
 					{
-						this.canLevelUp
+						this.interactive
 							? <Button disabled={this.player.attrPoints <= 0} className="js-start"
 							          onClick={() => this.screen.incAttr(meta.id)} label="+"/>
 							: <div/>

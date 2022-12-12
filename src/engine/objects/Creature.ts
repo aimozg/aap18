@@ -13,7 +13,6 @@ import {DefaultMonsterAI, MonsterAI} from "./MonsterAI";
 import {AbstractCombatAbility} from "../combat/AbstractCombatAbility";
 import {GOCreature} from "../combat/BattleGrid";
 import {Inventory} from "./Inventory";
-import {MaxLevel, XpPerLevel} from "../../game/xp";
 import {Loot} from "./Loot";
 import {CreatureCondition} from "./creature/CreatureCondition";
 import {Skill} from "./creature/Skill";
@@ -99,6 +98,7 @@ export class Creature {
 	get xp(): number { return this.stats.xp }
 	get attrPoints(): number { return this.stats.attrPoints }
 	get skillPoints(): number { return this.stats.skillPoints }
+	get perkPoints(): number { return this.stats.perkPoints }
 
 	get hp():number { return this.stats.hp }
 	get hpMax():number { return this.stats.hpMax }
@@ -113,14 +113,9 @@ export class Creature {
 	// Main Stats - Helpers
 	/////////////////////////
 
-	nextLevelXp(): number {
-		if (this.level >= MaxLevel) return Infinity;
-		return XpPerLevel[this.level];
-	}
+	nextLevelXp(): number { return this.ctrl.nextLevelXp }
 
-	canLevelUp():boolean {
-		return this.xp >= this.nextLevelXp();
-	}
+	canLevelUpNow():boolean { return this.ctrl.canLevelUpNow }
 
 	get hpRatio():number { return this.hp/this.hpMax }
 

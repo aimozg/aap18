@@ -19,6 +19,7 @@ import {Inventory} from "../objects/Inventory";
 import {CoreConditions} from "../objects/creature/CoreConditions";
 import {SkipCombatAction} from "./actions/SkipCombatAction";
 import {CoreSkills} from "../objects/creature/CoreSkills";
+import {LevelRules} from "../rules/LevelRules";
 
 const logger = LogManager.loggerFor("engine.combat.CombatController")
 
@@ -527,7 +528,7 @@ export class CombatController {
 	async awardXpFor(player: PlayerCharacter, victim: Creature) {
 		logger.info("awardXpFor {} {}", player, victim)
 		// TODO calculate xp from level
-		let xp = 50
+		let xp = 50*LevelRules.XpGainFactor
 		if (xp > 0) {
 			this.logInfo("+" + xp + " XP.")
 			this.ctx.animateValueChange(player, "xp", player.xp + xp, AnimationTime)

@@ -3,7 +3,7 @@
  */
 
 import {Creature} from "../objects/Creature";
-import {atMost, coerce} from "../math/utils";
+import {atLeast, atMost, coerce} from "../math/utils";
 import {IntParam, NonNegativeIntParam, ValidateParams} from "../utils/decorators";
 import {CreatureCondition} from "../objects/creature/CreatureCondition";
 import {CoreConditions} from "../objects/creature/CoreConditions";
@@ -13,7 +13,7 @@ import {CoreStatusEffects} from "../objects/creature/CoreStatusEffects";
 import {Buff, BuffableStatId} from "../objects/creature/stats/BuffableStat";
 import {LogManager} from "../logging/LogManager";
 import {Skill} from "../objects/creature/Skill";
-import {SkillXpPerLevel} from "../../game/xp";
+import {LevelRules} from "./LevelRules";
 import {Game} from "../Game";
 
 
@@ -44,13 +44,51 @@ export class CreatureController {
 	// XP //
 	//----//
 
+	get level():number { return this.stats.level }
+
+	/**
+	 * Level after spending all stored XP
+	 */
+	get potentialLevel():number {
+		let lvl = this.stats.level;
+		let xp = this.stats.xp;
+		while (lvl <= LevelRules.MaxLevel) {
+			xp -= LevelRules.XpPerLevel[lvl];
+			if (xp >= 0) {
+				lvl++;
+			} else {
+				break;
+			}
+		}
+		return lvl;
+	}
+	get nextLevelXp():number {
+		if (this.level >= LevelRules.MaxLevel) return Infinity;
+		return (LevelRules.XpPerLevel)[this.level];
+	}
+	get canLevelUp():boolean {
+		return this.level < LevelRules.MaxLevel
+	}
+	get canLevelUpNow():boolean {
+		return this.canLevelUp && this.xp >= this.nextLevelXp
+	}
+	get xp():number { return this.stats.xp }
+
+	private levelUpNoticeShown = false;
 	@ValidateParams
 	setXp(@IntParam xp: number) {
 		this.stats.xp = xp;
+		if (this.canLevelUpNow) {
+			if (!this.levelUpNoticeShown) {
+				this.levelUpNoticeShown = true;
+				this.gc.displayMessage(`${this.creature.name} has enough experience to level up.`, 'text-levelup')
+				// TODO log only if for player
+			}
+		}
 	}
 
 	addXp(xp: number) {
-		this.setXp(this.stats.xp + xp);
+		this.setXp(this.xp + xp);
 	}
 
 	//------------//
@@ -231,7 +269,7 @@ export class CreatureController {
 	nextSkillLevelXp(skill: Skill): number {
 		let level = this.naturalSkillLevel(skill);
 		if (level >= this.maxNaturalSkill) return Infinity;
-		return SkillXpPerLevel[level];
+		return (LevelRules.SkillXpPerLevel)[level];
 	}
 	spendSkillPoint(skill:Skill) {
 		if (this.stats.skillPoints <= 0) throw new Error("No skillPoints to spend");
@@ -258,6 +296,9 @@ export class CreatureController {
 			}
 		}
 		this.stats.skillXp[skill.resId] = xp;
+	}
+	get skillPointsPerLevel(): number {
+		return atLeast(LevelRules.SkillPointsGainMin, LevelRules.SkillPointsGainBase + LevelRules.SkillPointsGainPerIntMod*this.intMod);
 	}
 
 	//------------------//
@@ -364,6 +405,27 @@ export class CreatureController {
 		this.setHp(this.creature.hpMax);
 		this.setEp(this.creature.epMax);
 		this.setLp(0); // TODO lpMin
+	}
+
+	levelUp() {
+		logger.debug("{} levelUp()", this.creature)
+		if (!this.canLevelUpNow) throw new Error("Cannot level up now");
+		this.levelUpNoticeShown = false;
+		let xpCost = this.nextLevelXp;
+		this.stats.level++;
+		this.stats.xp -= xpCost;
+		let attrPointsAdd = (this.level%LevelRules.AttrPointsGainEveryNthLevel === 0) ? LevelRules.AttrPointsGain : 0;
+		let skillPointsAdd = this.skillPointsPerLevel;
+		let perkPointsAdd = (this.level%LevelRules.PerkPointsGainEveryNthLevel === 0) ? LevelRules.PerkPointsGain : 0;
+		this.stats.attrPoints += attrPointsAdd;
+		this.stats.skillPoints += skillPointsAdd;
+		this.stats.perkPoints += perkPointsAdd;
+		let msg = `${this.creature.name} advances to level ${this.level}!`;
+		if (attrPointsAdd) msg += ` +${attrPointsAdd} attribute points.`;
+		if (skillPointsAdd) msg += ` +${skillPointsAdd} skill points.`;
+		if (perkPointsAdd) msg += ` +${perkPointsAdd} perk points.`;
+		if (LevelRules.ClassUpAtLevels.includes(this.level)) msg += ` New class available!`;
+		this.gc.displayMessage(msg,"text-levelup")
 	}
 }
 

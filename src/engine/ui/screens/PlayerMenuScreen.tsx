@@ -19,7 +19,10 @@ import {CreatureSkill} from "../../objects/creature/stats/CreatureSkill";
 export class PlayerMenuScreen extends AbstractModalScreen<void> {
 	constructor(
 		public readonly player: PlayerCharacter,
-		public readonly canLevelUp:boolean
+		/**
+		 * Can level up, spend points, use items etc
+		 */
+		public readonly interactive:boolean
 	) {super();}
 
 	private tabs:AbstractPlayerScreenTab[] = [
@@ -41,6 +44,10 @@ export class PlayerMenuScreen extends AbstractModalScreen<void> {
 		this.render();
 	}
 
+	levelUp() {
+		this.player.ctrl.levelUp();
+		this.render();
+	}
 	incAttr(id:TAttribute) {
 		this.player.ctrl.spendAttributePoint(id);
 		this.render();

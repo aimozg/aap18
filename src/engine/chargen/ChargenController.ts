@@ -148,7 +148,7 @@ export class ChargenController {
 		return Game.instance.data.skillList;
 	}
 	skillMax(skill: Skill): number {
-		// TODO affected by class
+		// TODO affected by class?
 		return ChargenRules.skillMax;
 	}
 	skillPointsTotal():number {
