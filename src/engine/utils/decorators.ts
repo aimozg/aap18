@@ -3,7 +3,7 @@
  */
 
 import "reflect-metadata";
-import {assertInt} from "./assertions";
+import {assertInt, assertNonNegativeInt} from "./assertions";
 
 export function PropertyValidator<T>(initialValue:T, validator:(value:T, propertyName:string)=>T): PropertyDecorator {
 	return function(prototype:Object, propertyName:string) {
@@ -39,6 +39,9 @@ export function AddParamValidator<T>(target:Object, methodName:string, paramInde
 
 export function IntParam(target: Object, methodName:string, paramIndex:number) {
 	AddParamValidator(target, methodName, paramIndex, assertInt)
+}
+export function NonNegativeIntParam(target: Object, methodName:string, paramIndex:number) {
+	AddParamValidator(target, methodName, paramIndex, assertNonNegativeInt)
 }
 
 export function ValidateParams(target:Object, methodName:string, descriptor: TypedPropertyDescriptor<Function>) {

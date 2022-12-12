@@ -54,11 +54,13 @@ u, .text-u {
 .text-positive {
   color: var(--tc-plus);
 }
-.text-shadowed {
-  color: var(--tc-shadowed);
-}
 .text-negative {
   color: var(--tc-minus);
+}
+.text-neutral {
+}
+.text-shadowed {
+  color: var(--tc-shadowed);
 }
 .text-lust {
   color: var(--tc-lust);

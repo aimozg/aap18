@@ -1,0 +1,44 @@
+@use "../utils/uibox";
+
+.scene-panel {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  .text-panel {
+    flex-grow: 1;
+    @include uibox.uibox;
+  }
+}
+.text-panel {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.text-pages {
+}
+.text-page {
+  margin: 1rem 0;
+  &.-history {
+    opacity: 0.5;
+  }
+}
+.scene-actions {
+  .choices {
+    display: flex;
+    flex-direction: column;
+  }
+}
+.scene-delimiter {
+  text-align: center;
+  font-size: 150%;
+  font-variant: small-caps;
+  display: grid;
+  grid-template-columns: 1fr max-content 1fr;
+  &::before, &::after {
+    background: linear-gradient(0deg, transparent 45%, var(--tc-bold), transparent 55%);
+    content: ' ';
+    margin: 0.5rem;
+  }
+}

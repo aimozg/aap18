@@ -23,7 +23,7 @@ export class SeduceAction extends CombatAction<SeduceResult> {
 		return `[SeduceAction ${this.actor.name} ${this.target.name}${this.free ? " (free)" : ""}]`
 	}
 	dc = this.target.ctrl.seductionDC
-	bonus = this.actor.skillValue(CoreSkills.Seduce)
+	bonus = this.actor.skillLevel(CoreSkills.Seduce)
 	toHit = this.dc - this.bonus
 	label = "Seduce "+this.target.name+" ("+CommonText.skillDcHint(this.toHit)+")"
 	group = CombatActionGroups.AGSkills

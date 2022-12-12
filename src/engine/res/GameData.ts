@@ -55,6 +55,7 @@ export class GameData {
 
 	readonly skills = new ResLib<Skill>(Symbols.ResTypeSkill, "Skill");
 	skill(id: string): Skill { return this.skills.get(id) }
+	get skillList() { return this.skills.values().sortOn("name") }
 
 	readonly tiles = new ResLib<TileType>(Symbols.ResTypeTile, "Tile");
 	private tilesByChar: Record<string,TileType>|null = null;

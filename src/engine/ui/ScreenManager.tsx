@@ -14,6 +14,7 @@ import {milliTime} from "../utils/time";
 import {Game} from "../Game";
 import {h} from "preact";
 import {TooltipManager} from "./components/Tooltip";
+import {TextPanel} from "./panels/TextPanel";
 
 const logger = LogManager.loggerFor("engine.ui.ScreenManager");
 
@@ -22,6 +23,7 @@ export class ScreenManager {
 	gameScreen: GameScreen = new GameScreen();
 
 	sharedPlayerPanel: CreaturePanel = new CreaturePanel(null);
+	sharedTextPanel: TextPanel = new TextPanel()
 
 	constructor(
 		private screenHolder: HTMLElement

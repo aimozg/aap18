@@ -2,10 +2,9 @@ import {AbstractPlayerScreenTab} from "./AbstractPlayerScreenTab";
 import {Fragment, h, VNode} from "preact";
 import {numberOfThings} from "../../../text/utils";
 import {Skills} from "../../../../game/data/skills";
-import {Game} from "../../../Game";
 import {Button} from "../../components/Button";
 import {AttrMetadata} from "../../../../game/data/stats";
-import {signValue} from "../../../utils/math";
+import {signClass} from "../../../utils/math";
 
 export class PlayerSkillsTab extends AbstractPlayerScreenTab {
 	get label() {
@@ -23,7 +22,7 @@ export class PlayerSkillsTab extends AbstractPlayerScreenTab {
 				You have {numberOfThings(this.player.skillPoints, "skill point", "skill points")}. Maximum skill level
 				is {this.player.maxNaturalSkill}.
 			</p>
-			<div class="d-grid ai-start gap-2" style="grid-template-columns: repeat(8, max-content) 1fr">
+			<div class="d-igrid ai-start gap-2 text-center" style="grid-template-columns: repeat(8, max-content) 1fr">
 				<div className="th">Skill</div>
 				<div className="th cols-2">Natural</div>
 				<div className="th cols-2">Attribute</div>
@@ -31,12 +30,10 @@ export class PlayerSkillsTab extends AbstractPlayerScreenTab {
 				<div className="th cols-2">Total</div>
 				<div className="th">Description</div>
 
-				{Game.instance.data.skills.values().map(skill => <Fragment>
-					<div className="text-hl">{skill.name}</div>
-					<div>
-						{this.player.naturalSkillValue(skill)}{this.player.naturalSkillValue(skill) < this.player.maxNaturalSkill &&
-                        <span
-                            className="text-xs">,{(this.player.skillXp(skill) / this.player.nextSkillLevelXp(skill)).format('02d%')}</span>}
+				{this.player.skills().map(skill => <Fragment>
+					<div className="text-hl text-left">{skill.name}</div>
+					<div class="text-right">
+						{skill.naturalLevel}<span className="text-xs">,{skill.isMaxed ? '00' : skill.xpProgress.format('02d%')}</span>
 					</div>
 					{this.canLevelUp
 						? <Button disabled={!this.screen.canIncSkill(skill)}
@@ -47,14 +44,17 @@ export class PlayerSkillsTab extends AbstractPlayerScreenTab {
 					{skill.attr >= 0
 						? <Fragment>
 							<div>({AttrMetadata[skill.attr].abbr})</div>
-							<div className={"text-center "+signValue(this.player.attrMod(skill.attr),'text-negative','','text-positive')}>{this.player.attrMod(skill.attr).signed()}</div>
+							<div className={signClass(skill.attrBonus)}>{skill.attrBonus.signed()}</div>
 						</Fragment>
 						: <div className="cols-2"></div>
 					}
-					<div className="text-center">+0{/* TODO */}</div>
+					<div
+						className={signClass(skill.miscBonus)}>
+						{skill.miscBonus.signed()}{/* TODO tooltip */}
+					</div>
 					<div>=</div>
-					<div className="text-center">{this.player.skillValue(skill).signed()}</div>
-					<div>{skill.description}</div>
+					<div>{skill.level}</div>
+					<div class="text-left">{skill.description}</div>
 				</Fragment>)}
 			</div>
 		</Fragment>

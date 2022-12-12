@@ -4,7 +4,7 @@ import {ChargenController} from "./ChargenController";
 import {Fragment} from "preact/compat";
 import {Button} from "../ui/components/Button";
 import {AttrMetadata} from "../../game/data/stats";
-import {signValue} from "../utils/math";
+import {signClass} from "../utils/math";
 
 export class ChargenStepSkills extends ChargenStep {
 
@@ -19,6 +19,7 @@ export class ChargenStepSkills extends ChargenStep {
 	}
 
 	node(): VNode {
+		// TODO use CreatureSkill wrapper
 		return <Fragment>
 			<h3>Skills</h3>
 			<div style={{
@@ -47,8 +48,7 @@ export class ChargenStepSkills extends ChargenStep {
 					{skill.attr >= 0
 						? <Fragment>
 							<div>({AttrMetadata[skill.attr].abbr})</div>
-							<div
-								className={signValue(this.cc.attrMod(skill.attr), 'text-negative', '', 'text-positive')}>
+							<div className={signClass(this.cc.attrMod(skill.attr))}>
 								{this.cc.attrMod(skill.attr).signed()}
 							</div>
 						</Fragment>
@@ -57,7 +57,7 @@ export class ChargenStepSkills extends ChargenStep {
 
 					<div>=</div>
 					<div
-						class={"mx-2" + signValue(this.cc.skillTotal(skill) - this.cc.skillNatural(skill), ' text-negative', '', ' text-positive')}>
+						class={"mx-2 " + signClass(this.cc.skillTotal(skill) - this.cc.skillNatural(skill))}>
 						{this.cc.skillTotal(skill)}
 					</div>
 					<div>

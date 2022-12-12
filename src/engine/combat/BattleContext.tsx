@@ -9,7 +9,6 @@ import {Deferred} from "../utils/Deferred";
 import {AnimationTimeFast, BattleResult, BattleResultType, BattleState, CombatController} from "./CombatController";
 import {milliTime} from "../utils/time";
 import {coerce} from "../math/utils";
-import {LogPanel} from "../ui/panels/LogPanel";
 import {BattlePanel} from "../ui/panels/BattlePanel";
 import {Game} from "../Game";
 import {CombatAction} from "./CombatAction";
@@ -121,7 +120,8 @@ export class BattleContext implements GameContext {
 	}
 	readonly characterPanel = Game.instance.screenManager.sharedPlayerPanel
 	readonly enemyPanel
-	readonly logPanel = new LogPanel()
+	// TODO instead of reusing exact same element, request new "Chapter"
+	readonly logPanel = Game.instance.screenManager.sharedTextPanel
 	readonly battlePanel = new BattlePanel(this)
 	readonly battleActionsPanel = new BattleActionsPanel(this)
 	get layout(): GameScreenLayout {
@@ -169,7 +169,8 @@ export class BattleContext implements GameContext {
 	update() {
 		switch (this.state) {
 			case "starting":
-				this.cc.battleStart()
+				this.logPanel.newChapter("Battle");
+				this.cc.battleStart();
 				break;
 			case "flow":
 				this.scheduleTick();
@@ -177,8 +178,8 @@ export class BattleContext implements GameContext {
 			case "animation":
 			case "pc":
 			case "npc":
-			case "ended":
 			case "closed":
+			case "ended":
 				this.redraw();
 		}
 	}
@@ -204,6 +205,21 @@ export class BattleContext implements GameContext {
 		let updateActions = state === "pc" || oldState === "pc" || oldState === "starting";
 		this.redraw(updateActions);
 		switch (state) {
+			case "ended":
+				switch (this.resultType) {
+					case "victory":
+						this.logPanel.newChapter("Victory!","text-positive");
+						break;
+					case "defeat":
+						this.logPanel.newChapter("Defeat!","text-negative");
+						break;
+					case "draw":
+						this.logPanel.newChapter("Draw!");
+						break;
+					case "cancelled":
+						break;
+				}
+				break;
 			case "closed":
 				this.characterPanel.collapsed = this.charPanelWasCollapsed;
 				this._promise.resolve(this);

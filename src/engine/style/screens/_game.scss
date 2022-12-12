@@ -4,6 +4,13 @@ $leftPanelSize: 300px;
 $rightPanelSize: 300px;
 $duration: 0.5s;
 
+.game-layout, .gl-top, .gl-midrow, .gl-left, .gl-right, .gl-midcol, .gl-center, .gl-bottom {
+  overflow: hidden;
+}
+.gl-left, .gl-right, .gl-center, .gl-bottom {
+  display: flex;
+  flex-direction: column;
+}
 .game-layout {
   display:flex;
   max-height: 100vh;
@@ -19,7 +26,6 @@ $duration: 0.5s;
   .gl-midrow {
     flex-grow: 1;
     display: flex;
-    overflow: hidden auto;
     gap: 1rem;
   }
   .gl-left, .gl-right {
@@ -48,11 +54,9 @@ $duration: 0.5s;
   }
   .gl-center {
     flex-grow: 1;
-    display: flex;
-    flex-direction: column;
   }
   .gl-bottom {
     min-height: 1.5rem;
-    overflow-y: auto;
+    padding-bottom: 1rem;
   }
 }

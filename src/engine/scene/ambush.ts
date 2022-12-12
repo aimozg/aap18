@@ -195,6 +195,7 @@ export namespace AmbushRules {
 
 	async function playScene(ctx: SceneContext, scene:Scene|SceneFn|undefined) {
 		if (scene) {
+			ctx.output.scrollDown();
 			if (scene instanceof Scene) {
 				await ctx.play(scene)
 			} else {

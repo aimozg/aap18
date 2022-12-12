@@ -56,8 +56,8 @@ export class GlyphCanvas {
 	// Empty space
 	padding = 0
 	// Canvas size in cells
-	visibleCols = 28
-	visibleRows = 20
+	visibleCols = 14
+	visibleRows = 10
 	background = "#333333"
 
 	// TODO make it pixels
@@ -104,10 +104,10 @@ export class GlyphCanvas {
 			this.scrollY += (this.height - height) / (this.cellHeight * scale) / 2;
 			this.scrollX |= 0;
 			this.scrollY |= 0;
-			this.width = canvas.width = width;
-			this.height = canvas.height = height;
 			canvas.style.width = `${width/scale}px`;
 			canvas.style.height = `${height/scale}px`;
+			this.width = canvas.width = width;
+			this.height = canvas.height = height;
 		}
 	}
 	fitToParentSize() {

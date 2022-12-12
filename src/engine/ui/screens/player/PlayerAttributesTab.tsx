@@ -2,7 +2,7 @@ import {AbstractPlayerScreenTab} from "./AbstractPlayerScreenTab";
 import {Fragment, h, VNode} from "preact";
 import {AttrMetadata} from "../../../../game/data/stats";
 import {Button} from "../../components/Button";
-import {signValue} from "../../../utils/math";
+import {signClass} from "../../../utils/math";
 import {Parse} from "../../../text/ParseTag";
 import {numberOfThings} from "../../../text/utils";
 
@@ -24,7 +24,7 @@ export class PlayerAttributesTab extends AbstractPlayerScreenTab {
 				You have {numberOfThings(this.player.attrPoints,'attribute point','attribute points')}.
 				You get +1 to attribute of your choice every 4 levels.
 			</p>
-			<div class="d-grid ai-start gap-2" style="grid-template-columns: repeat(5, max-content) 1fr">
+			<div class="d-igrid ai-start gap-2" style="grid-template-columns: repeat(5, max-content) 1fr">
 				<div class="th">Attribute</div>
 				<div class="th cols-2">Natural</div>
 				<div class="th cols-2">Total</div>
@@ -40,7 +40,7 @@ export class PlayerAttributesTab extends AbstractPlayerScreenTab {
 							: <div/>
 					}
 					<div
-						class={"attr-value " + signValue(this.player.attr(meta.id) - this.player.naturalAttr(meta.id), 'text-negative', '', 'text-positive')}>{this.player.attr(meta.id)}</div>
+						class={"attr-value " + signClass(this.player.attr(meta.id) - this.player.naturalAttr(meta.id))}>{this.player.attr(meta.id)}</div>
 					<div>{/*TODO getAttrValueName from ChargenStepAttr*/}</div>
 					<div><Parse>{meta.description}</Parse><br/>{/*TODO explainStat from ChargenStepAttr*/}</div>
 				</Fragment>)}

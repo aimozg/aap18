@@ -14,7 +14,7 @@ import {PlayerSkillsTab} from "./player/PlayerSkillsTab";
 import {PlayerPerksTab} from "./player/PlayerPerksTab";
 import {PlayerClassTab} from "./player/PlayerClassTab";
 import {PlayerItemsTab} from "./player/PlayerItemsTab";
-import {Skill} from "../../objects/creature/Skill";
+import {CreatureSkill} from "../../objects/creature/stats/CreatureSkill";
 
 export class PlayerMenuScreen extends AbstractModalScreen<void> {
 	constructor(
@@ -45,11 +45,11 @@ export class PlayerMenuScreen extends AbstractModalScreen<void> {
 		this.player.ctrl.spendAttributePoint(id);
 		this.render();
 	}
-	canIncSkill(skill:Skill) {
-		return this.player.skillPoints > 0 && this.player.naturalSkillValue(skill) < this.player.maxNaturalSkill;
+	canIncSkill(skill:CreatureSkill) {
+		return this.player.skillPoints > 0 && !skill.isMaxed
 	}
-	incSkill(skill:Skill) {
-		this.player.ctrl.spendSkillPoint(skill);
+	incSkill(skill:CreatureSkill) {
+		this.player.ctrl.spendSkillPoint(skill.skill);
 		this.render();
 	}
 

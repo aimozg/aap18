@@ -6,8 +6,8 @@ import {CommonText} from "../../text/CommonText";
 import {Item} from "../../objects/Item";
 import {Inventory} from "../../objects/Inventory";
 import {TextOutput} from "../../text/output/TextOutput";
-import {TextPages} from "../panels/TextPages";
 import {AbstractModalScreen} from "../AbstractModalScreen";
+import {Game} from "../../Game";
 
 type ItemAction = UIAction & { longLabel: string, position: number }
 
@@ -74,7 +74,7 @@ export class InventoryScreen extends AbstractModalScreen<void> {
 
 // TODO store category & position instead
 	selectedItem: Item | null = null;
-	private textOutput: TextOutput = new TextOutput(new TextPages())
+	private textOutput: TextOutput = new TextOutput(Game.instance.screenManager.sharedTextPanel)
 	private mainInvMenus: ItemMenu[] = [];
 	private otherInvMenus: ItemMenu[] = [];
 
@@ -273,7 +273,7 @@ export class InventoryScreen extends AbstractModalScreen<void> {
 	}
 
 	async consume(item: Item) {
-		this.textOutput.clear();
+		// TODO inventory log bug this.textOutput.clear();
 		if (this.creature.inventory.includes(item)) {
 			await this.game.gameController.consumeFromInventory(this.creature, item, this.textOutput)
 		} else if (this.other && this.other?.includes(item)) {
@@ -436,7 +436,7 @@ export class InventoryScreen extends AbstractModalScreen<void> {
                             </div>
                         </Fragment>}
 						<div class="my-4">
-							{this.textOutput.pages.astsx}
+							{/*TODO bring it back this.textOutput.panel.astsx*/}
 						</div>
 					</div>
 				</div>

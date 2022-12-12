@@ -3,7 +3,7 @@ import {Button} from "../ui/components/Button";
 import {ChargenStep} from "./ChargenStep";
 import {ChargenController} from "./ChargenController";
 import {Parse} from "../text/ParseTag";
-import {signValue} from "../utils/math";
+import {signClass} from "../utils/math";
 
 export class ChargenStepStats extends ChargenStep {
 
@@ -42,7 +42,7 @@ export class ChargenStepStats extends ChargenStep {
 					        onClick={() => this.cc.statInc(ss)}
 					        label="+"/>
 					<div>=</div>
-					<div style="min-width:2rem" class={"text-center mx-2" + signValue(ss.total-ss.natural, ' text-negative', '', ' text-positive')}>
+					<div style="min-width:2rem" class={"text-center mx-2 " + signClass(ss.total-ss.natural)}>
 						{ss.total >= 0 ? '\xA0' : ''}{ss.total}</div>
 					<div>
 						<Parse>{ss.meta.explain(ss.total, this.player)}</Parse>

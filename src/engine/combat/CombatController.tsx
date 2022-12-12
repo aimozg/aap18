@@ -140,7 +140,6 @@ export class CombatController {
 	battleEnd() {
 		if (this.ended) throw new Error(`Cannot battleEnd() in ${this.state}`);
 		logger.info("battleEnd")
-		this.state = "ended";
 		if (this.partyLost && this.enemiesLost) {
 			this._result.type = "draw"
 		} else if (this.partyLost) {
@@ -152,6 +151,7 @@ export class CombatController {
 		} else {
 			this._result.type = "draw"
 		}
+		this.state = "ended";
 	}
 
 	async battleClose() {
@@ -218,8 +218,8 @@ export class CombatController {
 	async doSingleStealthCheck(spotter:Creature, sneaker:Creature) {
 		logger.info("doSingleStealthCheck {} {}", spotter, sneaker);
 		if (!spotter.isAlive) return;
-		let spotSkill = spotter.skillValue(CoreSkills.Spot);
-		let stealthSkill = sneaker.skillValue(CoreSkills.Stealth);
+		let spotSkill = spotter.skillLevel(CoreSkills.Spot);
+		let stealthSkill = sneaker.skillLevel(CoreSkills.Stealth);
 
 		let roll = this.rng.d20();
 		let bonus = spotSkill;

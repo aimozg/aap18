@@ -13,7 +13,7 @@ export class BattlePanel extends DomComponent {
 		let refMain = createRef<HTMLCanvasElement>()
 		super(
 			<div className="combat-panel d-flex flex-grow-1 jc-stretch">
-				<canvas className="flex-grow-1" ref={refMain}/>
+				<canvas ref={refMain}/>
 			</div>
 		);
 		this.refMain = refMain;

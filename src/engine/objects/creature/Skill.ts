@@ -26,4 +26,5 @@ export class Skill implements IResource {
 		this.attr = options.attr ?? -1;
 		this.description = options.description;
 	}
+	toString() { return `[Skill ${this.resId}]` }
 }

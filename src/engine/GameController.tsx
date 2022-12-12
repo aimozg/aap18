@@ -10,7 +10,6 @@ import {PlayerCharacter} from "./objects/creature/PlayerCharacter";
 import {StateManager} from "./state/StateManager";
 import {Place} from "./place/Place";
 import {NullGameContext} from "./state/GameContext";
-import {ScenePanel} from "./ui/panels/ScenePanel";
 import {BattleContext, BattleOptions, BattleSettings} from "./combat/BattleContext";
 import {Random} from "./math/Random";
 import {BattleGrid} from "./combat/BattleGrid";
@@ -18,10 +17,12 @@ import {GridPos} from "./utils/gridutils";
 import {PlaceContext} from "./place/PlaceContext";
 import {Creature} from "./objects/Creature";
 import {Item} from "./objects/Item";
-import {InteractiveTextOutput} from "./text/output/InteractiveTextOutput";
 import {Inventory} from "./objects/Inventory";
 import {InventoryScreen, InventoryScreenOptions} from "./ui/screens/InventoryScreen";
 import {Scene, SceneFn} from "./scene/Scene";
+import {ComponentChildren, h} from "preact";
+import {Skill} from "./objects/creature/Skill";
+import {SkillXp} from "../game/xp";
 
 const logger = LogManager.loggerFor("engine.GameController");
 
@@ -73,6 +74,14 @@ export class GameController {
 		this.showGameScreen()
 	}
 
+	displayMessage(message:ComponentChildren) {
+		if (typeof message === "string") {
+			this.game.screenManager.sharedTextPanel.append(<div class="text-hl">{message}</div>)
+		} else {
+			this.game.screenManager.sharedTextPanel.append(message)
+		}
+	}
+
 	async playScene(scene:string|Scene):Promise<string> {
 		scene = this.game.data.scene(scene);
 		return this.playSceneImpl(scene.resId, scene.sceneFn);
@@ -82,7 +91,7 @@ export class GameController {
 	}
 	private async playSceneImpl(sceneId:string, sceneFn:SceneFn):Promise<string> {
 		logger.info("playSceneFn {}", sceneId);
-		let context:SceneContext = new SceneContext(sceneId, sceneFn, new InteractiveTextOutput(new ScenePanel()));
+		let context:SceneContext = new SceneContext(sceneId, sceneFn, new TextOutput());
 		this.state.pushGameContext(context);
 		this.showGameScreen();
 		return context.promise;
@@ -123,7 +132,7 @@ export class GameController {
 			return;
 		}
 		if (context instanceof SceneContext) {
-			context.output = new InteractiveTextOutput(new ScenePanel());
+			context.output = new TextOutput();
 			gameScreen.applyLayout(context.layout);
 			context.playCurrentScene().then(()=>this.showGameScreen());
 			return;
@@ -247,6 +256,7 @@ export class GameController {
 		// TODO animate hp bar
 		creature.ctrl.modHp(amount);
 		if (output) {
+			// TODO instead of output, use shared displayMessage
 			output.selectActor(creature);
 			output.print(`<hl>[You]</hl> [are] healed (<text-hp>${amount}</text-hp>). `);
 			output.deselectActor();
@@ -316,4 +326,67 @@ export class GameController {
 		await new InventoryScreen(this.player, inv, options).showModal();
 		this.game.screenManager.sharedPlayerPanel.update();
 	}
+	useSkill(options:UseSkillOptions):SkillCheckResult {
+		let actor = options.actor ?? this.player;
+		let roll = options.roll ?? this.rng.d20();
+		let bonus = actor.skillLevel(options.skill);
+		let dc = options.dc;
+		let diff = roll+bonus - dc;
+		let critType = options.crit ?? "no";
+		let xp = options.xp ?? SkillXp.NORMAL;
+
+		let result:SkillCheckResult = {success:false,crit:false};
+		result.success = diff >= 0;
+		if (critType === "dice") {
+			if (roll === 1) result = {success:true,crit:true};
+			else if (roll === 20) result = {success:false,crit:true};
+		} else if (critType === "diff") {
+			if (diff <= -10) result = {success:false,crit:true};
+			else if (diff >= 10) result = {success:true,crit:true};
+		}
+		if (options.log ?? true) {
+			let className = result.success ?
+				(result.crit ? 'text-roll-critsuccess' : 'text-roll-success') :
+				(result.crit ? 'text-roll-critfail' : 'text-roll-fail');
+			let name = options.name ?? `${options.skill.name} check`;
+			let numbers = "";
+			if (options.logNumbers ?? true) {
+				numbers = ` (${roll}${bonus.signed()} vs DC ${dc})`;
+			}
+			let resultName = result.success ?
+				(result.crit ? 'Critical Success' : 'Success') :
+				(result.crit ? 'Critical Failure' : 'Failure');
+			this.displayMessage(<p class='text-roll-skill'>[{name}: <span class={className}>{resultName}{numbers}</span>]</p>)
+		}
+		if (result.success && xp > 0) {
+			actor.ctrl.giveSkillXp(options.skill, xp);
+		}
+		return result;
+	}
+}
+
+export type SkillCheckResult = {success:boolean,crit:boolean};
+/**
+ * * no - no crit fails/successes
+ * * dice - crit fail when d20 = 1, crit success when d20 = 20
+ * * diff - crit fail when total is lower than DC by 10 or more, success when higher by 10 or more
+ */
+export type SkillCritType = 'no'|'dice'|'diff';
+export interface UseSkillOptions {
+	/** default = player */
+	actor?: Creature;
+	skill: Skill;
+	dc: number;
+	/** skill xp to give, default = SkillXp.NORMAL */
+	xp?: number;
+	/** predefined roll value, default = ctx.d20() */
+	roll?: number;
+	/** default = "no" */
+	crit?: SkillCritType;
+	/** log, default = true */
+	log?: boolean;
+	/** log numbers, default = true */
+	logNumbers?: boolean;
+	/** skill usage text, default "SkillName check" */
+	name?: string;
 }

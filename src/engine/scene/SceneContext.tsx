@@ -7,7 +7,7 @@ import {Deferred} from "../utils/Deferred";
 import {Button} from "../ui/components/Button";
 import {h} from "preact";
 import {LogManager} from "../logging/LogManager";
-import {GameController} from "../GameController";
+import {GameController, SkillCheckResult, UseSkillOptions} from "../GameController";
 import {GameContext} from "../state/GameContext";
 import {BattleContext, BattleOptions} from "../combat/BattleContext";
 import {AmbushDef, AmbushRules} from "./ambush";
@@ -15,9 +15,8 @@ import {Random} from "../math/Random";
 import {KeyCodes} from "../ui/KeyCodes";
 import {Inventory} from "../objects/Inventory";
 import {Item} from "../objects/Item";
-import {InteractiveTextOutput} from "../text/output/InteractiveTextOutput";
 import {Creature} from "../objects/Creature";
-import {Skill} from "../objects/creature/Skill";
+import {TextOutput} from "../text/output/TextOutput";
 
 export interface ChoiceOptions {
 	/** Button text */
@@ -72,7 +71,7 @@ export class SceneContext implements GameContext {
 	constructor(
 		private _sceneId: string,
 		private _sceneFn: SceneFn,
-		public output: InteractiveTextOutput
+		public output: TextOutput
 	) {
 	}
 
@@ -104,7 +103,7 @@ export class SceneContext implements GameContext {
 	get layout(): GameScreenLayout {
 		return {
 			left: this.characterPanel.astsx,
-			center: this.output.panel.astsx
+			center: <div class="scene-panel">{this.output.panel.astsx}</div>
 		}
 	}
 
@@ -114,6 +113,7 @@ export class SceneContext implements GameContext {
 		this.nextButtons = [];
 		this.currentButtons = []
 		this.characterPanel.update()
+		this.output.scrollDown();
 	}
 
 	protected async flush() {
@@ -380,62 +380,8 @@ export class SceneContext implements GameContext {
 	d20(): number { return this.rng.d20() }
 	either<T>(...options:T[]):T { return this.rng.either(...options) }
 
-	// TODO move to GameController?
 	useSkill(options:UseSkillOptions):SkillCheckResult {
-		let actor = options.actor ?? this.player;
-		let roll = options.roll ?? this.d20();
-		let bonus = actor.skillValue(options.skill);
-		let dc = options.dc;
-		let diff = roll+bonus - dc;
-		let critType = options.crit ?? "no";
-
-		let result:SkillCheckResult = {success:false,crit:false};
-		result.success = diff >= 0;
-		if (critType === "dice") {
-			if (roll === 1) result = {success:true,crit:true};
-			else if (roll === 20) result = {success:false,crit:true};
-		} else if (critType === "diff") {
-			if (diff <= -10) result = {success:false,crit:true};
-			else if (diff >= 10) result = {success:true,crit:true};
-		}
-		if (options.log ?? true) {
-			let className = result.success ?
-				(result.crit ? 'text-roll-critsuccess' : 'text-roll-success') :
-				(result.crit ? 'text-roll-critfail' : 'text-roll-fail');
-			let name = options.name ?? `${options.skill.name} check`;
-			let numbers = "";
-			if (options.logNumbers ?? true) {
-				numbers = ` (${roll}${bonus.signed()} vs DC ${dc})`;
-			}
-			let resultName = result.success ?
-				(result.crit ? 'Critical Success' : 'Success') :
-				(result.crit ? 'Critical Failure' : 'Failure');
-			this.say(`<p class='text-roll-skill'>\\[${name}: <span class='${className}'>${resultName}${numbers}</span>\\]</p>`)
-		}
-		return result;
+		return this.gc.useSkill(options)
 	}
 }
 
-export type SkillCheckResult = {success:boolean,crit:boolean};
-/**
- * * no - no crit fails/successes
- * * dice - crit fail when d20 = 1, crit success when d20 = 20
- * * diff - crit fail when total is lower than DC by 10 or more, success when higher by 10 or more
- */
-export type SkillCritType = 'no'|'dice'|'diff';
-export interface UseSkillOptions {
-	/** default = player */
-	actor?: Creature;
-	skill: Skill;
-	dc: number;
-	/** predefined roll value, default = ctx.d20() */
-	roll?: number;
-	/** default = "no" */
-	crit?: SkillCritType;
-	/** log, default = true */
-	log?: boolean;
-	/** log numbers, default = true */
-	logNumbers?: boolean;
-	/** skill usage text, default "SkillName check" */
-	name?: string;
-}

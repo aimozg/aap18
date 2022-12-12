@@ -13,7 +13,7 @@ import {DefaultMonsterAI, MonsterAI} from "./MonsterAI";
 import {AbstractCombatAbility} from "../combat/AbstractCombatAbility";
 import {GOCreature} from "../combat/BattleGrid";
 import {Inventory} from "./Inventory";
-import {MaxLevel, SkillXpPerLevel, XpPerLevel} from "../../game/xp";
+import {MaxLevel, XpPerLevel} from "../../game/xp";
 import {Loot} from "./Loot";
 import {CreatureCondition} from "./creature/CreatureCondition";
 import {Skill} from "./creature/Skill";
@@ -23,6 +23,7 @@ import {StatusEffect, StatusEffectType} from "./creature/StatusEffect";
 import {BuffableStat, BuffableStatId} from "./creature/stats/BuffableStat";
 import {obj2map} from "../utils/collections";
 import {PartialRecord} from "../utils/types";
+import {CreatureSkill} from "./creature/stats/CreatureSkill";
 
 export class CreatureTexts {
 	constructor(public readonly creature: Creature) {}
@@ -295,23 +296,14 @@ export class Creature {
 	// Skills - Helpers //
 	//------------------//
 
-	naturalSkillValue(skill: Skill):number {
-		return this.stats.naturalSkills[skill.resId] ?? 0;
-	}
-	// TODO move to CreatureController
-	skillValue(skill: Skill):number {
-		return this.naturalSkillValue(skill) + (skill.attr >= 0 ? this.attrMod(skill.attr) : 0)
-	}
+	skill(skill:Skill):CreatureSkill { return new CreatureSkill(this, skill) }
+	skills():CreatureSkill[] { return Game.instance.data.skillList.map(skill=>this.skill(skill)) }
+	natualSkillLevel(skill: Skill):number { return this.ctrl.naturalSkillLevel(skill) }
+	skillLevel(skill: Skill):number { return this.ctrl.skillLevel(skill) }
 	get maxNaturalSkill():number { return this.ctrl.maxNaturalSkill }
-	skillXp(skill: Skill):number {
-		return this.stats.skillXp[skill.resId] ?? 0;
-	}
+	skillXp(skill: Skill):number { return this.ctrl.skillXp(skill) }
 	/** can be Infinity */
-	nextSkillLevelXp(skill:Skill):number {
-		let level = this.naturalSkillValue(skill);
-		if (level >= this.maxNaturalSkill) return Infinity;
-		return SkillXpPerLevel[level];
-	}
+	nextSkillLevelXp(skill:Skill):number { return this.ctrl.nextSkillLevelXp(skill) }
 
 	///////////////////
 	// Traits - Data //

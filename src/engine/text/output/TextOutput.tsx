@@ -2,33 +2,34 @@
  * Created by aimozg on 05.07.2022.
  */
 import {Parsed} from "../parser/Parsed";
-import {Fragment, h, VNode} from "preact";
+import {ComponentChildren, Fragment, h, VNode} from "preact";
 import {LogManager} from "../../logging/LogManager";
 import {Parser} from "../parser/Parser";
 import {Creature} from "../../objects/Creature";
-import {TextPages} from "../../ui/panels/TextPages";
+import {TextPanel} from "../../ui/panels/TextPanel";
+import {Game} from "../../Game";
 
 const logger = LogManager.loggerFor("engine.text.output.TextOutput")
 
 /**
- * Parses texts and renders in into ScenePanel
+ * Parses texts and renders in into TextPanel
  */
 export class TextOutput {
 
-	constructor(public readonly pages: TextPages,
+	constructor(public readonly panel: TextPanel = Game.instance.screenManager.sharedTextPanel,
 	            public readonly parser: Parser = new Parser()) {
 	}
 
 	clear(): void {
-		this.pages.clear();
+		this.panel.clear();
 	}
 
 	flush(): void {
-		this.pages.flush();
+		this.panel.flush();
 	}
 
 	flip(suffix?: string): void {
-		this.pages.flipPage(suffix)
+		this.panel.flipPage(suffix)
 	}
 
 	selectActor(actor: Creature) {
@@ -45,11 +46,23 @@ export class TextOutput {
 
 	append(input: Parsed | Parsed[]): void {
 		let e = TextOutput.render(input);
-		this.pages.addContent(e);
+		this.panel.append(e);
 	}
 
 	appendNode(e: Node | string | VNode): void {
-		this.pages.addContent(e);
+		this.panel.append(e);
+	}
+
+	appendAction(e: VNode) {
+		this.panel.addActions(e);
+	}
+
+	scrollDown() {
+		this.panel.scrollDown();
+	}
+
+	newChapter(content:ComponentChildren, extraClass:string="") {
+		this.panel.newChapter(content, extraClass);
 	}
 
 	static render(input: Parsed | Parsed[]): VNode {

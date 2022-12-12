@@ -11,7 +11,7 @@ import {LogManager} from "../../logging/LogManager";
 import {Button} from "../components/Button";
 import {CombatRules} from "../../../game/combat/CombatRules";
 import {TextIcon} from "../../objects/creature/CreatureCondition";
-import {signValue} from "../../utils/math";
+import {signClass} from "../../utils/math";
 import {TAttribute, TAttributes} from "../../rules/TAttribute";
 import {WithTooltip} from "../components/WithTooltip";
 
@@ -221,7 +221,7 @@ export class CreaturePanel extends DomComponent {
 				<div class="text-s">{TAttribute[attr]}</div>
 			)}
 			{TAttributes.map(attr=>
-				<div class={signValue(c.attrBuffable(attr).value, 'text-negative','','text-positive')}>{c.attr(attr)}</div>
+				<div class={signClass(c.attrBuffable(attr).value)}>{c.attr(attr)}</div>
 			)}
         </div>
 	}

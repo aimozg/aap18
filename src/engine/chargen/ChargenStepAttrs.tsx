@@ -53,7 +53,7 @@ export class ChargenStepAttrs extends ChargenStep {
 		}
 	}
 	private explainStat(meta: IAttrMetadata):string {
-		let skills = Game.instance.data.skills.values().filter(skill=>skill.attr===meta.id);
+		let skills = Game.instance.data.skillList.filter(skill=>skill.attr===meta.id);
 		let s = meta.explain(this.player.attrMod(meta.id), this.player.attr(meta.id), this.player);
 		if (skills.length > 0) {
 			s += " "+this.player.attrMod(meta.id).signed()+" to "+skills.map(skill=>skill.name).join(", ")+".";

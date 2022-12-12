@@ -4,7 +4,7 @@
 
 import {Creature} from "../objects/Creature";
 import {atMost, coerce} from "../math/utils";
-import {IntParam, ValidateParams} from "../utils/decorators";
+import {IntParam, NonNegativeIntParam, ValidateParams} from "../utils/decorators";
 import {CreatureCondition} from "../objects/creature/CreatureCondition";
 import {CoreConditions} from "../objects/creature/CoreConditions";
 import {TAttribute} from "./TAttribute";
@@ -13,6 +13,8 @@ import {CoreStatusEffects} from "../objects/creature/CoreStatusEffects";
 import {Buff, BuffableStatId} from "../objects/creature/stats/BuffableStat";
 import {LogManager} from "../logging/LogManager";
 import {Skill} from "../objects/creature/Skill";
+import {SkillXpPerLevel} from "../../game/xp";
+import {Game} from "../Game";
 
 
 export interface HornyStage {
@@ -36,6 +38,7 @@ export class CreatureController {
 	//-----------//
 
 	get stats() { return this.creature.stats }
+	get gc() { return Game.instance.gameController }
 
 	//----//
 	// XP //
@@ -98,13 +101,6 @@ export class CreatureController {
 		this.stats.attrPoints--;
 		this.stats.naturalAttrs[attr]++;
 		this.updateStats();
-	}
-	spendSkillPoint(skill:Skill) {
-		// TODO log
-		if (this.stats.skillPoints <= 0) throw new Error("No skillPoints to spend");
-		if (this.stats.naturalSkills[skill.resId] >= this.maxNaturalSkill) throw new Error("Skill capped");
-		this.stats.skillPoints--;
-		this.stats.naturalSkills[skill.resId]++;
 	}
 
 	//-----------//
@@ -219,8 +215,49 @@ export class CreatureController {
 	//--------//
 	// Skills //
 	//--------//
+	naturalSkillLevel(skill:Skill):number {
+		return this.stats.naturalSkills[skill.resId] ?? 0;
+	}
 	get maxNaturalSkill():number {
 		return this.stats.level + 3;
+	}
+	skillLevel(skill:Skill):number {
+		return this.naturalSkillLevel(skill) + (skill.attr >= 0 ? this.attrMod(skill.attr) : 0)
+	}
+	skillXp(skill: Skill): number {
+		return this.stats.skillXp[skill.resId] ?? 0;
+	}
+	/** can be Infinity */
+	nextSkillLevelXp(skill: Skill): number {
+		let level = this.naturalSkillLevel(skill);
+		if (level >= this.maxNaturalSkill) return Infinity;
+		return SkillXpPerLevel[level];
+	}
+	spendSkillPoint(skill:Skill) {
+		if (this.stats.skillPoints <= 0) throw new Error("No skillPoints to spend");
+		if (this.naturalSkillLevel(skill) >= this.maxNaturalSkill) throw new Error("Skill capped");
+		this.stats.skillPoints--;
+		this.stats.naturalSkills[skill.resId]++;
+		this.gc.displayMessage(`${skill.name} skill leveled up to ${this.skillLevel(skill)}`);
+	}
+	@ValidateParams
+	giveSkillXp(skill:Skill, @NonNegativeIntParam amount:number, log:boolean=true) {
+		logger.debug("{} giveSkillXp({}, {})", this.creature, skill, amount)
+		if (this.naturalSkillLevel(skill) >= this.maxNaturalSkill) {
+			return
+		}
+		let xp = this.stats.skillXp[skill.resId];
+		let nextXp = this.nextSkillLevelXp(skill);
+		if (!isFinite(nextXp)) return;
+		xp += amount;
+		if (xp >= nextXp) {
+			xp -= nextXp;
+			this.stats.naturalSkills[skill.resId]++;
+			if (log) {
+				this.gc.displayMessage(`${skill.name} skill leveled up to ${this.skillLevel(skill)}.`);
+			}
+		}
+		this.stats.skillXp[skill.resId] = xp;
 	}
 
 	//------------------//

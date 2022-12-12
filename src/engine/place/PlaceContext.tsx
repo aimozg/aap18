@@ -1,22 +1,22 @@
 import {Place} from "./Place";
 import {InternalChoiceData, SceneContext} from "../scene/SceneContext";
-import {ScenePanel} from "../ui/panels/ScenePanel";
 import {GameScreenLayout} from "../ui/screens/GameScreen";
 import {PlaceSidebar} from "../ui/panels/PlaceSidebar";
 import {createRef, h} from "preact";
-import {InteractiveTextOutput} from "../text/output/InteractiveTextOutput";
 import {PlayerMenuScreen} from "../ui/screens/PlayerMenuScreen";
+import {TextOutput} from "../text/output/TextOutput";
 
 export class PlaceContext extends SceneContext {
 	private readonly sidebarRef = createRef<PlaceSidebar>();
 
 	constructor(public place: Place) {
-		super(place.sceneId, place.scene.sceneFn, new InteractiveTextOutput(new ScenePanel()));
+		super(place.sceneId, place.scene.sceneFn, new TextOutput());
 	}
 
 	async display(): Promise<void> {
 		this.sidebarRef.current?.enable();
 		this.sidebarRef.current?.forceUpdate();
+		this.output.newChapter(this.place.displayName());
 		await this.playCurrentScene()
 	}
 

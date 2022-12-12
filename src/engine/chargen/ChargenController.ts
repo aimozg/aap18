@@ -145,7 +145,7 @@ export class ChargenController {
 		}]
 	}
 	allowedSkills(): Skill[] {
-		return Game.instance.data.skills.values().sortOn("name");
+		return Game.instance.data.skillList;
 	}
 	skillMax(skill: Skill): number {
 		// TODO affected by class
