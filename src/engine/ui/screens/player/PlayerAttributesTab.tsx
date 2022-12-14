@@ -9,11 +9,9 @@ import {LevelRules} from "../../../rules/LevelRules";
 
 export class PlayerAttributesTab extends AbstractPlayerScreenTab {
 	get label() {
-		if (this.interactive && this.player.attrPoints > 0) return <div class="d-ib text-nowrap">
-			Attributes<span class="d-ib text-hl text-xs"
-			                style="transform: translate(0, -33%)">(+{this.player.attrPoints})</span>
+		return <div class="d-ib text-nowrap">
+			Attributes{this.interactive && this.player.attrPoints > 0 && <span class="text-hl text-elevated">(+{this.player.attrPoints})</span>}
 		</div>
-		return "Attributes"
 	}
 
 	node(): VNode {

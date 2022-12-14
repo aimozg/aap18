@@ -1,17 +1,15 @@
 import {AbstractPlayerScreenTab} from "./AbstractPlayerScreenTab";
 import {Fragment, h, VNode} from "preact";
 import {numberOfThings} from "../../../text/utils";
-import {Skills} from "../../../../game/data/skills";
 import {Button} from "../../components/Button";
 import {AttrMetadata} from "../../../../game/data/stats";
 import {signClass} from "../../../utils/math";
 
 export class PlayerSkillsTab extends AbstractPlayerScreenTab {
 	get label() {
-		if (this.interactive && this.player.skillPoints > 0) return <div class="d-ib text-nowrap">
-			Skills<span class="text-hl text-elevated">(+{this.player.skillPoints})</span>
+		return <div class="d-ib text-nowrap">
+			Skills{this.interactive && this.player.skillPoints > 0 && <span class="text-hl text-elevated">(+{this.player.skillPoints})</span>}
 		</div>
-		return "Skills"
 	}
 
 	node(): VNode {

@@ -100,6 +100,7 @@ export class CreatureController {
 	}
 
 	attrMod(attr: TAttribute): number { return this.attr(attr) - 5; }
+	attrModNatural(attr: TAttribute): number { return this.stats.naturalAttrs[attr] - 5; }
 
 	get str(): number { return this.attr(TAttribute.STR) }
 
@@ -124,6 +125,8 @@ export class CreatureController {
 	get int(): number { return this.attr(TAttribute.INT) }
 
 	get intMod(): number { return this.attrMod(TAttribute.INT) }
+
+	get intModNatural(): number { return this.attrModNatural(TAttribute.INT) }
 
 	get wis(): number { return this.attr(TAttribute.WIS) }
 
@@ -298,7 +301,7 @@ export class CreatureController {
 		this.stats.skillXp[skill.resId] = xp;
 	}
 	get skillPointsPerLevel(): number {
-		return atLeast(LevelRules.SkillPointsGainMin, LevelRules.SkillPointsGainBase + LevelRules.SkillPointsGainPerIntMod*this.intMod);
+		return atLeast(LevelRules.SkillPointsGainMin, LevelRules.SkillPointsGainBase + LevelRules.SkillPointsGainPerIntMod*this.intModNatural);
 	}
 
 	//------------------//
@@ -426,6 +429,7 @@ export class CreatureController {
 		if (perkPointsAdd) msg += ` +${perkPointsAdd} perk points.`;
 		if (LevelRules.ClassUpAtLevels.includes(this.level)) msg += ` New class available!`;
 		this.gc.displayMessage(msg,"text-levelup")
+		this.updateStats();
 	}
 }
 
