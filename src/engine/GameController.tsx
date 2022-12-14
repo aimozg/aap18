@@ -20,7 +20,7 @@ import {Item} from "./objects/Item";
 import {Inventory} from "./objects/Inventory";
 import {InventoryScreen, InventoryScreenOptions} from "./ui/screens/InventoryScreen";
 import {Scene, SceneFn} from "./scene/Scene";
-import {ComponentChildren, h} from "preact";
+import {ComponentChildren, Fragment, h} from "preact";
 import {Skill} from "./objects/creature/Skill";
 import {LevelRules} from "./rules/LevelRules";
 
@@ -334,16 +334,21 @@ export class GameController {
 		let roll = options.roll ?? this.rng.d20();
 		let bonus = actor.skillLevel(options.skill);
 		let dc = options.dc;
-		let diff = roll+bonus - dc;
 		let critType = options.crit ?? "no";
 		let xp = options.xp ?? LevelRules.SkillXp.NORMAL;
+		let target = options.target;
+		let targetSkill = options.targetSkill;
+		let targetXp = options.targetXp ?? xp;
 		xp *= LevelRules.XpGainFactor;
+		targetXp *= LevelRules.XpGainFactor;
+		if (targetSkill && target) dc += target.skillLevel(targetSkill);
 
+		let diff = roll+bonus - dc;
 		let result:SkillCheckResult = {success:false,crit:false};
 		result.success = diff >= 0;
 		if (critType === "dice") {
-			if (roll === 1) result = {success:true,crit:true};
-			else if (roll === 20) result = {success:false,crit:true};
+			if (roll === 1) result = {success:false,crit:true};
+			else if (roll === 20) result = {success:true,crit:true};
 		} else if (critType === "diff") {
 			if (diff <= -10) result = {success:false,crit:true};
 			else if (diff >= 10) result = {success:true,crit:true};
@@ -352,18 +357,24 @@ export class GameController {
 			let className = result.success ?
 				(result.crit ? 'text-roll-critsuccess' : 'text-roll-success') :
 				(result.crit ? 'text-roll-critfail' : 'text-roll-fail');
-			let name = options.name ?? `${options.skill.name} check`;
+			let name = options.name ?? (
+				(target && targetSkill)
+					? <Fragment><b>{actor.name}</b> {options.skill.name} vs <b>{target.name}</b> {targetSkill.name} check</Fragment> : `${options.skill.name} check`);
 			let numbers = "";
 			if (options.logNumbers ?? true) {
-				numbers = ` (${roll}${bonus.signed()} vs DC ${dc})`;
+				numbers = ` (${roll}${bonus.signed()} vs ${target ? "" : "DC "}${dc})`;
 			}
 			let resultName = result.success ?
 				(result.crit ? 'Critical Success' : 'Success') :
 				(result.crit ? 'Critical Failure' : 'Failure');
-			this.displayMessage(<p class='text-roll-skill'>[{name}: <span class={className}>{resultName}{numbers}</span>]</p>)
+			this.displayMessage(<div class='text-roll-skill'>[{name}: <span class={className}>{resultName}{numbers}</span>]</div>)
 		}
 		if (result.success && xp > 0) {
-			actor.ctrl.giveSkillXp(options.skill, xp);
+			actor.ctrl.giveSkillXpScaled(options.skill, xp, dc);
+		} else if (target && targetSkill && targetXp > 0) {
+			// 1 - P(1d20 >= DC) = P(1d20 >= 22-DC)
+			// 1 - P(1d20 + MYSKILL >= OTHERSKILL + DC) = P(1d20 + OTHERSKILL >= MYSKILL + 22-DC)
+			target.ctrl.giveSkillXpScaled(targetSkill, targetXp, bonus+22-options.dc);
 		}
 		return result;
 	}
@@ -393,4 +404,12 @@ export interface UseSkillOptions {
 	logNumbers?: boolean;
 	/** skill usage text, default "SkillName check" */
 	name?: string;
+
+	/** if rolling vs other skill */
+	target?:Creature;
+	/** if rolling vs other skill */
+	targetSkill?: Skill;
+	/** skill xp to give target on failure, default = xp */
+	targetXp?: number;
+
 }

@@ -281,9 +281,13 @@ export class CreatureController {
 		this.stats.naturalSkills[skill.resId]++;
 		this.gc.displayMessage(`${skill.name} skill leveled up to ${this.skillLevel(skill)}`);
 	}
+	giveSkillXpScaled(skill: Skill, @NonNegativeIntParam base:number, @IntParam dc:number, log:boolean=true) {
+		logger.debug("{} giveSkillXpScaled({}, {}, {}, {})", this.creature, skill, base, dc, log)
+		this.giveSkillXp(skill, LevelRules.calcSkillXpGain(base, dc-this.skillLevel(skill)), log);
+	}
 	@ValidateParams
 	giveSkillXp(skill:Skill, @NonNegativeIntParam amount:number, log:boolean=true) {
-		logger.debug("{} giveSkillXp({}, {})", this.creature, skill, amount)
+		logger.debug("{} giveSkillXp({}, {}, {})", this.creature, skill, amount, log)
 		if (this.naturalSkillLevel(skill) >= this.maxNaturalSkill) {
 			return
 		}
@@ -295,7 +299,7 @@ export class CreatureController {
 			xp -= nextXp;
 			this.stats.naturalSkills[skill.resId]++;
 			if (log) {
-				this.gc.displayMessage(`${skill.name} skill leveled up to ${this.skillLevel(skill)}.`);
+				this.gc.displayMessage(`${this.creature.name}'s ${skill.name} skill leveled up to ${this.skillLevel(skill)}.`);
 			}
 		}
 		this.stats.skillXp[skill.resId] = xp;

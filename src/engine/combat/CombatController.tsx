@@ -72,8 +72,10 @@ export class CombatController {
 	}
 
 	public readonly grid: BattleGrid;
+	public readonly player: PlayerCharacter = this.ctx.player;
 	public readonly party: Creature[] = this.ctx.settings.party
 	public readonly enemies: Creature[] = this.ctx.settings.enemies
+	public get gc() { return Game.instance.gameController }
 	public ownSide(creature:Creature):Creature[] {
 		if (this.party.includes(creature)) return this.party;
 		if (this.enemies.includes(creature)) return this.enemies;
@@ -219,19 +221,30 @@ export class CombatController {
 	async doSingleStealthCheck(spotter:Creature, sneaker:Creature) {
 		logger.info("doSingleStealthCheck {} {}", spotter, sneaker);
 		if (!spotter.isAlive) return;
-		let spotSkill = spotter.skillLevel(CoreSkills.Spot);
-		let stealthSkill = sneaker.skillLevel(CoreSkills.Stealth);
-
-		let roll = this.rng.d20();
-		let bonus = spotSkill;
-		let dc = 10 + stealthSkill;
-		// TODO critical success/failure?
-		let success = roll + bonus >= dc
-		this.logSkillCheck(roll, bonus, dc, <Fragment>
-				{logref(spotter)}{' '}Spot vs {logref(sneaker)}{' '}Stealth check
-			</Fragment>);
-		if (success) {
-			await this.noticeCreature(sneaker);
+		if (sneaker === this.player) {
+			let result = this.gc.useSkill({
+				actor: sneaker,
+				skill: CoreSkills.Stealth,
+				xp: LevelRules.SkillXp.SMALL,
+				dc: 10,
+				target: spotter,
+				targetSkill: CoreSkills.Spot,
+				targetXp: LevelRules.SkillXp.NORMAL,
+				crit: "dice"
+			});
+			if (!result.success) await this.noticeCreature(sneaker);
+		} else {
+			let result = this.gc.useSkill({
+				actor: spotter,
+				skill: CoreSkills.Spot,
+				xp: LevelRules.SkillXp.NORMAL,
+				dc: 10,
+				target: sneaker,
+				targetSkill: CoreSkills.Stealth,
+				targetXp: LevelRules.SkillXp.SMALL,
+				crit: "dice"
+			});
+			if (result.success) await this.noticeCreature(sneaker);
 		}
 	}
 	async doFullStealthCheck(creature:Creature) {
@@ -328,13 +341,6 @@ export class CombatController {
 		this.log("-action", <Fragment>
 			{logref(actor)}{" "}{verb}{" "}{logref(target)}{": "}
 			<span className="--action">{action}</span>
-		</Fragment>)
-	}
-	logSkillCheck(roll:number,bonus:number,dc:number,name:ComponentChildren) {
-		let success = roll + bonus >= dc
-		let className = success ? "text-roll-success" : "text-roll-fail";
-		this.log("-check", <Fragment>
-			[{name}: <span class={className}>{success?"Success":"Failure"} ({roll}{bonus.signed()} vs {dc})</span>]
 		</Fragment>)
 	}
 

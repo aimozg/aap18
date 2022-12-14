@@ -1,6 +1,6 @@
 {
   "name": "aap18",
-  "version": "0.1.4",
+  "version": "0.1.5-dev",
   "private": true,
   "config": {
     "title": "AAP18"

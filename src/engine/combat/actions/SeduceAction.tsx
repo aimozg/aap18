@@ -3,16 +3,14 @@ import {Creature} from "../../objects/Creature";
 import {CommonText} from "../../text/CommonText";
 import {CoreSkills} from "../../objects/creature/CoreSkills";
 import {CombatActionGroups} from "../CombatActionGroups";
-import {CombatController, logref} from "../CombatController";
+import {CombatController} from "../CombatController";
 import {CombatRules} from "../../../game/combat/CombatRules";
-import {Fragment, h} from "preact";
+import {h} from "preact";
 import {CoreConditions} from "../../objects/creature/CoreConditions";
+import {SkillCheckResult} from "../../GameController";
+import {LevelRules} from "../../rules/LevelRules";
 
-export interface SeduceResult {
-	success: boolean;
-}
-
-export class SeduceAction extends CombatAction<SeduceResult> {
+export class SeduceAction extends CombatAction<SkillCheckResult> {
 
 	constructor(actor: Creature,
 	            public readonly target: Creature,
@@ -33,8 +31,8 @@ export class SeduceAction extends CombatAction<SeduceResult> {
 		// TODO if target has seduction immunity
 		return "";
 	}
-	async perform(cc: CombatController): Promise<SeduceResult> {
-		let {actor,target,dc,bonus,toHit} = this
+	async perform(cc: CombatController): Promise<SkillCheckResult> {
+		let {actor,target,dc} = this
 		if (!this.free) {
 			// TODO seduce AP cost
 			let ap = 1000;
@@ -42,15 +40,18 @@ export class SeduceAction extends CombatAction<SeduceResult> {
 			await cc.deduceAP(actor, ap)
 		}
 		// TODO animations
-		let roll = cc.rng.d20()
-		let successIsGood = cc.party.includes(actor);
-		let success = roll >= toHit;
-		cc.logSkillCheck(roll,bonus,dc,<Fragment>{logref(actor)} Seduce {logref(target)}</Fragment>);
-		if (success) {
+		// TODO flavour text
+		let result = cc.gc.useSkill({
+			actor,
+			skill:CoreSkills.Seduce,
+			dc,
+			xp: LevelRules.SkillXp.LARGE
+		})
+		if (result.success) {
 			// TODO animate successful seduction
 			target.setCondition(CoreConditions.Seduced);
 		}
-		return { success: success }
+		return result
 	}
 
 }
