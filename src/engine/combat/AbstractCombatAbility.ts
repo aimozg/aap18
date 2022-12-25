@@ -5,6 +5,7 @@
 import {AbilityTarget, UseAbilityAction} from "./actions/UseAbilityAction";
 import {CombatController} from "./CombatController";
 import {CombatRules} from "../../game/combat/CombatRules";
+import {ComponentChildren} from "preact";
 
 export abstract class AbstractCombatAbility {
 	abstract readonly name:string;
@@ -39,7 +40,7 @@ export abstract class AbstractCombatAbility {
 				return `ERROR bad action target type ${(action.target as AbilityTarget).type}`
 		}
 	}
-	tooltip(action: UseAbilityAction):string {
+	tooltip(action: UseAbilityAction):ComponentChildren {
 		switch (action.target.type) {
 			case AbilityTargetType.SELF:
 				return `Use ${this.name} on self`;

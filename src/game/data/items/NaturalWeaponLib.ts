@@ -4,8 +4,9 @@
 
 import {BaseNaturalWeapon} from "../../../engine/objects/item/BaseNaturalWeapon";
 import {DamageTypes} from "../../../engine/rules/DamageType";
-import {baseDmgSpec} from "../../../engine/rules/Damage";
+import {meleeAttackMode} from "../../../engine/objects/item/WeaponComponent";
 
 export namespace NaturalWeaponLib {
-	export const NaturalFists = new BaseNaturalWeapon("/nwpn_fists", "fists", baseDmgSpec("1d3", DamageTypes.BLUNT));
+	export const NaturalFists = new BaseNaturalWeapon("/nwpn_fists", "fists",
+		meleeAttackMode("Punch","punch","1d3", DamageTypes.BLUNT));
 }

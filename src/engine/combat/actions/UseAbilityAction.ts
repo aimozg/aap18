@@ -7,6 +7,7 @@ import {Creature} from "../../objects/Creature";
 import {AbilityTargetType, AbstractCombatAbility} from "../AbstractCombatAbility";
 import {CombatController} from "../CombatController";
 import {CombatActionGroups} from "../CombatActionGroups";
+import {ComponentChildren} from "preact";
 
 export class UseAbilityAction extends CombatAction<void>{
 
@@ -33,7 +34,7 @@ export class UseAbilityAction extends CombatAction<void>{
 	group = CombatActionGroups.AGAbilities
 	readonly label: string;
 	readonly target: AbilityTarget;
-	readonly tooltip: string;
+	readonly tooltip: ComponentChildren;
 	readonly energyCost: number;
 	readonly apCost: number;
 	get targetCreature():Creature {

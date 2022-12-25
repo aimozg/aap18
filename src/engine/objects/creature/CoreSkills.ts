@@ -19,7 +19,7 @@ export namespace CoreSkills {
 	export const Spot = new Skill("/sk_spot", {
 		name: "Spot",
 		attr: TAttribute.PER,
-		description: "Detect stealthy enemies, rolled vs enemy Stealth skill."
+		description: "Detect sneaking enemies, rolled vs enemy Stealth skill."
 	});
 	export const Stealth = new Skill("/sk_stealth", {
 		name: "Stealth",

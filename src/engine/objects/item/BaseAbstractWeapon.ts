@@ -1,13 +1,13 @@
 import {BaseItem} from "../BaseItem";
-import {BaseDamageSpec} from "../../rules/Damage";
-import {WeaponComponent} from "./WeaponComponent";
+import {MeleeAttackMode, WeaponComponent} from "./WeaponComponent";
 
 export abstract class BaseAbstractWeapon extends BaseItem {
 	protected constructor(resId: string,
 						  name: string,
-	                      public dmgSpec:BaseDamageSpec) {
+	                      primaryAttack:MeleeAttackMode,
+	                      ...secondaryAttacks:MeleeAttackMode[]) {
 		super(resId, name);
-		new WeaponComponent(this, dmgSpec);
+		new WeaponComponent(this, primaryAttack, secondaryAttacks);
 	}
 }
 

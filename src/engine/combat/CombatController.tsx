@@ -20,6 +20,7 @@ import {CoreConditions} from "../objects/creature/CoreConditions";
 import {SkipCombatAction} from "./actions/SkipCombatAction";
 import {CoreSkills} from "../objects/creature/CoreSkills";
 import {LevelRules} from "../rules/LevelRules";
+import {damageSpan} from "../text/utils";
 
 const logger = LogManager.loggerFor("engine.combat.CombatController")
 
@@ -459,8 +460,7 @@ export class CombatController {
 		if (damage === 0) {
 			this.log("", <Fragment>(<span class="text-damage-none" title={hint}>0</span>)</Fragment>)
 		} else {
-			this.log("", <Fragment>(<span class={"text-damage-" + damageType.cssSuffix}
-			                              title={hint}>{damage} {damageType.name}</span>)</Fragment>)
+			this.log("", <Fragment>({damageSpan(damage, damageType, hint)})</Fragment>);
 			await this.deduceHP(target, damage, source);
 		}
 	}

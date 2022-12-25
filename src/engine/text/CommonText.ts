@@ -12,7 +12,7 @@ export namespace CommonText {
 	}
 
 	export function weaponInfo(w: Item): string {
-		return w.asWeapon?.damage?.toString() ?? "-";
+		return w.asWeapon?.primaryAttack?.damage?.toString() ?? "-";
 	}
 
 	export function itemInfo(i: Item): string {

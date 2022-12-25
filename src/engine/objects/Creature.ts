@@ -23,6 +23,7 @@ import {BuffableStat, BuffableStatId} from "./creature/stats/BuffableStat";
 import {obj2map} from "../utils/collections";
 import {PartialRecord} from "../utils/types";
 import {CreatureSkill} from "./creature/stats/CreatureSkill";
+import {MeleeAttackMode} from "./item/WeaponComponent";
 
 export class CreatureTexts {
 	constructor(public readonly creature: Creature) {}
@@ -244,6 +245,11 @@ export class Creature {
 		if (mw?.ifWeapon/* TODO and mw is melee weapon */) return mw;
 		return this.fists;
 	}
+	get currentAttackMode():MeleeAttackMode {
+		let weapon = this.currentWeapon.asWeapon!;
+		if (this.preferredAttackMode && weapon.hasMode(this.preferredAttackMode)) return this.preferredAttackMode;
+		return weapon.primaryAttack;
+	}
 	addToInventory(item:Item) {
 		this.inventory.addItem(item);
 	}
@@ -261,6 +267,7 @@ export class Creature {
 	ap = 0;
 	gobj: GOCreature|null = null;
 	ai: MonsterAI = new DefaultMonsterAI(this);
+	preferredAttackMode: MeleeAttackMode|null = null;
 
 	// TODO make these computable
 	abilities: AbstractCombatAbility[] = [];

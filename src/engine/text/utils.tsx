@@ -1,10 +1,12 @@
 /*
  * Created by aimozg on 05.07.2022.
  */
-import {Fragment, h, VNode} from "preact";
+import {ComponentChildren, Fragment, h, VNode} from "preact";
 import {Parser} from "./parser/Parser";
 import {TextOutput} from "./output/TextOutput";
 import {substitutePattern} from "../utils/string";
+import {DamageType} from "../rules/Damage";
+import {Dice} from "../math/Dice";
 
 export function simpleparse(input: string | null | undefined): VNode {
 	if (!input) return <Fragment/>
@@ -27,4 +29,10 @@ export function numberOfThings(count:number,
 		'number': count,
 		'noun': (count === 1 || count === -1) ? singular : plural
 	})
+}
+
+export function damageSpan(damage: number | Dice | string, damageType: DamageType, hint:string|undefined=undefined):ComponentChildren {
+	if (damage instanceof Dice) damage = damage.toString();
+	return <span class={"text-damage-" + damageType.cssSuffix}
+	             title={hint}>{damage} {damageType.name}</span>
 }

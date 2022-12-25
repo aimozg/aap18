@@ -34,17 +34,18 @@ export namespace Skills {
 	export const Stealth = CoreSkills.Stealth;
 
 	export const list = [
-		// Ambush,
+		Ambush,
 		Alchemy,
 		Arcana,
 		Enchanting,
-		// Seduce,
+		Seduce,
 		Smithing,
-		// Spot,
-		// Stealth
+		Spot,
+		Stealth
 	];
 }
 
 export function gdRegisterSkills(gd:GameDataBuilder) {
-	gd.addSkills(Skills.list);
+	// register non-core skills
+	gd.addSkills(Skills.list.filter(skill=>!CoreSkills.list.includes(skill)));
 }

@@ -61,7 +61,7 @@ export class BattleActionsPanel extends DomComponent {
 	private dpadActions: UIAction[] = [];
 	private currentGroup = -1
 	private actionsOpenGroup: UIAction[] = CombatActionGroups.LIST.map((name,i)=>({
-		label: name,
+		label: '▸ '+name,
 		hotkey: BattleActionsPanel.GroupHotkeys[i],
 		disabled: ()=>(this.combatActionsGrouped[i]?.length??0) === 0,
 		callback: ()=>this.openActionGroup(i)
@@ -97,7 +97,7 @@ export class BattleActionsPanel extends DomComponent {
 		let hotkey = BattleActionsPanel.GroupHotkeys[i];
 		return <Fragment>
 			{
-				actions.length === 0 && <Button label={group} hotkey={hotkey} disabled={true}/>
+				actions.length === 0 && <Button label={'▸'+group} hotkey={hotkey} disabled={true}/>
 			}
 			{
 				actions.length === 1 && <Button action={actions[0]} hotkey={hotkey}/>
@@ -113,7 +113,11 @@ export class BattleActionsPanel extends DomComponent {
 		render(
 			CombatActionGroups.LIST.map((group,i)=>
 				this.renderActionGroup(group, i, this.combatActionsGrouped[i]??[])
-			), this.refActions.current!)
+			), this.refActions.current!);
+		for (let group of this.refGroups) {
+			if (!group.current) continue;
+			group.current.style.display = "none";
+		}
 	}
 
 	openActionGroup(i:number) {
@@ -130,6 +134,7 @@ export class BattleActionsPanel extends DomComponent {
 		}
 		this.currentGroup = i;
 		this.refCurrentGroup = this.refGroups[i];
+		this.refCurrentGroup!.current!.style.display = "";
 		render(
 			actions.map(
 				a => <Button action={a}/>
@@ -138,6 +143,7 @@ export class BattleActionsPanel extends DomComponent {
 	}
 	closeActionGroup() {
 		removeChildren(this.refCurrentGroup?.current)
+		if (this.refCurrentGroup?.current) this.refCurrentGroup.current.style.display = "none";
 		this.refCurrentGroup = null
 		this.currentGroup = -1
 	}

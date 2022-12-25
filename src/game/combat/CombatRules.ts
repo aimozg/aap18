@@ -16,6 +16,7 @@ import {StepAction} from "../../engine/combat/actions/StepAction";
 import {CoreConditions} from "../../engine/objects/creature/CoreConditions";
 import {TeaseAction} from "../../engine/combat/actions/TeaseAction";
 import {SeduceAction} from "../../engine/combat/actions/SeduceAction";
+import {SelectMeleeAttackModeAction} from "../../engine/combat/actions/SelectMeleeAttackModeAction";
 
 export namespace CombatRules {
 
@@ -34,6 +35,11 @@ export namespace CombatRules {
 			actions.push(new MeleeAttackAction(player, target))
 			actions.push(new TeaseAction(player, target))
 			actions.push(new SeduceAction(player, target))
+		}
+		if (player.currentWeapon.asWeapon!.secondaryAttacks.length > 0) {
+			for (let mode of player.currentWeapon.asWeapon!.attackModes) {
+				actions.push(new SelectMeleeAttackModeAction(player, mode));
+			}
 		}
 		for (let dir of Direction.Steps) {
 			actions.push(new StepAction(player, dir.add(player.gobj!)))
@@ -109,14 +115,15 @@ export namespace CombatRules {
 	}
 	export function baseMeleeDamage(attacker:Creature):DamageSpec {
 		let weapon = attacker.meleeWeapon.asWeapon!;
-		let primary:DamageSpecEntry = {
-			damage: weapon.damage,
-			damageType: weapon.damageType,
+		let mode = attacker.currentAttackMode;
+		let mainDamage:DamageSpecEntry = {
+			damage: mode.damage,
+			damageType: mode.damageType,
 			canCrit: true
 		};
-		primary.damage = primary.damage.withBonus(attacker.strMod);
+		mainDamage.damage = mainDamage.damage.withBonus(attacker.strMod);
 		// TODO enchantments
-		return [primary];
+		return [mainDamage];
 	}
 	export function meleeDamageVs(attacker:Creature, target:Creature):DamageSpec {
 		// TODO target-dependent effects

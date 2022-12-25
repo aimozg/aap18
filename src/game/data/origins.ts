@@ -2,6 +2,7 @@
  * Created by aimozg on 04.07.2022.
  */
 import {GameDataBuilder} from "../GameDataBuilder";
+import {MeleeWeaponLib} from "./items/MeleeWeaponLib";
 
 export function gdRegisterOrigins(gd: GameDataBuilder) {
 	gd.logger.debug("gdRegisterOrigins");
@@ -39,7 +40,8 @@ export function gdRegisterOrigins(gd: GameDataBuilder) {
 			"Good starting equipment. <b>(NOT IMPLEMENTED)</b></i>",
 		introText: "You're a knight who led the purge of a village of Notingnam, a dark village with foul traditions, buried deep in the wilds. After executing demon-worshipping heretics, you've discovered a portal to some kind of Demon Realm. You and your loyal followers entered it bravely...",
 		adjustPlayer: (pc)=>{
-			pc.ctrl.addXp(pc.nextLevelXp()-pc.xp)
+			pc.ctrl.addXp(pc.nextLevelXp()-pc.xp);
+			pc.setMainHandItem(MeleeWeaponLib.Longsword.spawn());
 		}
 	}, {
 		id: 'isekai',

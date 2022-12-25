@@ -1,9 +1,9 @@
 export namespace CombatActionGroups {
-	export let AGMelee = "Melee"
-	export let AGRanged = "Ranged"
+	export let AGMelee = "Melee Attacks"
+	export let AGRanged = "Ranged Attacks"
 	export let AGTease = "Tease"
 	export let AGSkills = "Skills"
-	export let AGModes = "Modes"
+	export let AGModes = "Switch Modes"
 	export let AGSpells = "Spells"
 	export let AGAbilities = "Abilities"
 	export let AGItems = "Items"

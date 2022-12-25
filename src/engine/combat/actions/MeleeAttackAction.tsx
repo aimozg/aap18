@@ -5,6 +5,7 @@ import {h} from "preact";
 import {CombatRoll} from "../CombatRoll";
 import {Direction} from "../../utils/gridutils";
 import {CombatActionGroups} from "../CombatActionGroups";
+import {MeleeAttackMode} from "../../objects/item/WeaponComponent";
 
 export class MeleeAttackAction extends CombatAction<CombatRoll> {
 	constructor(
@@ -18,8 +19,9 @@ export class MeleeAttackAction extends CombatAction<CombatRoll> {
 		}
 	}
 
+	mode: MeleeAttackMode = this.actor.currentAttackMode
 	toString(): string {
-		return "[MeleeAttackAction " + this.actor.name + " " + this.target.name + (this.free ? " (free)" : "") + "]"
+		return `[MeleeAttackAction ${this.actor.name} ${this.mode.name} ${this.target.name}${this.free ? " (free)" : ""}]`
 	}
 	protected disabledReason(cc: CombatController): string {
 		// TODO impossible if actor has condition, or target is invulnerable/dead
@@ -27,13 +29,13 @@ export class MeleeAttackAction extends CombatAction<CombatRoll> {
 		if (!cc.adjacent(this.actor, this.target)) return "Too far";
 		return "";
 	}
-	label = "Strike " + this.target.name
+	label = this.mode.verb.capitalize() + " " + this.target.name
 	group = CombatActionGroups.AGMelee
 
 	get dpadLabel() { return "Strike" }
 	get dpadClass() { return "dpad-strike"}
 
-	tooltip = "Strike " + this.target.name // TODO details
+	tooltip = this.mode.verb.capitalize() + " " + this.target.name // TODO details
 	async perform(cc: CombatController): Promise<CombatRoll> {
 		return await cc.processMeleeRoll(new CombatRoll(
 			this.actor,

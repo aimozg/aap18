@@ -16,8 +16,8 @@ export let IntroScenes = buildScenes(namespace, {
 	async intro(ctx: SceneContext) {
 		// Set player location
 		ctx.gc.placePlayer(SceneLib.Camp.CampPlace);
-		ctx.player.setMainHandItem(MeleeWeaponLib.Dagger.spawn());
-		ctx.player.setBodyArmor(ArmorLib.LeatherArmor.spawn());
+		if (!ctx.player.mainHandItem) ctx.player.setMainHandItem(MeleeWeaponLib.Dagger.spawn());
+		if (!ctx.player.bodyArmor) ctx.player.setBodyArmor(ArmorLib.LeatherArmor.spawn());
 		ctx.player.inventory.addItem(ConsumableLib.PotionHealingLesser.spawn());
 
 		let origin = ctx.player.origin;

@@ -6,6 +6,7 @@ import {Creature} from "../objects/Creature";
 import {CombatController} from "./CombatController";
 import {Direction} from "../utils/gridutils";
 import {CombatActionGroups} from "./CombatActionGroups";
+import {ComponentChildren} from "preact";
 
 export abstract class CombatAction<RESULT> {
 	protected constructor(
@@ -30,6 +31,6 @@ export abstract class CombatAction<RESULT> {
 		return !this._disabledReason;
 	}
 	abstract label: string
-	abstract tooltip: string
+	abstract tooltip: ComponentChildren
 }
 

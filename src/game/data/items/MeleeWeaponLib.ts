@@ -4,7 +4,7 @@
 
 import {BaseMeleeWeapon} from "../../../engine/objects/item/BaseMeleeWeapon";
 import {DamageTypes} from "../../../engine/rules/DamageType";
-import {baseDmgSpec} from "../../../engine/rules/Damage";
+import {meleeAttackMode} from "../../../engine/objects/item/WeaponComponent";
 
 /*
  * Base values (by Liadri):
@@ -29,5 +29,10 @@ import {baseDmgSpec} from "../../../engine/rules/Damage";
  */
 
 export namespace MeleeWeaponLib {
-	export const Dagger = new BaseMeleeWeapon("/mwpn_dagger", "dagger", baseDmgSpec("1d4", DamageTypes.SLASHING));
+	export const Dagger = new BaseMeleeWeapon("/mwpn_dagger", "dagger",
+		meleeAttackMode("Stab","stab","1d6", DamageTypes.PIERCING));
+	export const Longsword = new BaseMeleeWeapon("/mwpn_longsword", "longsword",
+		meleeAttackMode("Slash", "slash", "1d8", DamageTypes.SLASHING),
+		meleeAttackMode("Stab", "stab", "1d3", DamageTypes.PIERCING)
+	)
 }

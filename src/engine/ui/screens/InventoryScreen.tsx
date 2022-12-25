@@ -8,6 +8,7 @@ import {Inventory} from "../../objects/Inventory";
 import {TextOutput} from "../../text/output/TextOutput";
 import {AbstractModalScreen} from "../AbstractModalScreen";
 import {Game} from "../../Game";
+import {damageSpan} from "../../text/utils";
 
 type ItemAction = UIAction & { longLabel: string, position: number }
 
@@ -419,13 +420,15 @@ export class InventoryScreen extends AbstractModalScreen<void> {
 						{selitem && <Fragment>
                             <h3>{selitem.name}</h3>
 							{selitem.asArmor && <div>
+                                <span className="text-hl">[Armor]</span><br/>
                                 Defense: {selitem.asArmor.defenseBonus} <br/>
                                 DR: {selitem.asArmor.drBonus}
                             </div>}
 							{selitem.asWeapon && <div>
-                                Damage: {selitem.asWeapon.damage.toString()} <br/>
-                                Damage type: <span
-                                class={'text-damage-' + selitem.asWeapon.damageType.cssSuffix}>{selitem.asWeapon.damageType.name}</span>
+                                <span className="text-hl">[Weapon]</span><br/>
+								{selitem.asWeapon.attackModes.map(mode=><div>
+									{mode.name}: {damageSpan(mode.damage,mode.damageType)}
+								</div>)}
                             </div>}
                             <div class="d-flex gap-4 my-4">
 								{this.itemActions(selitem).map(action =>
