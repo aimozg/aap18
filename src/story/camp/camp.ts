@@ -1,7 +1,7 @@
 /*
  * Created by aimozg on 18.07.2022.
  */
-import {Imp, ImpScenes} from "../common/Imp";
+import {Imp, ImpScenes} from "../monsters/Imp";
 import {ConsumableLib} from "../../game/data/items/ConsumableLib";
 import {buildScene} from "../../engine/scene/builder";
 import {buildPlace} from "../../engine/place/Place";

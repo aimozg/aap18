@@ -6,17 +6,17 @@ import Symbols from "../symbols";
 import {IResource} from "../IResource";
 import {Creature} from "../objects/Creature";
 
-export abstract class TraitType implements IResource {
-	readonly resType: symbol = Symbols.ResTypeTrait
+export abstract class PerkType implements IResource {
+	readonly resType: symbol = Symbols.ResTypePerk
 	protected constructor(
 		public readonly resId: string
 	) {}
-	/* TODO parametrized traits */
+	/* TODO parametrized perks */
 	abstract name(host:Creature|null):string
 	abstract description(host:Creature|null):string
 }
 
-export class SimpleTraitType extends TraitType {
+export class SimplePerkType extends PerkType {
 	constructor(resId: string, public constName:string, public constDescription: string) {
 		super(resId);
 	}

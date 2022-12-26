@@ -1,7 +1,7 @@
 import {Character} from "../../engine/objects/creature/Character";
 import {RacialGroups} from "../../game/data/racialGroups";
 import {Game} from "../../engine/Game";
-import {TinyFireBolt} from "../monsters/abilities/TinyFireBolt";
+import {TinyFireBolt} from "./abilities/TinyFireBolt";
 import {LootTable, setupLoot} from "../../engine/objects/Loot";
 import {ConsumableLib} from "../../game/data/items/ConsumableLib";
 import {TSex} from "../../engine/rules/gender";

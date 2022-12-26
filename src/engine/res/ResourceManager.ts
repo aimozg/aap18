@@ -48,8 +48,8 @@ export class ResourceManager {
 				!!gdtt.solid)
 			data.tiles.register(tt)
 		}
-		data.traits.clear();
-		data.traits.registerMany(idata.traits)
+		data.perks.clear();
+		data.perks.registerMany(idata.perks)
 	}
 
 

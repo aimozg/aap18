@@ -9,7 +9,7 @@ import {gdRegisterRacialGroups} from "./data/racialGroups";
 import {gdRegisterStory} from "../story";
 import {gdRegisterBodyParts} from "./data/bodyParts";
 import {gdRegisterColors} from "./data/colors";
-import {gdRegisterTraits} from "./data/traits";
+import {gdRegisterPerks} from "./data/perks";
 import {gdRegisterTiles} from "./data/tiles";
 import {gdRegisterSkills} from "./data/skills";
 
@@ -28,7 +28,7 @@ export async function loadGameData():Promise<ImportedGameData> {
 	gdRegisterSkills(gd);
 	gdRegisterStory(gd);
 	gdRegisterTiles(gd);
-	gdRegisterTraits(gd);
+	gdRegisterPerks(gd);
 
 	return gd.data;
 }

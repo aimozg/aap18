@@ -30,9 +30,9 @@ export class ChargenStepFinalize extends ChargenStep {
 					<p>
 						You will play as <b>{pc.origin.shortDesc}, {pc.name} the {pc.txt.sex} {this.cc.race} {this.cc.classObject!.name.capitalize()}.</b>
 					</p>
-					<h5>Traits</h5>
-					{pc.traits.size === 0 && "(No strating traits)"}
-					{pc.traitList().map(t=><div>
+					<h5>Perks</h5>
+					{pc.perks.size === 0 && "(No strating perks)"}
+					{pc.perkList().map(t=><div>
 						<b>{t.name(pc)}</b> &ndash; <Parse>{t.description(pc)}</Parse>
 					</div>)}
 					<h5>Appearance</h5>

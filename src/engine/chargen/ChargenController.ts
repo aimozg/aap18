@@ -18,8 +18,8 @@ import {Game} from "../Game";
 import {IStatMetadata, StatMetadata} from "../../game/data/stats";
 import {CharacterClass} from "../rules/classes/CharacterClass";
 import {PenisSizeTier, PenisSizeTiers} from "../../game/data/body/Penis";
-import {GdStartingTraits} from "../../game/data/traits/starting";
-import {TraitType} from "../rules/TraitType";
+import {GdStartingPerks} from "../../game/data/./perks/starting";
+import {PerkType} from "../rules/PerkType";
 import {Skill} from "../objects/creature/Skill";
 
 interface IChargenSecondaryStat {
@@ -157,8 +157,8 @@ export class ChargenController {
 	getUpgradeableSkills() {
 		return this.allowedSkills().filter(skill => this.canIncSkill(skill));
 	}
-	allowedTraits(withNone:boolean=true): ButtonMenuItem<string | null>[] {
-		let list: ButtonMenuItem<string|null>[] = GdStartingTraits.ALL.map(t=>({
+	allowedPerks(withNone:boolean=true): ButtonMenuItem<string | null>[] {
+		let list: ButtonMenuItem<string|null>[] = GdStartingPerks.ALL.map(t=>({
 			label: t.name(null),
 			value: t.resId
 		})).sortOn("label");
@@ -195,8 +195,8 @@ export class ChargenController {
 	// Skills
 	skillPointsSpent: number;
 	skills: Record<string,number> = {};
-	// Traits
-	trait: string|null; // TODO allow multiple traits in chargen
+	// Perks
+	perk: string|null; // TODO allow multiple perks in chargen
 
 	/////////////
 	// Setters //
@@ -244,13 +244,13 @@ export class ChargenController {
 		if (!this.cclass) return null;
 		return Game.instance.data.classes.get(this.cclass)
 	}
-	setTrait(trait: string|null) {
-		this.trait = trait;
+	setPerk(perk: string|null) {
+		this.perk = perk;
 		this.update();
 	}
-	get traitObject(): TraitType | null {
-		if (!this.trait) return null;
-		return Game.instance.data.traits.get(this.trait);
+	get perkObject(): PerkType | null {
+		if (!this.perk) return null;
+		return Game.instance.data.perks.get(this.perk);
 	}
 
 	///////////////
@@ -288,8 +288,8 @@ export class ChargenController {
 		// Skills
 		this.skillPointsSpent = 0;
 		this.skills = {};
-		// Traits
-		this.trait = null;
+		// Perks
+		this.perk = null;
 	}
 	/** Recreate player */
 	private updatePlayer() {
@@ -321,8 +321,8 @@ export class ChargenController {
 		for (let [id, value] of Object.entries(this.skills)) {
 			this.player.stats.naturalSkills[id] = value;
 		}
-		// Traits
-		if (this.traitObject) this.player.addTrait(this.traitObject);
+		// Perks
+		if (this.perkObject) this.player.addPerk(this.perkObject);
 
 		this.player.origin.adjustPlayer?.(this.player);
 		this.player.updateStats();
@@ -357,9 +357,9 @@ export class ChargenController {
 			if (validSkills.length === 0) break;
 			this.skillInc(fxrng.pick(validSkills));
 		}
-		// Traits
-		// TODO class-dependent trait
-		this.trait = fxrng.pick(this.allowedTraits(false)).value;
+		// Perks
+		// TODO class-dependent perk
+		this.perk = fxrng.pick(this.allowedPerks(false)).value;
 		// Finalize
 		this.updatePlayer();
 		this.internalUpdate = false;

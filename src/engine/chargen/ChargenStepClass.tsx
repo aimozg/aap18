@@ -26,7 +26,7 @@ export class ChargenStepClass extends ChargenStep {
 		return <Fragment>
 			<h3>Class</h3>
 			<p>
-				Picking a class unlocks traits, skills, and abilities.
+				Picking a class unlocks perks, skills, and abilities.
 				Every 6th level you can advance your class or pick another.
 			</p>
 			<div class="grid-12">

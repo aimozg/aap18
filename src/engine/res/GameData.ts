@@ -10,7 +10,7 @@ import {Scene} from "../scene/Scene";
 import {Place} from "../place/Place";
 import {Color, colorSortKey} from "../objects/Color";
 import {Game} from "../Game";
-import {TraitType} from "../rules/TraitType";
+import {PerkType} from "../rules/PerkType";
 import {TileType} from "../combat/BattleGrid";
 import {Skill} from "../objects/creature/Skill";
 
@@ -72,8 +72,8 @@ export class GameData {
 		return tt;
 	}
 
-	readonly traits = new ResLib<TraitType>(Symbols.ResTypeTrait, "Trait");
-	trait(id: string): TraitType {
-		return this.traits.get(id)
+	readonly perks = new ResLib<PerkType>(Symbols.ResTypePerk, "Perk");
+	perk(id: string): PerkType {
+		return this.perks.get(id)
 	}
 }

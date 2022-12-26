@@ -8,7 +8,7 @@ import {NaturalWeaponLib} from "../../game/data/items/NaturalWeaponLib";
 import {RacialGroup} from "../rules/RacialGroup";
 import {Game} from "../Game";
 import {Item} from "./Item";
-import {TraitType} from "../rules/TraitType";
+import {PerkType} from "../rules/PerkType";
 import {DefaultMonsterAI, MonsterAI} from "./MonsterAI";
 import {AbstractCombatAbility} from "../combat/AbstractCombatAbility";
 import {GOCreature} from "../combat/BattleGrid";
@@ -307,26 +307,26 @@ export class Creature {
 	/** can be Infinity */
 	nextSkillLevelXp(skill:Skill):number { return this.ctrl.nextSkillLevelXp(skill) }
 
-	///////////////////
-	// Traits - Data //
-	///////////////////
+	//////////////////
+	// Perks - Data //
+	//////////////////
 
-	traits = new Set<TraitType>();
+	perks = new Set<PerkType>();
 
-	//////////////////////
-	// Traits - Helpers //
-	//////////////////////
+	/////////////////////
+	// Perks - Helpers //
+	/////////////////////
 
-	traitList():TraitType[] {
-		return Array.from(this.traits.values()).sortOn("name");
+	perkList():PerkType[] {
+		return Array.from(this.perks.values()).sortOn("name");
 	}
-	hasTrait(trait:TraitType|string):boolean {
-		if (typeof trait === 'string') trait = Game.instance.data.trait(trait);
-		return this.traits.has(trait);
+	hasPerk(perk:PerkType|string):boolean {
+		if (typeof perk === 'string') perk = Game.instance.data.perk(perk);
+		return this.perks.has(perk);
 	}
 	// TODO move to CreatureController
-	addTrait(trait:TraitType):void {
-		this.traits.add(trait)
+	addPerk(perk:PerkType):void {
+		this.perks.add(perk)
 	}
 
 	///////////////////

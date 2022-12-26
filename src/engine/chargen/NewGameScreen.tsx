@@ -7,7 +7,7 @@ import {ChargenStepIdentity} from "./ChargenStepIdentity";
 import {ChargenStepRace} from "./ChargenStepRace";
 import {ChargenStepStats} from "./ChargenStepStats";
 import {ChargenStepClass} from "./ChargenStepClass";
-import {ChargenStepTraits} from "./ChargenStepTraits";
+import {ChargenStepPerks} from "./ChargenStepPerks";
 import {ChargenStepAppearance} from "./ChargenStepAppearance";
 import {ChargenStepFinalize} from "./ChargenStepFinalize";
 import {ChargenStep} from "./ChargenStep";
@@ -38,7 +38,7 @@ export class NewGameScreen extends AbstractScreen {
 			new ChargenStepAttrs(cc),
 			new ChargenStepStats(cc),
 			new ChargenStepSkills(cc),
-			new ChargenStepTraits(cc),
+			new ChargenStepPerks(cc),
 			new ChargenStepFinalize(cc),
 		];
 		this.update();

@@ -13,12 +13,12 @@ import {CharacterBody} from "../engine/objects/creature/Character";
 import {BodyMaterial, BodyMaterialType} from "../engine/objects/creature/BodyMaterial";
 import {Color} from "../engine/objects/Color";
 import {PlayerCharacter} from "../engine/objects/creature/PlayerCharacter";
-import {SimpleTraitType, TraitType} from "../engine/rules/TraitType";
+import {PerkType} from "../engine/rules/PerkType";
 import {Skill} from "../engine/objects/creature/Skill";
 import {KeysOfType} from "../engine/utils/types";
 
 /**
- * Essential game data (races, traits, items, ...)
+ * Essential game data (races, perks, items, ...)
  */
 export interface ImportedGameData {
 	startingSceneId: string;
@@ -31,7 +31,7 @@ export interface ImportedGameData {
 	scenes: Scene[];
 	skills: Skill[];
 	tiles: GDTileType[];
-	traits: TraitType[];
+	perks: PerkType[];
 }
 
 export interface GDPlayerOrigin {
@@ -78,7 +78,7 @@ export class GameDataBuilder {
 			scenes: [],
 			skills: [],
 			tiles: [],
-			traits: [],
+			perks: [],
 		}
 	}
 
@@ -186,14 +186,11 @@ export class GameDataBuilder {
 	addTiles(tiles:GDTileType[]):void {
 		this.data.tiles.push(...tiles);
 	}
-	addTrait(trait:TraitType):void {
-		this.data.traits.push(trait);
+	addPerk(perk:PerkType):void {
+		this.data.perks.push(perk);
 	}
-	addTraits(traits:TraitType[]):void {
-		this.data.traits.push(...traits);
-	}
-	mkTrait(id:string, name:string, desc:string):void {
-		this.addTrait(new SimpleTraitType(id,name,desc));
+	addPerks(perks:PerkType[]):void {
+		this.data.perks.push(...perks);
 	}
 
 	buildPlace(def: PlaceDef): void {

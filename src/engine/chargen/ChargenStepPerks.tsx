@@ -4,13 +4,13 @@ import {ChargenController} from "./ChargenController";
 import {ButtonMenu} from "../ui/components/ButtonMenu";
 import {Parse} from "../text/ParseTag";
 
-export class ChargenStepTraits extends ChargenStep {
+export class ChargenStepPerks extends ChargenStep {
 
 	constructor(cc: ChargenController) {
 		super(cc);
 	}
 
-	label: string = "Traits";
+	label: string = "Perks";
 
 	complete(): boolean {
 		return true;
@@ -18,16 +18,16 @@ export class ChargenStepTraits extends ChargenStep {
 
 	node(): VNode {
 		return <Fragment>
-			<h3>Traits</h3>
-			<p>Pick your strating trait.</p>
+			<h3>Perks</h3>
+			<p>Pick your strating perk.</p>
 			<div class="grid-12">
 				<div class="cols-3 d-flex flex-column ai-stretch mr-4">
-					<ButtonMenu items={this.cc.allowedTraits()}
-					            onChange={x=>this.cc.setTrait(x)}
-					            selected={this.cc.trait}/>
+					<ButtonMenu items={this.cc.allowedPerks()}
+					            onChange={x=>this.cc.setPerk(x)}
+					            selected={this.cc.perk}/>
 				</div>
 				<div class="cols-9">
-					<Parse>{this.cc.traitObject?.description(this.player)}</Parse>
+					<Parse>{this.cc.perkObject?.description(this.player)}</Parse>
 				</div>
 			</div>
 
