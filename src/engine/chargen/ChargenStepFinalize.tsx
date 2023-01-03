@@ -33,7 +33,7 @@ export class ChargenStepFinalize extends ChargenStep {
 					<h5>Perks</h5>
 					{pc.perks.size === 0 && "(No strating perks)"}
 					{pc.perkList().map(t=><div>
-						<b>{t.name(pc)}</b> &ndash; <Parse>{t.description(pc)}</Parse>
+						<b>{t.name}</b> &ndash; <Parse>{t.description(pc)}</Parse>
 					</div>)}
 					<h5>Appearance</h5>
 					{Appearance.characterAppearance(pc, parser)}

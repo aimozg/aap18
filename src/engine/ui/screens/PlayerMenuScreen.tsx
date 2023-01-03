@@ -15,6 +15,7 @@ import {PlayerPerksTab} from "./player/PlayerPerksTab";
 import {PlayerClassTab} from "./player/PlayerClassTab";
 import {PlayerItemsTab} from "./player/PlayerItemsTab";
 import {CreatureSkill} from "../../objects/creature/stats/CreatureSkill";
+import {PerkType} from "../../rules/PerkType";
 
 export class PlayerMenuScreen extends AbstractModalScreen<void> {
 	constructor(
@@ -53,10 +54,18 @@ export class PlayerMenuScreen extends AbstractModalScreen<void> {
 		this.render();
 	}
 	canIncSkill(skill:CreatureSkill) {
-		return this.player.skillPoints > 0 && !skill.isMaxed
+		return this.interactive && this.player.skillPoints > 0 && !skill.isMaxed
 	}
 	incSkill(skill:CreatureSkill) {
 		this.player.ctrl.spendSkillPoint(skill.skill);
+		this.render();
+	}
+
+	canTakePerk(perk:PerkType) {
+		return this.interactive && this.player.perkPoints > 0 && perk.obtainableBy(this.player);
+	}
+	takePerk(perk:PerkType) {
+		this.player.ctrl.spendPerkPoint(perk);
 		this.render();
 	}
 

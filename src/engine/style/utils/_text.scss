@@ -51,6 +51,18 @@ u, .text-u {
 .text-hl {
   color: var(--tc-hl);
 }
+.text-focus-blink {
+  animation: 0.25s steps(2) infinite alternate text-focus-blink;
+}
+@keyframes text-focus-blink {
+  from {
+    color: var(--tc-focus);
+  }
+  to {
+    color: var(--tc-shadowed);
+  }
+}
+
 .text-error {
   background: #111;
   color: #a00;

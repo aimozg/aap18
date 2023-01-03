@@ -159,7 +159,7 @@ export class ChargenController {
 	}
 	allowedPerks(withNone:boolean=true): ButtonMenuItem<string | null>[] {
 		let list: ButtonMenuItem<string|null>[] = GdStartingPerks.ALL.map(t=>({
-			label: t.name(null),
+			label: t.name,
 			value: t.resId
 		})).sortOn("label");
 		if (withNone) list.unshift({

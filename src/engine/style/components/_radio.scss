@@ -1,0 +1,36 @@
+
+label > input[type=radio] {
+  margin-left: 0.75rem;
+}
+
+input[type=radio] {
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+  border: 2px solid var(--theme-ctrl-fg);
+  border-radius: 8px;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin: 0 4px;
+
+  &:disabled {
+    border-color: var(--theme-ctrl-disabled);
+    cursor: default;
+  }
+  &:focus {
+    border-color: var(--theme-ctrl-default);
+  }
+  &:checked {
+    &:before {position: relative;
+      content: " ";
+      background: var(--tc-focus);
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 4px;
+      left: 2px;
+      top: -2px;
+    }
+  }
+}

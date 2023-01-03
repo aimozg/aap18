@@ -7,7 +7,7 @@ import {Button} from "../../components/Button";
 export class PlayerStatsTab extends AbstractPlayerScreenTab {
 	get label() {
 		return <div class="d-ib text-nowrap">
-			Stats{this.interactive && this.player.canLevelUpNow() && <span class="text-hl text-elevated">(+)</span>}
+			Stats{this.interactive && this.player.canLevelUpNow() && <span class="text-focus-blink text-elevated">(+)</span>}
 		</div>
 	}
 
@@ -22,7 +22,7 @@ export class PlayerStatsTab extends AbstractPlayerScreenTab {
 			<p>
 				<label> Level:</label> {this.player.level}
 				{this.interactive && this.player.canLevelUpNow() &&
-                    <Button className="ml-8 -link" onClick={() => this.screen.levelUp()}>Level Up</Button>}
+                    <Button className="ml-8 -link" onClick={() => this.screen.levelUp()}>LEVEL UP</Button>}
 				<br/>
 				<label>XP:</label>
 				<span className={this.player.level >= LevelRules.MaxLevel ? "text-maxlevel" :
@@ -30,7 +30,9 @@ export class PlayerStatsTab extends AbstractPlayerScreenTab {
 				<br/>
 			</p>
 			{/*<div className="help-block">TODO display more detailed data</div>*/}
+			<div>
 			{panel.astsx}
+			</div>
 		</div>
 	}
 }

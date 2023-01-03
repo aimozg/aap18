@@ -1,6 +1,6 @@
 import {AbstractPlayerScreenTab} from "./AbstractPlayerScreenTab";
 import {Fragment, h, VNode} from "preact";
-import {numberOfThings} from "../../../text/utils";
+import {numberOfThingsStyled} from "../../../text/utils";
 import {Button} from "../../components/Button";
 import {AttrMetadata} from "../../../../game/data/stats";
 import {signClass} from "../../../utils/math";
@@ -8,7 +8,7 @@ import {signClass} from "../../../utils/math";
 export class PlayerSkillsTab extends AbstractPlayerScreenTab {
 	get label() {
 		return <div class="d-ib text-nowrap">
-			Skills{this.interactive && this.player.skillPoints > 0 && <span class="text-hl text-elevated">(+{this.player.skillPoints})</span>}
+			Skills{this.interactive && this.player.skillPoints > 0 && <span class="text-focus-blink text-elevated">(+{this.player.skillPoints})</span>}
 		</div>
 	}
 
@@ -16,8 +16,8 @@ export class PlayerSkillsTab extends AbstractPlayerScreenTab {
 		return <Fragment>
 			<h3>Skills</h3>
 			<p>
-				You have {numberOfThings(this.player.skillPoints, "skill point")}. Maximum skill level
-				is {this.player.maxNaturalSkill}.
+				You have {numberOfThingsStyled("text-hl", "", this.player.skillPoints, "skill point")}. Maximum skill level
+				is <span class="text-hl">{this.player.maxNaturalSkill}</span>.
 			</p>
 			<div class="d-igrid ai-start gap-2 text-center" style="grid-template-columns: repeat(8, max-content) 1fr">
 				<div className="th">Skill</div>

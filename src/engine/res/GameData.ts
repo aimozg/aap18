@@ -39,6 +39,16 @@ export class GameData {
 		return names.map(name=>this.colorByName(name,palette)).sortWith(colorSortKey);
 	}
 
+	readonly perks = new ResLib<PerkType>(Symbols.ResTypePerk, "Perk");
+	perk(id: string): PerkType {
+		return this.perks.get(id)
+	}
+	private allObtainablePerksCached:PerkType[];
+	allObtainablePerks():PerkType[] {
+		// TODO sort on distance
+		return this.allObtainablePerksCached ??= this.perks.values().filter(p=>p.obtainable);
+	}
+
 	readonly places = new ResLib<Place>(Symbols.ResTypePlace, "Place");
 	place(place: string|Place): Place {
 		return place instanceof Place ? place : this.places.get(place)
@@ -70,10 +80,5 @@ export class GameData {
 		let tt = this.tilesByChar[char];
 		if (!tt) throw new Error(`Unknown tile '${char}'`)
 		return tt;
-	}
-
-	readonly perks = new ResLib<PerkType>(Symbols.ResTypePerk, "Perk");
-	perk(id: string): PerkType {
-		return this.perks.get(id)
 	}
 }

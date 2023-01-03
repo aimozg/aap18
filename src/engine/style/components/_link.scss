@@ -9,3 +9,6 @@
 a, .link {
   @include link;
 }
+.link-bad {
+  color: var(--tc-link-bad) !important;
+}

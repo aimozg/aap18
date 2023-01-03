@@ -80,7 +80,7 @@ export class PlaceSidebar extends Component<PlaceSidebarProps, PlaceSidebarState
 				<Button label={
 					<Fragment>Character{pc.place.canLevelUp()
 						&& (pc.player.canLevelUpNow() || pc.player.skillPoints > 0 || pc.player.attrPoints > 0 || pc.player.perkPoints > 0)
-						&& <span class="text-elevated text-hl">+</span>}</Fragment>
+						&& <span class="text-elevated text-focus-blink">+</span>}</Fragment>
 				}
 				        className="-big"
 				        action={this.aCharacterMenu}/>

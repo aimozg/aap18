@@ -4,3 +4,7 @@ label, .label {
   display: inline-block;
   margin-top: 0.25em;
 }
+
+label:has(input[type=radio]:not(:disabled)) {
+  cursor: pointer;
+}

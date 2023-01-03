@@ -16,22 +16,32 @@ export function simpleparse(input: string | null | undefined): VNode {
 /**
  * Very primitive! Adds "s" or replaces "y" with "ies", for other nouns specify plural manually. Lowercase only
  */
-export function guessPlural(singular:string):string {
-	if (singular.endsWith('y')) return singular.substring(0, singular.length-1) + 'ies';
-	return singular+'s';
+export function guessPlural(singular: string): string {
+	if (singular.endsWith('y')) return singular.substring(0, singular.length - 1) + 'ies';
+	return singular + 's';
 }
-// TODO allow numerals ("one thing") and
-export function numberOfThings(count:number,
-                               singular:string,
-                               plural:string=guessPlural(singular),
-                               pattern:string='{number} {noun}') {
+
+// TODO allow numerals ("one thing") and ... something else I forgot
+export function numberOfThings(count: number,
+                               singular: string,
+                               plural: string = guessPlural(singular),
+                               pattern: string = '{number} {noun}') {
 	return substitutePattern(pattern, {
 		'number': count,
 		'noun': (count === 1 || count === -1) ? singular : plural
 	})
 }
 
-export function damageSpan(damage: number | Dice | string, damageType: DamageType, hint:string|undefined=undefined):ComponentChildren {
+export function numberOfThingsStyled(
+	numberClass: string,
+	labelClass: string,
+	count: number,
+	singular: string,
+	plural: string = guessPlural(singular)) {
+	return <Fragment><span class={numberClass}>{count}</span> <span class={labelClass}>{(count === 1 || count === -1) ? singular : plural}</span></Fragment>
+}
+
+export function damageSpan(damage: number | Dice | string, damageType: DamageType, hint: string | undefined = undefined): ComponentChildren {
 	if (damage instanceof Dice) damage = damage.toString();
 	return <span class={"text-damage-" + damageType.cssSuffix}
 	             title={hint}>{damage} {damageType.name}</span>

@@ -15,6 +15,7 @@ import {LogManager} from "../logging/LogManager";
 import {Skill} from "../objects/creature/Skill";
 import {LevelRules} from "./LevelRules";
 import {Game} from "../Game";
+import {PerkType} from "./PerkType";
 
 
 export interface HornyStage {
@@ -279,7 +280,7 @@ export class CreatureController {
 		if (this.naturalSkillLevel(skill) >= this.maxNaturalSkill) throw new Error("Skill capped");
 		this.stats.skillPoints--;
 		this.stats.naturalSkills[skill.resId]++;
-		this.gc.displayMessage(`${skill.name} skill leveled up to ${this.skillLevel(skill)}`);
+		this.gc.displayMessage(`${skill.name} skill increased to ${this.skillLevel(skill)}`);
 	}
 	giveSkillXpScaled(skill: Skill, @NonNegativeIntParam base:number, @IntParam dc:number, log:boolean=true) {
 		logger.debug("{} giveSkillXpScaled({}, {}, {}, {})", this.creature, skill, base, dc, log)
@@ -299,13 +300,37 @@ export class CreatureController {
 			xp -= nextXp;
 			this.stats.naturalSkills[skill.resId]++;
 			if (log) {
-				this.gc.displayMessage(`${this.creature.name}'s ${skill.name} skill leveled up to ${this.skillLevel(skill)}.`);
+				this.gc.displayMessage(`${this.creature.name}'s ${skill.name} skill increased to ${this.skillLevel(skill)}.`);
 			}
 		}
 		this.stats.skillXp[skill.resId] = xp;
 	}
 	get skillPointsPerLevel(): number {
 		return atLeast(LevelRules.SkillPointsGainMin, LevelRules.SkillPointsGainBase + LevelRules.SkillPointsGainPerIntMod*this.intModNatural);
+	}
+
+	//-------//
+	// Perks //
+	//-------//
+
+	futurePerks(): PerkType[] {
+		// TODO sort by distance/relative distance
+		return this.gc.game.data.allObtainablePerks()
+			.filter(p=>!this.creature.hasPerk(p));
+	}
+	spendPerkPoint(perk:PerkType) {
+		logger.debug("{} spendPerkPoint({})", this.creature, perk);
+		if (this.stats.perkPoints <= 0) throw new Error(`No perk points`);
+		if (!perk.obtainableBy(this.creature)) throw new Error(`Cannot take the perk`);
+		this.stats.perkPoints--;
+		this.addPerk(perk);
+	}
+	addPerk(perk:PerkType, log:boolean=true){
+		logger.debug("{} addPerk({})", this.creature, perk);
+		this.creature.perks.add(perk);
+		if (log) {
+			this.gc.displayMessage(`${this.creature.name} got the ${perk.name} perk!`);
+		}
 	}
 
 	//------------------//

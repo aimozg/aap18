@@ -3,6 +3,13 @@
  */
 
 declare global {
+	interface JoinToStringOptions<T> {
+		last?:string;
+		prefix?:string;
+		postfix?:string;
+		transform?:(item:T)=>string;
+	}
+
 	interface Number {
 		/**
 		 * spec:
@@ -49,6 +56,10 @@ declare global {
 		sortWith(selector: (item: T, index: number, array: T[]) => string | number, options?: number): this;
 
 		count(predicate: (item: T, index: number, array: T[]) => boolean, thisArg?: any): number;
+
+		joinToString(separator: string): string;
+		joinToString(separator: string, lastSeparator: string): string;
+		joinToString(separator: string, options:JoinToStringOptions<T>): string;
 	}
 }
 
@@ -208,6 +219,32 @@ function initExtensions() {
 				if (predicate.call(thisArg, value, index, this)) n++;
 			});
 			return n;
+		}
+	});
+
+	Object.defineProperty(Array.prototype, "joinToString", {
+		enumerable: false,
+		writable: false,
+		configurable: false,
+		// joinEx(separator: string, options:JoinExOptions<T>): string;
+		value: function <T>(this: T[], separator: string, arg2:string|undefined|JoinToStringOptions<T>): string {
+			if (typeof arg2 === "string") arg2 = {last:arg2};
+			let last = arg2?.last ?? separator;
+			let prefix = arg2?.prefix ?? "";
+			let postfix = arg2?.postfix ?? "";
+			let transform = arg2?.transform ?? ((x:T)=>String(x));
+			let result = prefix;
+			let n = this.length;
+			if (n > 0) {
+				for (let i = 0; i < n; i++) {
+					if (i > 0) {
+						result += (i === n - 1) ? last : separator;
+					}
+					result += transform(this[i]);
+				}
+			}
+			result += postfix;
+			return result;
 		}
 	})
 }

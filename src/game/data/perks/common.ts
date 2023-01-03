@@ -25,6 +25,7 @@ export namespace CommonPerks {
 		"Quick Reflexes",
 		"+1 Reflex.");
 
+	/*
 	export let EyesOfTheHunterBasic = new SimplePerkType("/pk_eyesofthehunter1",
 		"Eyes of the Hunter (Basic)",
 		"You can see exact values of enemy resource stats (AP, HP, EP, LP).");
@@ -40,6 +41,38 @@ export namespace CommonPerks {
 	export let EyesOfTheHunterGrandmaster = new SimplePerkType("/pk_eyesofthehunter5",
 		"Eyes of the Hunter (Grandmaster)",
 		"You can see enemy equipment properties.");
+	*/
 
-	export let ALL = [];
+	export function configurePerkRequirements() {
+		TankI.setupRequirements()
+			.requireLevel(1);
+		EnduranceI.setupRequirements()
+			.requireLevel(1);
+		SeductionResistanceI.setupRequirements()
+			.requireLevel(1);
+		StrongWill.setupRequirements()
+			.requireLevel(1);
+		Toughness.setupRequirements()
+			.requireLevel(1);
+		QuickReflexes.setupRequirements()
+			.requireLevel(1);
+		/*
+		EyesOfTheHunterBasic.setupRequirements()
+			.requireLevel(1)
+			.requirePer(5);
+		EyesOfTheHunterAdvanced.setupRequirements()
+			.requireLevel(6)
+			.requirePer(6);
+		EyesOfTheHunterExpert.setupRequirements()
+			.requireLevel(12)
+			.requirePer(7);
+		EyesOfTheHunterMaster.setupRequirements()
+			.requireLevel(18)
+			.requirePer(8);
+		EyesOfTheHunterGrandmaster.setupRequirements()
+			.requireLevel(24)
+			.requirePer(9);
+
+		 */
+	}
 }
