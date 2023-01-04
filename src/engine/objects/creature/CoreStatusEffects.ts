@@ -14,6 +14,7 @@ export namespace CoreStatusEffects {
 			INT: -1,
 			WIS: -1,
 			CHA: +1,
+			SedRes: -10,
 		}
 	});
 	export let Horny50 = StatusEffectType.build({
@@ -29,6 +30,7 @@ export namespace CoreStatusEffects {
 			INT: -2,
 			WIS: -2,
 			CHA: +2,
+			SedRes: -20,
 		}
 	});
 	export let Horny75 = StatusEffectType.build({
@@ -44,6 +46,7 @@ export namespace CoreStatusEffects {
 			INT: -3,
 			WIS: -3,
 			CHA: +3,
+			SedRes: -30,
 		}
 	});
 	export let Horny100 = StatusEffectType.build({
@@ -59,6 +62,7 @@ export namespace CoreStatusEffects {
 			INT: -4,
 			WIS: -4,
 			CHA: +4,
+			SedRes: -40,
 		}
 	});
 

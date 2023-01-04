@@ -6,6 +6,13 @@ import {ReadonlyRecord} from "../../../utils/types";
 import {coerce} from "../../../math/utils";
 
 export interface SoftEnumBuffableStatIds {
+	// Resources
+	hpMax: 1,
+	hpMaxPerLevel: 1,
+	epMax: 1,
+	epMaxPerLevel: 1,
+	lpMax: 1,
+	// Attributes
 	STR: 1,
 	DEX: 1,
 	CON: 1,
@@ -14,6 +21,15 @@ export interface SoftEnumBuffableStatIds {
 	INT: 1,
 	WIS: 1,
 	CHA: 1,
+	// Secondary attrs TODO
+	// Saving Throws
+	Reflex: 1,
+	Fortitude: 1,
+	Willpower: 1,
+	// Resistances
+	SedRes: 1,
+	// Primary combat stats
+	Def: 1,
 }
 export type BuffableStatId = keyof SoftEnumBuffableStatIds;
 export type StaticBuffs = {

@@ -9,6 +9,5 @@ import {PerkType} from "../../engine/rules/PerkType";
 export function gdRegisterPerks(gd:GameDataBuilder) {
 	gd.logger.debug("gdRegisterPerks");
 	gd.addPerks(GdStartingPerks.ALL);
-	CommonPerks.configurePerkRequirements();
 	gd.addPerks(Object.values(CommonPerks).filter(f=>f instanceof PerkType) as PerkType[]);
 }

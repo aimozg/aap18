@@ -2,6 +2,7 @@ import {TextIcon} from "./CreatureCondition";
 import {Creature} from "../Creature";
 import {Buff, StaticBuffs} from "./stats/BuffableStat";
 import {substitutePattern} from "../../utils/string";
+import {LogManager} from "../../logging/LogManager";
 
 export interface StatusEffectOptions {
 	id: string;
@@ -14,6 +15,8 @@ export interface StatusEffectOptions {
 
 	buffs?: StaticBuffs;
 }
+
+let logger = LogManager.loggerFor("engine.objects.creature.StatusEffect");
 
 export class StatusEffectType {
 	constructor(
@@ -60,5 +63,18 @@ export class StatusEffect {
 	}
 	get icon():TextIcon { return this.type.icon }
 	currentBuffs:Buff[] = [];
+
+	onAdd() {
+		if (this.buffs) {
+			this.currentBuffs.push(...this.host.ctrl.addBuffs(this.buffs, this.type.resId, this.name));
+		}
+		this.type.onAdd?.(this);
+	}
+
+	onRemove() {
+		for (let buff of this.currentBuffs) buff.remove();
+		this.currentBuffs = [];
+		this.type.onRemove?.(this);
+	}
 }
 

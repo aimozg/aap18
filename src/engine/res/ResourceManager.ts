@@ -6,6 +6,7 @@ import {Game} from "../Game";
 import {TileType} from "../combat/BattleGrid";
 import * as tinycolor from "tinycolor2";
 import {CoreSkills} from "../objects/creature/CoreSkills";
+import {configurePerkRequirements} from "../rules/PerkType";
 
 /**
  * Loads images and other resources required by game
@@ -49,7 +50,8 @@ export class ResourceManager {
 			data.tiles.register(tt)
 		}
 		data.perks.clear();
-		data.perks.registerMany(idata.perks)
+		data.perks.registerMany(idata.perks);
+		configurePerkRequirements();
 	}
 
 

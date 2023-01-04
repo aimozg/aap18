@@ -20,7 +20,7 @@ import {CreatureController} from "../rules/CreatureController";
 import {CreatureStats} from "./creature/CreatureStats";
 import {StatusEffect, StatusEffectType} from "./creature/StatusEffect";
 import {BuffableStat, BuffableStatId} from "./creature/stats/BuffableStat";
-import {obj2map} from "../utils/collections";
+import {pairs2map} from "../utils/collections";
 import {PartialRecord} from "../utils/types";
 import {CreatureSkill} from "./creature/stats/CreatureSkill";
 import {MeleeAttackMode} from "./item/WeaponComponent";
@@ -124,17 +124,28 @@ export class Creature {
 	// Attributes - Data
 	//////////////////////
 	// TODO move to CreatureStats
-	buffableStats = obj2map<BuffableStatId, BuffableStat>({
-		// TODO This could be organized better
-		"STR": new BuffableStat("STR"),
-		"DEX": new BuffableStat("DEX"),
-		"CON": new BuffableStat("CON"),
-		"SPE": new BuffableStat("SPE"),
-		"PER": new BuffableStat("PER"),
-		"INT": new BuffableStat("INT"),
-		"WIS": new BuffableStat("WIS"),
-		"CHA": new BuffableStat("CHA"),
-	});
+	// TODO This could be organized better
+	buffableStats = pairs2map(([
+		"hpMax",
+		"hpMaxPerLevel",
+		"epMax",
+		"epMaxPerLevel",
+		"lpMax",
+		"STR",
+		"DEX",
+		"CON",
+		"SPE",
+		"PER",
+		"INT",
+		"WIS",
+		"CHA",
+		"Reflex",
+		"Fortitude",
+		"Willpower",
+		"SedRes",
+		"Def",
+	] as BuffableStatId[]).map(id=>[id, new BuffableStat(id)]));
+	buffableStatValue(id:BuffableStatId):number { return this.ctrl.buffableStatValue(id) }
 
 	naturalAttr(attr:TAttribute):number { return this.stats.naturalAttrs[attr] }
 	get naturalLib(): number { return this.stats.naturalLib }
@@ -151,6 +162,7 @@ export class Creature {
 	attr(id: TAttribute): number {  return this.ctrl.attr(id) }
 	attrMod(id: TAttribute): number { return this.ctrl.attrMod(id) }
 
+	// TODO remove this
 	attrBuffable(id: TAttribute): BuffableStat { return this.buffableStats.get(AttributeToBuffableStat[id])!}
 
 	/** Strength */
@@ -324,10 +336,7 @@ export class Creature {
 		if (typeof perk === 'string') perk = Game.instance.data.perk(perk);
 		return this.perks.has(perk);
 	}
-	// TODO move to CreatureController
-	addPerk(perk:PerkType):void {
-		this.perks.add(perk)
-	}
+	addPerk(perk:PerkType):void { this.ctrl.addPerk(perk) }
 
 	///////////////////
 	// Other Helpers //

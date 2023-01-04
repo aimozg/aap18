@@ -2,7 +2,7 @@
  * Created by aimozg on 29.11.2022.
  */
 
-import {Creature} from "../objects/Creature";
+import {AttributeToBuffableStat, Creature} from "../objects/Creature";
 import {atLeast, atMost, coerce} from "../math/utils";
 import {IntParam, NonNegativeIntParam, ValidateParams} from "../utils/decorators";
 import {CreatureCondition} from "../objects/creature/CreatureCondition";
@@ -10,24 +10,24 @@ import {CoreConditions} from "../objects/creature/CoreConditions";
 import {TAttribute} from "./TAttribute";
 import {StatusEffect, StatusEffectType} from "../objects/creature/StatusEffect";
 import {CoreStatusEffects} from "../objects/creature/CoreStatusEffects";
-import {Buff, BuffableStatId} from "../objects/creature/stats/BuffableStat";
+import {Buff, BuffableStatId, StaticBuffs} from "../objects/creature/stats/BuffableStat";
 import {LogManager} from "../logging/LogManager";
 import {Skill} from "../objects/creature/Skill";
 import {LevelRules} from "./LevelRules";
 import {Game} from "../Game";
 import {PerkType} from "./PerkType";
+import {numberOfThings} from "../text/utils";
 
 
 export interface HornyStage {
 	effect: StatusEffectType,
 	threshold: number,
-	seduceDC: number,
 }
 const HornyStages: HornyStage[] = [
-	{effect: CoreStatusEffects.Horny100, threshold: 1.00, seduceDC: -40},
-	{effect: CoreStatusEffects.Horny75, threshold: 0.75, seduceDC: -30},
-	{effect: CoreStatusEffects.Horny50, threshold: 0.50, seduceDC: -20},
-	{effect: CoreStatusEffects.Horny25, threshold: 0.25, seduceDC: -10},
+	{effect: CoreStatusEffects.Horny100, threshold: 1.00},
+	{effect: CoreStatusEffects.Horny75, threshold: 0.75},
+	{effect: CoreStatusEffects.Horny50, threshold: 0.50},
+	{effect: CoreStatusEffects.Horny25, threshold: 0.25},
 ];
 
 export class CreatureController {
@@ -40,6 +40,12 @@ export class CreatureController {
 
 	get stats() { return this.creature.stats }
 	get gc() { return Game.instance.gameController }
+
+	buffableStatValue(id:BuffableStatId):number {
+		let stat = this.creature.buffableStats.get(id);
+		if (!stat) throw new Error(`No buffable stat ${id}`);
+		return stat.value;
+	}
 
 	//----//
 	// XP //
@@ -97,7 +103,7 @@ export class CreatureController {
 	//------------//
 
 	attr(attr: TAttribute): number {
-		return this.stats.naturalAttrs[attr] + this.creature.attrBuffable(attr).value;
+		return this.stats.naturalAttrs[attr] + this.buffableStatValue(AttributeToBuffableStat[attr]);
 	}
 
 	attrMod(attr: TAttribute): number { return this.attr(attr) - 5; }
@@ -161,7 +167,11 @@ export class CreatureController {
 	}
 
 	calcHpMax(): number {
-		return Math.max(1, this.stats.level * (this.stats.baseHpPerLevel + this.conMod));
+		return Math.max(1, this.stats.level * this.hpPerLevel() + this.buffableStatValue("hpMax"));
+	}
+
+	hpPerLevel() {
+		return this.stats.baseHpPerLevel + this.conMod + this.buffableStatValue("hpMaxPerLevel");
 	}
 
 	@ValidateParams
@@ -176,7 +186,11 @@ export class CreatureController {
 	}
 
 	calcEpMax(): number {
-		return Math.max(1, this.stats.level * (this.stats.baseEpPerLevel + this.conMod))
+		return Math.max(1, this.stats.level * this.epMaxPerLevel() + this.buffableStatValue("epMax"))
+	}
+
+	epMaxPerLevel() {
+		return this.stats.baseEpPerLevel + this.conMod + this.buffableStatValue("epMaxPerLevel");
 	}
 
 	@ValidateParams
@@ -191,7 +205,7 @@ export class CreatureController {
 	}
 
 	calcLpMax(): number {
-		return Math.max(1, this.stats.baseLpMax);
+		return Math.max(1, this.stats.baseLpMax + this.buffableStatValue("lpMax"));
 	}
 
 	//-----------------//
@@ -212,26 +226,22 @@ export class CreatureController {
 
 	/** Universal fortitude saving throw */
 	get fortitude(): number {
-		// TODO other sources
-		return this.conMod
+		return this.conMod + this.buffableStatValue("Fortitude")
 	}
 
 	/** Universal reflex saving throw */
 	get reflex(): number {
-		// TODO other sources (base value, buffs)
-		return this.dexMod
+		return this.dexMod + this.buffableStatValue("Reflex")
 	}
 
 	/** Universal willpower saving throw */
 	get willpower(): number {
-		// TODO other sources (base value, buffs)
-		return this.wisMod
+		return this.wisMod + this.buffableStatValue("Willpower")
 	}
 
 	/** Seduction difficulty check */
 	get seductionDC(): number {
-		// TODO other sources (buffs)
-		return 50 + this.stats.level + this.willpower + (this.hornyStage()?.seduceDC ?? 0)
+		return 50 + this.stats.level + this.willpower + this.buffableStatValue("SedRes")
 	}
 
 	/** Universal damage reduction */
@@ -328,6 +338,8 @@ export class CreatureController {
 	addPerk(perk:PerkType, log:boolean=true){
 		logger.debug("{} addPerk({})", this.creature, perk);
 		this.creature.perks.add(perk);
+		perk.onAdd(this.creature, false);
+		this.updateStats();
 		if (log) {
 			this.gc.displayMessage(`${this.creature.name} got the ${perk.name} perk!`);
 		}
@@ -353,12 +365,8 @@ export class CreatureController {
 		let effect = new StatusEffect(type, this.creature, power, Object.assign({}, type.buffs));
 		this.removeStatusEffect(type);
 		this.creature.statusEffects.set(type, effect);
-		effect.type.onAdd?.(effect);
-		if (effect.buffs) {
-			for (let [k, v] of Object.entries(effect.buffs)) {
-				this.addStatusEffectBuff(k as BuffableStatId, v, effect);
-			}
-		}
+		effect.onAdd();
+		this.updateStats();
 		return effect;
 	}
 
@@ -366,26 +374,33 @@ export class CreatureController {
 		logger.debug("{} removeStatusEffect({})", this.creature, type)
 		let effect = this.creature.statusEffects.get(type);
 		if (!effect) return false;
-		effect.type.onRemove?.(effect);
-		effect.currentBuffs.forEach(b => b.remove());
+		effect.onRemove();
 		this.creature.statusEffects.delete(type);
+		this.updateStats();
 		return true;
 	}
 
-	// TODO move to StatusEffect and leave only generic addBuff here?
-	addStatusEffectBuff(statId: BuffableStatId, power: number, source: StatusEffect): Buff {
-		logger.debug("{} addStatusEffectBuff({}, {}, {})", this.creature, statId, power, source);
+	addBuff(statId: BuffableStatId, buffId:string, power: number, text: string): Buff {
+		logger.debug("{} addBuff({}, {}, {}, {})", this.creature, statId, buffId, power, text);
 		let stat = this.creature.findStat(statId);
 		if (!stat) throw new Error(`Invalid BuffableStat ${statId}`);
 		let buff = stat.addBuff({
-			id: source.type.resId,
+			id: buffId,
 			value: power,
-			text: source.name
+			text: text,
 		});
-		source.currentBuffs.push(buff);
-		return buff
+		this.updateStats();
+		return buff;
 	}
 
+	addBuffs(buffs:StaticBuffs, buffId:string, text:string):Buff[] {
+		return Object.entries(buffs).map(([k,v])=>this.addBuff(k as BuffableStatId, buffId, v, text));
+	}
+	removeBuffs(buffId:string):void {
+		this.creature.buffableStats.forEach(stat=>stat.removeBuff(buffId));
+	}
+
+	// TODO called too often?
 	updateStats() {
 		logger.debug("{} updateStats()", this.creature)
 		// update hp max, keep ratio
@@ -453,9 +468,9 @@ export class CreatureController {
 		this.stats.skillPoints += skillPointsAdd;
 		this.stats.perkPoints += perkPointsAdd;
 		let msg = `${this.creature.name} advances to level ${this.level}!`;
-		if (attrPointsAdd) msg += ` +${attrPointsAdd} attribute points.`;
-		if (skillPointsAdd) msg += ` +${skillPointsAdd} skill points.`;
-		if (perkPointsAdd) msg += ` +${perkPointsAdd} perk points.`;
+		if (attrPointsAdd) msg += ' +'+numberOfThings(attrPointsAdd,'attribute point')+'.';
+		if (skillPointsAdd) msg += ' +'+numberOfThings(skillPointsAdd,'skill point')+'.';
+		if (perkPointsAdd) msg += ' +'+numberOfThings(perkPointsAdd,'perk point')+'.';
 		if (LevelRules.ClassUpAtLevels.includes(this.level)) msg += ` New class available!`;
 		this.gc.displayMessage(msg,"text-levelup")
 		this.updateStats();
