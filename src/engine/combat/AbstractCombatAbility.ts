@@ -6,16 +6,45 @@ import {AbilityTarget, UseAbilityAction} from "./actions/UseAbilityAction";
 import {CombatController} from "./CombatController";
 import {CombatRules} from "../../game/combat/CombatRules";
 import {ComponentChildren} from "preact";
+import {Creature} from "../objects/Creature";
+import {CombatAction} from "./CombatAction";
 
 export abstract class AbstractCombatAbility {
 	abstract readonly name:string;
 	abstract readonly targetType:AbilityTargetType;
 	abstract readonly tags:AbilityTag[];
+	group:string|undefined;
 	hasTag(tag:AbilityTag):boolean { return this.tags.includes(tag); }
+
+	guessTargets(actor: Creature, cc: CombatController): Creature[] {
+		if (this.hasTag("damaging") || this.hasTag("debuff") || this.hasTag("teasing")) {
+			return cc.enemiesOf(actor);
+		}
+		if (this.hasTag("buff") || this.hasTag("healing")) {
+			return cc.alliesOf(actor);
+		}
+		return cc.participants;
+	}
+	makeActions(actor:Creature, cc: CombatController): CombatAction<any>[] {
+		let result: CombatAction<any>[] = [];
+		switch (this.targetType) {
+			case AbilityTargetType.SELF:
+				result.push(new UseAbilityAction(actor, this, "self"));
+				break;
+			case AbilityTargetType.CREATURE:
+				result.push(...this.guessTargets(actor, cc).map(target=>new UseAbilityAction(actor, this, target)));
+				break;
+			case AbilityTargetType.AREA:
+				// TODO area-targeting abilities
+				break;
+		}
+		return result;
+	}
 
 	energyCost(action:UseAbilityAction):number { return 0 }
 	apCost(action:UseAbilityAction):number { return 1000*CombatRules.speedApFactor(action.actor.spe) }
-	disabledReason(action: UseAbilityAction):string {
+
+	disabledReason(action: UseAbilityAction, cc: CombatController):string {
 		if (action.energyCost > action.actor.ep) return "Not enough energy";
 		return ""
 	}

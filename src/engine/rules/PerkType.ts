@@ -5,7 +5,7 @@
 import Symbols from "../symbols";
 import {IResource} from "../IResource";
 import {Creature} from "../objects/Creature";
-import {PerkRequirementBuilder} from "./perkRequirements";
+import {PerkRequirementBuilder, PerkRequirementMinLevel} from "./perkRequirements";
 import {StaticBuffs} from "../objects/creature/stats/BuffableStat";
 
 export interface PerkRequirement {
@@ -39,6 +39,14 @@ export abstract class PerkType implements IResource {
 
 	setupRequirements(): PerkRequirementBuilder {
 		return new PerkRequirementBuilder(this);
+	}
+
+	/** Required level, or 0 if perk is unobtainable or has no level requirement */
+	get level(): number {
+		for (let p of this.requirements) {
+			if (p instanceof PerkRequirementMinLevel) return p.minLevel;
+		}
+		return 0;
 	}
 }
 

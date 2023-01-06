@@ -6,12 +6,12 @@ import {createPerk} from "../../../engine/rules/PerkType";
 
 export namespace GdStartingPerks {
 	export let MalleableBody = createPerk({
-		id: "/pk_malleablebody",
+		id: "/pkstart_malleablebody",
 		name: "Malleable Body",
 		description: "Transformatives are 20% more potent."
 	});
 	export let StableBody = createPerk({
-		id: "/pk_stablebody",
+		id: "/pkstart_stablebody",
 		name: "Stable Body",
 		description: "Transformatives are 20% less potent."
 	});

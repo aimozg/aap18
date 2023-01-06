@@ -20,13 +20,13 @@ export class ChargenStepPerks extends ChargenStep {
 		return <Fragment>
 			<h3>Perks</h3>
 			<p>Pick your strating perk.</p>
-			<div class="grid-12">
-				<div class="cols-3 d-flex flex-column ai-stretch mr-4">
+			<div class="grid-12 gap-4">
+				<div class="cols-6 d-flex flex-column ai-stretch">
 					<ButtonMenu items={this.cc.allowedPerks()}
 					            onChange={x=>this.cc.setPerk(x)}
 					            selected={this.cc.perk}/>
 				</div>
-				<div class="cols-9">
+				<div class="cols-6">
 					<Parse>{this.cc.perkObject?.description(this.player)}</Parse>
 				</div>
 			</div>

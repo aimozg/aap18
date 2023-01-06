@@ -16,7 +16,7 @@ export class SelectMeleeAttackModeAction extends CombatAction<void> {
 		return `[SelectMeleeAttackModeAction ${this.actor.name} ${this.mode.name}]`
 	}
 
-	protected disabledReason(cc: CombatController): string {
+	disabledReason(cc: CombatController): string {
 		if (!this.actor.currentWeapon.asWeapon!.hasMode(this.mode)) return `Cannot ${this.mode.name} with ${this.actor.currentWeapon.name}`;
 		return ""
 	}

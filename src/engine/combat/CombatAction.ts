@@ -24,7 +24,7 @@ export abstract class CombatAction<RESULT> {
 	public removeStealth = true
 
 	abstract perform(cc: CombatController): Promise<RESULT>
-	protected abstract disabledReason(cc: CombatController): string;
+	abstract disabledReason(cc: CombatController): string;
 	private _disabledReason: string|null = null;
 	isPossible(cc: CombatController): boolean {
 		this._disabledReason ??= this.disabledReason(cc);

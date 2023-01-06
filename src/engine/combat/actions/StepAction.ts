@@ -32,7 +32,8 @@ export class StepAction extends CombatAction<StepActionResult> {
 	removeStealth = false
 
 	tooltip: string
-	protected disabledReason(cc: CombatController): string {
+
+	disabledReason(cc: CombatController): string {
 		if (!cc.grid.hasxy(this.target.x, this.target.y)) return "Occupied"
 		if (!cc.grid.isempty(this.target)) return "Occupied"
 		return "";

@@ -158,7 +158,9 @@ export class ChargenController {
 		return this.allowedSkills().filter(skill => this.canIncSkill(skill));
 	}
 	allowedPerks(withNone:boolean=true): ButtonMenuItem<string | null>[] {
-		let list: ButtonMenuItem<string|null>[] = GdStartingPerks.ALL.map(t=>({
+		let perkTypes = [...GdStartingPerks.ALL];
+		perkTypes.push(...Game.instance.data.allObtainablePerks().filter(p=>p.level===1));
+		let list: ButtonMenuItem<string|null>[] = perkTypes.map(t=>({
 			label: t.name,
 			value: t.resId
 		})).sortOn("label");

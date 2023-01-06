@@ -28,10 +28,11 @@ export class UseAbilityAction extends CombatAction<void>{
 		this.energyCost = ability.energyCost(this);
 		this.apCost = ability.apCost(this);
 	}
-	protected disabledReason(cc: CombatController): string {
-		return this.ability.disabledReason(this);
+
+	disabledReason(cc: CombatController): string {
+		return this.ability.disabledReason(this, cc);
 	}
-	group = CombatActionGroups.AGAbilities
+	group = this.ability.group ?? CombatActionGroups.AGAbilities
 	readonly label: string;
 	readonly target: AbilityTarget;
 	readonly tooltip: ComponentChildren;

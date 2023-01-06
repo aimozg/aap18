@@ -41,6 +41,9 @@ export namespace CombatRules {
 				actions.push(new SelectMeleeAttackModeAction(player, mode));
 			}
 		}
+		for (let ability of player.abilities) {
+			actions.push(...ability.makeActions(player, cc));
+		}
 		for (let dir of Direction.Steps) {
 			actions.push(new StepAction(player, dir.add(player.gobj!)))
 		}

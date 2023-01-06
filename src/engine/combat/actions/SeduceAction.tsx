@@ -27,7 +27,7 @@ export class SeduceAction extends CombatAction<SkillCheckResult> {
 	group = CombatActionGroups.AGSkills
 	tooltip = "Persuade "+this.target.name+" to surrender and have fun."
 
-	protected disabledReason(cc: CombatController): string {
+	disabledReason(cc: CombatController): string {
 		// TODO if target has seduction immunity
 		return "";
 	}

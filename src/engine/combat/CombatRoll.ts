@@ -61,6 +61,7 @@ export class CombatRoll {
 	 * Damage dice to be dealt
 	 */
 	damageSpec: DamageSpec = [];
+	// TODO This could be abstracted into CombatEffect
 	/**
 	 * Damage that was dealt (or to be dealt)
 	 */
@@ -82,6 +83,9 @@ export class CombatRoll {
 	 */
 	dc: number = 0;
 
+	/** After stats are calculated, before d20 rolling */
+	onStrike: ((roll:CombatRoll, cc:CombatController)=>Promise<void>)|null = null;
+	/** On successful hit before applying effect */
 	onHit: ((roll:CombatRoll, cc:CombatController)=>Promise<void>)|null = null;
 
 	toString():string {

@@ -192,6 +192,9 @@ export class GameDataBuilder {
 	addPerks(perks:PerkType[]):void {
 		this.data.perks.push(...perks);
 	}
+	addPerksFromRecord(perks:Record<string,PerkType>):void {
+		this.data.perks.push(...Object.values(perks));
+	}
 
 	buildPlace(def: PlaceDef): void {
 		this.addPlaces(Place.build(def))

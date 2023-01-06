@@ -22,7 +22,8 @@ export class TeaseAction extends CombatAction<TeaseResult> {
 	toString(): string {
 		return `[TeaseAction ${this.actor.name} ${this.target.name}${this.free ? " (free)" : ""}]`
 	}
-	protected disabledReason(cc: CombatController): string {
+
+	disabledReason(cc: CombatController): string {
 		// TODO impossible if actor has condition, or target is invulnerable/dead
 		if (this.target.lp >= this.target.lpMax) return "Already at max Lust"
 		return "";

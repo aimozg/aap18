@@ -1,14 +1,13 @@
 /*
  * Created by aimozg on 04.07.2022.
  */
-import {ClassWarrior} from "./classes/ClassWarrior";
+import {ClassWarrior, WarriorPerks} from "./classes/ClassWarrior";
 import {GameDataBuilder} from "../GameDataBuilder";
 
 export function gdRegisterClasses(gd:GameDataBuilder) {
 	gd.logger.debug("gdRegisterClasses");
-	gd.addClasses(
-		new ClassWarrior()
-	);
+	gd.addClasses(ClassWarrior);
+	gd.addPerksFromRecord(WarriorPerks);
 }
 
 /*

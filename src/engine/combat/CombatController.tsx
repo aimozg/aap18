@@ -77,12 +77,12 @@ export class CombatController {
 	public readonly party: Creature[] = this.ctx.settings.party
 	public readonly enemies: Creature[] = this.ctx.settings.enemies
 	public get gc() { return Game.instance.gameController }
-	public ownSide(creature:Creature):Creature[] {
+	public alliesOf(creature:Creature):Creature[] {
 		if (this.party.includes(creature)) return this.party;
 		if (this.enemies.includes(creature)) return this.enemies;
 		throw new Error("Not a combatant: "+creature);
 	}
-	public otherSide(creature:Creature):Creature[] {
+	public enemiesOf(creature:Creature):Creature[] {
 		if (this.party.includes(creature)) return this.enemies;
 		if (this.enemies.includes(creature)) return this.party;
 		throw new Error("Not a combatant: "+creature);
@@ -250,7 +250,7 @@ export class CombatController {
 	}
 	async doFullStealthCheck(creature:Creature) {
 		logger.debug("doFullStealthCheck {}", creature)
-		for (let spotter of this.otherSide(creature)) {
+		for (let spotter of this.enemiesOf(creature)) {
 			if (!creature.hasCondition(CoreConditions.Stealth)) break;
 			await this.doSingleStealthCheck(spotter, creature);
 		}
@@ -260,7 +260,7 @@ export class CombatController {
 		if (creature.removeCondition(CoreConditions.Stealth)) {
 			this.logInfo(<Fragment>{logref(creature)} is found!</Fragment>);
 		}
-		for (let enemy of this.otherSide(creature)) {
+		for (let enemy of this.enemiesOf(creature)) {
 			if (enemy.removeCondition(CoreConditions.Unaware)) {
 				this.logInfo(<Fragment>{logref(enemy)} is alerted!</Fragment>)
 			}
@@ -385,7 +385,7 @@ export class CombatController {
 		roll.dc = CombatRules.meleeDefenseVs(roll.target, roll.actor);
 		roll.damageSpec = CombatRules.meleeDamageVs(roll.actor, roll.target);
 		// Strike
-		// TODO onStrike callback
+		await roll.onStrike?.(roll, this);
 		if (roll.ap > 0) {
 			await this.deduceAP(roll.actor, roll.ap);
 		}

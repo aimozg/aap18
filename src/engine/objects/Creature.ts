@@ -276,6 +276,7 @@ export class Creature {
 	// Combat - Data //
 	///////////////////
 	/** Action Points */
+	// TODO move AP to stats
 	ap = 0;
 	gobj: GOCreature|null = null;
 	ai: MonsterAI = new DefaultMonsterAI(this);
@@ -284,6 +285,7 @@ export class Creature {
 	// TODO make these computable
 	abilities: AbstractCombatAbility[] = [];
 	// TODO conditions should be map to number (counter) or max-aggregated buffable stat
+	// TODO move to stats
 	conditions: Set<CreatureCondition> = new Set();
 	statusEffects = new Map<StatusEffectType,StatusEffect>();
 

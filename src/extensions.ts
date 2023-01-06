@@ -60,6 +60,8 @@ declare global {
 		joinToString(separator: string): string;
 		joinToString(separator: string, lastSeparator: string): string;
 		joinToString(separator: string, options:JoinToStringOptions<T>): string;
+
+		remove(item: T): boolean;
 	}
 }
 
@@ -226,7 +228,6 @@ function initExtensions() {
 		enumerable: false,
 		writable: false,
 		configurable: false,
-		// joinEx(separator: string, options:JoinExOptions<T>): string;
 		value: function <T>(this: T[], separator: string, arg2:string|undefined|JoinToStringOptions<T>): string {
 			if (typeof arg2 === "string") arg2 = {last:arg2};
 			let last = arg2?.last ?? separator;
@@ -245,6 +246,18 @@ function initExtensions() {
 			}
 			result += postfix;
 			return result;
+		}
+	});
+
+	Object.defineProperty(Array.prototype, "remove", {
+		enumerable: false,
+		writable: false,
+		configurable: false,
+		value: function <T>(this: T[], item: T):boolean {
+			let i = this.indexOf(item);
+			if (i < 0) return false;
+			this.splice(i, 1);
+			return true;
 		}
 	})
 }
