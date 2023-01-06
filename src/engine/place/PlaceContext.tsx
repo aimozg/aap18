@@ -54,7 +54,7 @@ export class PlaceContext extends SceneContext {
 	async onCharacterClick() {
 		let screen = new PlayerMenuScreen(this.player, this.place.canLevelUp())
 		await screen.showModal()
-		this.characterPanel.update();
+		this.refCharacterPanel.current?.update()
 		this.sidebarRef.current?.forceUpdate()
 	}
 

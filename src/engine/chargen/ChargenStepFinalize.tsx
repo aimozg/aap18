@@ -13,7 +13,6 @@ export class ChargenStepFinalize extends ChargenStep {
 	}
 
 	label: string = "Finalize";
-	panel = new CreaturePanel(null, {collapsible:false});
 
 	complete(): boolean {
 		return false;
@@ -22,7 +21,6 @@ export class ChargenStepFinalize extends ChargenStep {
 	node(): VNode {
 		let pc = this.player;
 		let parser = new Parser(pc);
-		this.panel.creature = pc;
 		return <Fragment>
 			<h3>Review</h3>
 			<div class="grid-12 gap-4">
@@ -39,7 +37,7 @@ export class ChargenStepFinalize extends ChargenStep {
 					{Appearance.characterAppearance(pc, parser)}
 				</div>
 				<div class="cols-6">
-					{this.panel.astsx}
+					<CreaturePanel creature={pc} options={{collapsible:false}}/>
 				</div>
 			</div>
 		</Fragment>;

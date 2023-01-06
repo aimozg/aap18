@@ -15,7 +15,7 @@ import {CombatAction} from "./CombatAction";
 import {PlayerCharacter} from "../objects/creature/PlayerCharacter";
 import {CombatRules} from "../../game/combat/CombatRules";
 import {BattleGrid} from "./BattleGrid";
-import {h} from "preact";
+import {createRef, h} from "preact";
 import {Fragment} from "preact/compat";
 import {BattleActionsPanel} from "../ui/panels/BattleActionsPanel";
 import {Scene, SceneFn} from "../scene/Scene";
@@ -77,11 +77,6 @@ export class BattleContext implements GameContext {
 	) {
 		this.cc = new CombatController(this);
 		this.battlePanel.init();
-		this.enemyPanel = new CreaturePanel(this.cc.enemies[0]);
-		this.enemyPanel.options.money = false;
-		this.charPanelWasCollapsed = this.characterPanel.collapsed;
-		this.characterPanel.collapse();
-		this.enemyPanel.collapse();
 	}
 	toString() { return `[BattleContext ${this.state} ${this.resultType}]`}
 
@@ -118,8 +113,8 @@ export class BattleContext implements GameContext {
 	async onBattleFinishClick() {
 		await this.cc.battleClose();
 	}
-	readonly characterPanel = Game.instance.screenManager.sharedPlayerPanel
-	readonly enemyPanel
+	refCharacterPanel = createRef<CreaturePanel>()
+	refEnemyPanel = createRef<CreaturePanel>()
 	// TODO instead of reusing exact same element, request new "Chapter"
 	readonly logPanel = Game.instance.screenManager.sharedTextPanel
 	readonly battlePanel = new BattlePanel(this)
@@ -131,9 +126,10 @@ export class BattleContext implements GameContext {
 			// TODO expanding one collapses others
 			left: <Fragment>
 				{/*<h3 class="text-positive mt-0">Party:</h3>*/}
-				{this.characterPanel.astsx}
+				<CreaturePanel creature={this.player} ref={this.refCharacterPanel} options={{collapsed: true}}/>
 				<h3 class="text-negative">Enemies:</h3>
-				{this.enemyPanel.astsx}
+				<CreaturePanel creature={this.enemies[0]} ref={this.refEnemyPanel}
+				               options={{money: false, collapsed: true}}/>
 			</Fragment>,
 			right: this.battleActionsPanel.astsx,
 			center: this.battlePanel.astsx,
@@ -151,14 +147,14 @@ export class BattleContext implements GameContext {
 	// TODO move animation to ctrl
 	animateValueChange(creature:Creature, key:CreatureValueId, newValue:number, durationMs:number) {
 		// TODO wait for half of the animation time? so animations won't stack on top of each other
-		let panel = [this.characterPanel, this.enemyPanel].find(p=>p.creature === creature);
+		let panel = [this.refCharacterPanel.current!, this.refEnemyPanel.current!].find(p=>p.creature === creature);
 		if (!panel) return;
 		panel.animateValue(key, newValue, durationMs);
 	}
 	redraw(updateActions:boolean=true) {
 		if (this.state === "closed") return;
-		this.characterPanel.update()
-		this.enemyPanel.update()
+		this.refCharacterPanel.current?.update()
+		this.refEnemyPanel.current?.update()
 		if (this.state === "ended") {
 			this.battleActionsPanel.showFinishBattle();
 		} else if (updateActions) {
@@ -198,8 +194,8 @@ export class BattleContext implements GameContext {
 			await this.tick(dticks);
 		}
 		this.battlePanel.animationFrame(dt,t2);
-		this.characterPanel.animationFrame(dt);
-		this.enemyPanel.animationFrame(dt);
+		this.refCharacterPanel.current?.animationFrame(dt);
+		this.refEnemyPanel.current?.animationFrame(dt);
 	}
 	stateChanged(state:BattleState, oldState:BattleState) {
 		let updateActions = state === "pc" || oldState === "pc" || oldState === "starting";
@@ -221,7 +217,6 @@ export class BattleContext implements GameContext {
 				}
 				break;
 			case "closed":
-				this.characterPanel.collapsed = this.charPanelWasCollapsed;
 				this._promise.resolve(this);
 				Game.instance.gameController.battleEnded(this);
 				return;

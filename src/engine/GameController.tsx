@@ -69,7 +69,6 @@ export class GameController {
 		logger.info("beginStory")
 		let ss = this.game.screenManager.gameScreen;
 		await this.game.screenManager.replaceTop(ss, 'fade-fast');
-		this.game.screenManager.sharedPlayerPanel.creature = this.player;
 		this.game.screenManager.sharedTextPanel.clear();
 		await this.playScene(this.game.idata.startingSceneId);
 		this.showGameScreen()
@@ -327,7 +326,6 @@ export class GameController {
 	}
 	async openTransferMenu(inv: Inventory|null, options: Partial<InventoryScreenOptions> = {}) {
 		await new InventoryScreen(this.player, inv, options).showModal();
-		this.game.screenManager.sharedPlayerPanel.update();
 	}
 	useSkill(options:UseSkillOptions):SkillCheckResult {
 		let actor = options.actor ?? this.player;

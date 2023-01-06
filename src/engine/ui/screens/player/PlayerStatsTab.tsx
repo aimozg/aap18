@@ -13,8 +13,6 @@ export class PlayerStatsTab extends AbstractPlayerScreenTab {
 
 	node(): VNode {
 		// TODO display more detailed data in 2-3 columns
-		let panel = new CreaturePanel(this.player, {cssclass: "-noborder", collapsible: false});
-		panel.update();
 		return <div>
 			<h3>
 				Stats
@@ -31,7 +29,7 @@ export class PlayerStatsTab extends AbstractPlayerScreenTab {
 			</p>
 			{/*<div className="help-block">TODO display more detailed data</div>*/}
 			<div>
-			{panel.astsx}
+				<CreaturePanel creature={this.player} options={{cssclass:"-noborder", collapsible:false}}/>
 			</div>
 		</div>
 	}

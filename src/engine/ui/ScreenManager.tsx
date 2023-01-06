@@ -9,7 +9,6 @@ import {GameScreen} from "./screens/GameScreen";
 import {LogManager} from "../logging/LogManager";
 import {animateTransition, TransitionAnimationName} from "./animations";
 import {KeyCodes} from "./KeyCodes";
-import {CreaturePanel} from "./panels/CreaturePanel";
 import {milliTime} from "../utils/time";
 import {Game} from "../Game";
 import {h} from "preact";
@@ -22,7 +21,6 @@ export class ScreenManager {
 	screens: AbstractScreen[] = [];
 	gameScreen: GameScreen = new GameScreen();
 
-	sharedPlayerPanel: CreaturePanel = new CreaturePanel(null);
 	sharedTextPanel: TextPanel = new TextPanel()
 
 	constructor(

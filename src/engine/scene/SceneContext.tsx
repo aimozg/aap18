@@ -5,7 +5,7 @@ import {Scene, SceneFn} from "./Scene";
 import {GameScreenLayout} from "../ui/screens/GameScreen";
 import {Deferred} from "../utils/Deferred";
 import {Button} from "../ui/components/Button";
-import {h} from "preact";
+import {createRef, h} from "preact";
 import {LogManager} from "../logging/LogManager";
 import {GameController, SkillCheckResult, UseSkillOptions} from "../GameController";
 import {GameContext} from "../state/GameContext";
@@ -17,6 +17,7 @@ import {Inventory} from "../objects/Inventory";
 import {Item} from "../objects/Item";
 import {Creature} from "../objects/Creature";
 import {TextOutput} from "../text/output/TextOutput";
+import {CreaturePanel} from "../ui/panels/CreaturePanel";
 
 export interface ChoiceOptions {
 	/** Button text */
@@ -79,7 +80,7 @@ export class SceneContext implements GameContext {
 
 	// TODO do we need it? the original intent was to invoke a dialogue and use its result
 	lastValue: string = '';
-	readonly characterPanel = Game.instance.screenManager.sharedPlayerPanel;
+	refCharacterPanel = createRef<CreaturePanel>()
 
 	public get sceneId(): string { return this._sceneId }
 
@@ -102,7 +103,7 @@ export class SceneContext implements GameContext {
 
 	get layout(): GameScreenLayout {
 		return {
-			left: this.characterPanel.astsx,
+			left: <CreaturePanel creature={this.player} ref={this.refCharacterPanel}/> ,
 			center: <div class="scene-panel">{this.output.panel.astsx}</div>
 		}
 	}
@@ -112,7 +113,7 @@ export class SceneContext implements GameContext {
 		if (!append) this.clear();
 		this.nextButtons = [];
 		this.currentButtons = []
-		this.characterPanel.update()
+		this.refCharacterPanel.current?.update()
 		this.output.scrollDown();
 	}
 
@@ -123,7 +124,7 @@ export class SceneContext implements GameContext {
 			return;
 		}
 		if (!this._dirty) return;
-		this.characterPanel.update();
+		this.refCharacterPanel.current?.update()
 		this._dirty = false;
 		this.checkDeadEnd();
 		this.output.appendAction(<div class="choices">{this.nextButtons.map(btn =>

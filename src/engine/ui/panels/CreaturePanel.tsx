@@ -1,9 +1,7 @@
-import {DomComponent} from "../DomComponent";
-import {ComponentChildren, h, VNode} from "preact";
+import {Component, ComponentChildren, h, VNode} from "preact";
 import {Creature} from "../../objects/Creature";
-import {Fragment, render} from "preact/compat";
+import {Fragment} from "preact/compat";
 import {Bar} from "../components/Bar";
-import {removeChildren} from "../../utils/dom";
 import {stripedBackground} from "../../utils/css";
 import {CommonText} from "../../text/CommonText";
 import {PartialRecord} from "../../utils/types";
@@ -18,6 +16,7 @@ import {WithTooltip} from "../components/WithTooltip";
 export interface CreaturePanelOptions {
 	cssclass: string;
 	collapsible: boolean;
+	collapsed: boolean;
 
 	ap: boolean;
 
@@ -64,23 +63,18 @@ interface ConditionOrEffect {
 	name: string;
 	description: string;
 }
-export class CreaturePanel extends DomComponent {
-	constructor(
-		creature: Creature|null,
-		options:Partial<CreaturePanelOptions> = {}) {
-		super(<div class={"creature-panel "+(options.cssclass??"")}></div>);
-		this._creature = creature;
-		this.options = Object.assign({}, CreaturePanel.DefaultOptions, options);
+export interface CreaturePanelProps {
+	creature:Creature|null,
+	options?:Partial<CreaturePanelOptions>
+}
+export class CreaturePanel extends Component<CreaturePanelProps, any> {
+	constructor(props:CreaturePanelProps) {
+		super();
+		this.options = Object.assign({}, CreaturePanel.DefaultOptions, props.options);
+		this._collapsed = this.options.collapsed;
 	}
-	private _creature:Creature|null;
 	get creature(): Creature|null {
-		return this._creature;
-	}
-
-	set creature(value: Creature | null) {
-		this._creature = value;
-		this.animatedValues = {};
-		this.update()
+		return this.props.creature;
 	}
 
 	private _collapsed: boolean = false;
@@ -106,6 +100,7 @@ export class CreaturePanel extends DomComponent {
 	options: CreaturePanelOptions;
 	static DefaultOptions: CreaturePanelOptions = {
 		collapsible: true,
+		collapsed: false,
 		cssclass: "",
 
 		ap: true,
@@ -376,17 +371,17 @@ export class CreaturePanel extends DomComponent {
 	}
 
 	update() {
-		if (!this.creature) {
-			removeChildren(this.node);
-			return;
-		}
-		this.node.classList.toggle("-dead", !this.creature.isAlive);
-		this.node.classList.toggle("-collapsed", this.collapsed);
-		this.node.classList.toggle("-collapsible", this.options.collapsible);
-		render(
-			this.collapsed ? this.renderCollapsed() : this.renderExpanded(),
-			this.node
-		)
+		this.forceUpdate();
+	}
+	render(): ComponentChildren {
+		let creature = this.creature;
+		if (!creature) return <div></div>
+		let className = "creature-panel";
+		if (this.options.cssclass) className += " "+this.options.cssclass;
+		if (!creature.isAlive) className += " -dead";
+		if (this.collapsed) className += " -collapsed";
+		if (this.options.collapsible) className += " -collapsible";
+		return <div className={className}>{this.collapsed ? this.renderCollapsed() : this.renderExpanded()}</div>
 	}
 }
 
