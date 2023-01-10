@@ -28,18 +28,25 @@ export interface ICanvasOverlay {
 	row: number;
 	col: number;
 }
-
+export interface StyledTextSpan {
+	color: AnimatedColor;
+	font: string;
+	text: string;
+}
 export interface CanvasOverlayGlyph extends ICanvasOverlay {
 	type: "glyph";
 	glyph: GlyphData;
 }
-
+export interface CanvasOverlayText extends ICanvasOverlay {
+	type: "text";
+	text: StyledTextSpan[];
+}
 export interface CanvasOverlayImage extends ICanvasOverlay {
 	type: "image";
 	image: CanvasImageSource;
 }
 
-export type CanvasOverlay = CanvasOverlayGlyph | CanvasOverlayImage;
+export type CanvasOverlay = CanvasOverlayGlyph | CanvasOverlayImage | CanvasOverlayText;
 
 export class GlyphCanvas {
 	constructor(private readonly c2d: CanvasRenderingContext2D) {
@@ -141,13 +148,26 @@ export class GlyphCanvas {
 	renderOverlay(overlay: CanvasOverlay) {
 		let x = (overlay.col - this.scrollX) * this.cellWidth + this.padding;
 		let y = (overlay.row - this.scrollY) * this.cellHeight + this.padding;
+		let c2d = this.c2d;
 		switch (overlay.type) {
 			case "image":
-				this.c2d.drawImage(overlay.image, x, y);
+				c2d.drawImage(overlay.image, x, y);
 				break;
 			case "glyph":
-				this.c2d.font = this.font;
+				c2d.font = this.font;
 				this.renderGlyph(overlay.glyph, x, y);
+				break;
+			case "text":
+				for (let span of overlay.text) {
+					c2d.font = span.font;
+					let color = animatedColorToRGB(span.color, this.phase);
+					c2d.strokeStyle = color.isDark() ? "#aaa" : "#333";
+					c2d.lineWidth = 1;
+					c2d.strokeText(span.text, x, y);
+					c2d.fillStyle = color.toString();
+					c2d.fillText(span.text, x, y);
+					x += c2d.measureText(span.text).width;
+				}
 				break;
 		}
 	}

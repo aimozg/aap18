@@ -5,10 +5,10 @@
 import {Creature} from "../objects/Creature";
 import {RGBColor} from "../objects/Color";
 import * as tinycolor from "tinycolor2";
-import {CanvasOverlay, GlyphData, GlyphSource} from "../ui/components/GlyphCanvas";
+import {CanvasOverlay, GlyphData, GlyphSource, StyledTextSpan} from "../ui/components/GlyphCanvas";
 import {PlayerCharacter} from "../objects/creature/PlayerCharacter";
 import {Random} from "../math/Random";
-import {GridPos} from "../utils/gridutils";
+import {GridPos, sumpos} from "../utils/gridutils";
 import {IResource} from "../IResource";
 import Symbols from "../symbols";
 import {ApToAct} from "./CombatController";
@@ -111,6 +111,31 @@ interface MovingGlyph {
 	promise:Deferred<void>;
 }
 
+export type FloatingTextStyle = "bubbleup"|"jitter"|"stay";
+interface FloatingText {
+	pos: GridPos;
+	from: GridPos;
+	style: FloatingTextStyle;
+	time: number;
+	durationMs: number;
+	text: StyledTextSpan[];
+	promise: Deferred<void>;
+}
+/** style => (time => {dx,dy}) */
+const FloatingTextFunctions:Record<FloatingTextStyle,(timeSec:number)=>GridPos> = {
+	bubbleup: (time) => ({
+		x: 0.5,
+		// hyperbolic plot that gives y=0.25 at time=0 and y=-0.25 at time=0.5
+		y: 0.5/(time+0.5)-0.75
+	}),
+	jitter: (time) => ({
+		// 100Hz jitter, starting at x=0.5
+		x: 0.5+0.05*Math.sin(100*time),
+		y: 0,
+	}),
+	stay: ()=>({x:0,y:0})
+}
+
 export interface WrappedAnimationPromise {
 	finished:Promise<void>;
 }
@@ -130,6 +155,21 @@ export class BattleGrid implements GlyphSource {
 	public _data:GridCellData[];
 	public readonly size:number = this.width*this.height;
 	private movingGlyphs:Map<GridObject,MovingGlyph> = new Map();
+	private floatingTexts:FloatingText[] = [];
+	animateFloatingText(pos:GridPos, style:FloatingTextStyle, durationMs:number, ...text:StyledTextSpan[]):WrappedAnimationPromise {
+		let ft:FloatingText = {
+			from: pos,
+			pos: sumpos(pos, FloatingTextFunctions[style](0)),
+			time: 0,
+			durationMs,
+			text,
+			promise: new Deferred<void>(),
+			style
+		}
+		logger.debug("animateFloatingText: {},{} {} {}", ft.pos.x,ft.pos.y, style, text[0]?.text);
+		this.floatingTexts.push(ft);
+		return {finished:ft.promise};
+	}
 	animateMovement(go:GridObject, from:GridPos, to:GridPos, durationMs:number, steps:number=4):WrappedAnimationPromise {
 		let mg:MovingGlyph = {
 			go,
@@ -158,12 +198,22 @@ export class BattleGrid implements GlyphSource {
 		return gd;
 	}
 	overlays(): CanvasOverlay[] {
-		return [...this.movingGlyphs.values()].map(mg=>({
-			type: "glyph",
-			row: mg.pos.y,
-			col: mg.pos.x,
-			glyph: mg.go.glyph
-		}))
+		let overlays:CanvasOverlay[] = [];
+		this.movingGlyphs.forEach(mg=>{
+			overlays.push({
+				type: "glyph",
+				row: mg.pos.y,
+				col: mg.pos.x,
+				glyph: mg.go.glyph
+			});
+		});
+		overlays.push(...this.floatingTexts.map<CanvasOverlay>(ft=>({
+			type: "text",
+			row: ft.pos.y,
+			col: ft.pos.x,
+			text: ft.text
+		})))
+		return overlays;
 	}
 	animationFrame(dt:number) {
 		for (let mg of this.movingGlyphs.values()) {
@@ -181,6 +231,16 @@ export class BattleGrid implements GlyphSource {
 				x: lint(phase, mg.from.x, mg.to.x),
 				y: lint(phase, mg.from.y, mg.to.y),
 			}
+		}
+		for (let ft of this.floatingTexts) {
+			ft.time += dt;
+			if (ft.time >= ft.durationMs) {
+				this.floatingTexts.remove(ft);
+				logger.debug("animation finished for {}",ft.text[0]?.text);
+				ft.promise.resolve();
+				continue;
+			}
+			ft.pos = sumpos(ft.from, FloatingTextFunctions[ft.style](ft.time/1000));
 		}
 	}
 	public index(x:number, y:number):number {

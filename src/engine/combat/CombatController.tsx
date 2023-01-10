@@ -262,7 +262,8 @@ export class CombatController {
 		}
 		for (let enemy of this.enemiesOf(creature)) {
 			if (enemy.removeCondition(CoreConditions.Unaware)) {
-				this.logInfo(<Fragment>{logref(enemy)} is alerted!</Fragment>)
+				this.logInfo(<Fragment>{logref(enemy)} is alerted!</Fragment>);
+				this.ctx.animateTextAt(enemy, "!", BattleContext.FT_NOTIFICATION);
 			}
 		}
 	}
@@ -474,6 +475,7 @@ export class CombatController {
 			this.log("", <Fragment>(<span class="text-damage-none">0</span>)</Fragment>)
 		} else {
 			this.log("", <Fragment>(<span class="text-lust">{damage}</span>)</Fragment>)
+			this.ctx.animateTextAt(target, String(damage), BattleContext.FT_LUST);
 			await this.increaseLP(target, damage, source);
 		}
 	}
@@ -494,9 +496,12 @@ export class CombatController {
 
 	async deduceHP(target: Creature, damage: number, source: Creature | null) {
 		logger.info("deduceHP {} {} {}", target, damage, source)
+		if (damage === 0) return;
+		if (damage < 0 || !isFinite(damage)) throw new Error(`deduceHP called with invalid value ${damage}`)
 		let wasAlive = target.isAlive
 		this.ctx.animateValueChange(target, "hp", target.hp - damage, AnimationTime)
 		target.ctrl.modHp(-damage);
+		this.ctx.animateTextAt(target, String(damage), BattleContext.FT_DAMAGE);
 		if (target.hp <= 0) target.setCondition(CoreConditions.Defeated);
 		if (wasAlive && !target.isAlive) {
 			// TODO consider handling death later, as an immediate follow-up event

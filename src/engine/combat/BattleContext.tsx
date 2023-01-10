@@ -144,7 +144,18 @@ export class BattleContext implements GameContext {
 			await this.cc.performAction(action);
 		}
 	}
-	// TODO move animation to ctrl
+	// TODO move animation to ctrl?
+	static FT_DAMAGE = "#c22";
+	static FT_LUST = "#c2f";
+	static FT_HEAL = "#2c2";
+	static FT_NOTIFICATION = "#cc2";
+	animateTextAt(creature: Creature, text:string, color:string) {
+		this.grid.animateFloatingText(creature.gobj!.pos, "bubbleup", 1000, {
+			text,
+			color,
+			font: "24px monospace" // TODO move out
+		})
+	}
 	animateValueChange(creature:Creature, key:CreatureValueId, newValue:number, durationMs:number) {
 		// TODO wait for half of the animation time? so animations won't stack on top of each other
 		let panel = [this.refCharacterPanel.current!, this.refEnemyPanel.current!].find(p=>p.creature === creature);

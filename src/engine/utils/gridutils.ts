@@ -1,5 +1,12 @@
 export type GridPos = { x: number, y: number }
 
+export function sumpos(a:GridPos, b:GridPos):GridPos {
+	return {x:a.x+b.x,y:a.y+b.y};
+}
+export function mulpos(a:GridPos, scale:number):GridPos {
+	return {x:a.x*scale,y:a.y*scale};
+}
+
 export class Direction {
 	private constructor(
 		/** Index in Direction.All list */
