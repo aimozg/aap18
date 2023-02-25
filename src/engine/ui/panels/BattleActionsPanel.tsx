@@ -43,7 +43,7 @@ export class BattleActionsPanel extends DomComponent {
 		super(<div className="combat-actions d-flex flex-column gap-4">
 			<div class="combat-dpad grid-3 grid-v3" ref={refDPad}>
 			</div>
-			<div class="combat-actions-list d-flex flex-column gap-2" ref={refActions}>
+			<div class="combat-actions-list d-flex flex-column gap-sm-0 gap-2" ref={refActions}>
 
 			</div>
 		</div>);

@@ -1,7 +1,8 @@
 @use "../utils/uibox";
+@use "../media";
 
 $leftPanelSize: 300px;
-$rightPanelSize: 300px;
+$leftPanelSizeMin: 200px;
 $duration: 0.5s;
 
 .game-layout, .gl-top, .gl-midrow, .gl-left, .gl-right, .gl-midcol, .gl-center, .gl-bottom {
@@ -17,6 +18,9 @@ $duration: 0.5s;
   flex-direction: column;
   width: 1200px;
   gap: 1rem;
+  @include media.mq-ms {
+    gap: 0.25rem;
+  }
   &.-wide {
     flex-grow: 1;
   }
@@ -27,12 +31,19 @@ $duration: 0.5s;
     flex-grow: 1;
     display: flex;
     gap: 1rem;
+    @include media.mq-ms {
+      gap: 0.25rem;
+    }
   }
   .gl-left, .gl-right {
     flex-grow: 0;
     flex-shrink: 0;
     box-sizing: border-box;
     flex-basis: $leftPanelSize;
+    overflow-y: auto;
+    @include media.mq-ms {
+      flex-basis: $leftPanelSizeMin;
+    }
     transition:
             visibility $duration steps(1, end),
             margin-left $duration ease-in-out,
@@ -40,11 +51,17 @@ $duration: 0.5s;
   }
   &.-collapse-left .gl-left {
     visibility: hidden;
-    margin-left: #{-$rightPanelSize};
+    margin-left: #{-$leftPanelSize};
+    @include media.mq-ms {
+      margin-left: #{-$leftPanelSizeMin};
+    }
   }
   &.-collapse-right .gl-right {
     visibility: hidden;
-    margin-right: #{-$rightPanelSize};
+    margin-right: #{-$leftPanelSize};
+    @include media.mq-ms {
+      margin-right: #{-$leftPanelSizeMin};
+    }
   }
   .gl-midcol {
     display: flex;

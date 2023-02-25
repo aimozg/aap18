@@ -17,11 +17,19 @@ import {TextPanel} from "./panels/TextPanel";
 
 const logger = LogManager.loggerFor("engine.ui.ScreenManager");
 
+export type ScreenType = "desktop" | "tablet" | "phone";
+
 export class ScreenManager {
 	screens: AbstractScreen[] = [];
 	gameScreen: GameScreen = new GameScreen();
 
 	sharedTextPanel: TextPanel = new TextPanel()
+
+	get screenType():ScreenType {
+		if (screen.availWidth >= 1200) return "desktop";
+		if (screen.availWidth >= 768) return "tablet";
+		return "phone"
+	}
 
 	constructor(
 		private screenHolder: HTMLElement

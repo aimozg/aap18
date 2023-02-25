@@ -21,7 +21,7 @@ export class MainMenuScreen extends AbstractScreen {
 
 	node(): VNode {
 		return <div class="text-center text-intense screen-main-menu">
-			<div class="text-xxxl mt-8">{this.game.info.title}</div>
+			<div class="text-xxxl mt-lg-8 mt-4">{this.game.info.title}</div>
 			<div class="">{this.game.info.subtitle}</div>
 			<div class="text-s mb-8">{this.game.info.version}</div>
 

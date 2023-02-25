@@ -5,6 +5,32 @@ import {DomComponent} from "../DomComponent";
 import {createRef, h} from "preact";
 import {BattleContext} from "../../combat/BattleContext";
 import {GlyphCanvas} from "../components/GlyphCanvas";
+import {ScreenType} from "../ScreenManager";
+import {Game} from "../../Game";
+
+let CanvasConfigs: {
+	[index in ScreenType]:{
+		font: string;
+		cellWidth: number;
+		cellHeight: number;
+	}
+} = {
+	desktop: {
+		font: "32px monospace",
+		cellWidth: 36,
+		cellHeight: 36
+	},
+	tablet: {
+		font: "24px monospace",
+		cellWidth: 27,
+		cellHeight: 27
+	},
+	phone: {
+		font: "16px monospace",
+		cellWidth: 18,
+		cellHeight: 18
+	},
+}
 
 export class BattlePanel extends DomComponent {
 	private readonly refMain
@@ -22,6 +48,10 @@ export class BattlePanel extends DomComponent {
 	init() {
 		this.canvas.visibleCols = this.context.grid.width;
 		this.canvas.visibleRows = this.context.grid.height;
+		let sz = CanvasConfigs[Game.instance.screenManager.screenType];
+		this.canvas.font = sz.font;
+		this.canvas.cellWidth = sz.cellWidth;
+		this.canvas.cellHeight = sz.cellHeight;
 	}
 	animationFrame(dt:number, time:number):void{
 		this.context.grid.animationFrame(dt);

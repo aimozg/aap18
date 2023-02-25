@@ -22,3 +22,12 @@
 .d-ib {
   display: inline-block;
 }
+
+@each $i in (auto,scroll,hidden) {
+  .ox-#{$i} {
+    overflow-x: $i;
+  }
+  .oy-#{$i} {
+    overflow-y: $i;
+  }
+}

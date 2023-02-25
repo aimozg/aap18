@@ -58,8 +58,8 @@ export class GlyphCanvas {
 	cellWidth = 36
 	cellHeight = 36
 	// Text offset
-	x0 = 10
-	y0 = -7
+	x0 = 0
+	y0 = 0
 	// Empty space
 	padding = 0
 	// Canvas size in cells
@@ -141,7 +141,7 @@ export class GlyphCanvas {
 		}
 		if (glyph.ch && glyph.ch !== ' ') {
 			c2d.fillStyle = animatedColorToRGB(glyph.fg, this.phase).toString();
-			c2d.fillText(glyph.ch, this.x0 + x, y + this.y0 + this.cellHeight)
+			c2d.fillText(glyph.ch, this.x0 + this.cellWidth/2 + x, y + this.y0 + this.cellHeight/2)
 		}
 	}
 
@@ -183,6 +183,8 @@ export class GlyphCanvas {
 		c2d.fillStyle = this.background;
 		c2d.fillRect(0, 0, this.width | 0, this.height | 0);
 		c2d.font = this.font;
+		c2d.textBaseline = "middle";
+		c2d.textAlign = "center";
 		c2d.save();
 		c2d.scale(this.scale, this.scale);
 

@@ -1,0 +1,57 @@
+
+$desktop-width: 1200px;
+$tablet-width: 768px;
+
+/** Large (desktop) */
+@mixin mq-lg {
+  @media (min-width: $desktop-width) {
+    @content;
+  }
+}
+
+/** Medium (tablet) */
+@mixin mq-md {
+  @media (min-width: $tablet-width) and (max-width: #{$desktop-width - 1px}) {
+    @content;
+  }
+}
+
+/** Small (phone) */
+@mixin mq-sm {
+  @media (max-width: #{$tablet-width - 1px}) {
+    @content;
+  }
+}
+
+/** Medium and large (tablet/desktop) */
+@mixin mq-ml {
+  @media (min-width: $tablet-width) {
+    @content;
+  }
+}
+
+/** Medium and small (tablet/phone) */
+@mixin mq-ms {
+  @media (max-width: #{$desktop-width - 1px}) {
+    @content;
+  }
+}
+
+@mixin with-media-queries {
+  @content("");
+  @include mq-lg {
+    @content("-lg");
+  }
+  @include mq-md {
+    @content("-md");
+  }
+  @include mq-sm {
+    @content("-sm");
+  }
+  @include mq-ml {
+    @content("-ml");
+  }
+  @include mq-ms {
+    @content("-ms");
+  }
+}

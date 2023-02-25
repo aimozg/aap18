@@ -1,9 +1,18 @@
+@use "../media";
+
 html, body, #root {
   height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   background: var(--theme-bg);
   color: var(--tc-fg);
   font-size: var(--theme-font-size);
+  @include media.mq-md {
+    font-size: var(--theme-font-size-md);
+  }
+  @include media.mq-sm {
+    font-size: var(--theme-font-size-sm);
+  }
   font-family: var(--theme-font-face);
 }

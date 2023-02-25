@@ -404,8 +404,8 @@ export class InventoryScreen extends AbstractModalScreen<void> {
 
 	node(): VNode {
 		let selitem = this.selectedItem;
-		return <div class="ui-box screen-inventory d-flex flex-column">
-			<div class="grid-2 gap-4 flex-grow-1">
+		return <div class="ui-box screen-inventory">
+			<div class="grid-2 gap-4 screen-inventory-main">
 				<div class="grid-v2">
 					<div>
 						<h3>{this.isEquipmentScreen ? "Equipment" : this.other!.name}</h3>
@@ -443,14 +443,14 @@ export class InventoryScreen extends AbstractModalScreen<void> {
 						</div>
 					</div>
 				</div>
-				<div>
+				<div class="d-flex flex-column oy-hidden">
 					<h3>{this.main.name}</h3>
-					<div class="inventory-items">
+					<div class="inventory-items oy-auto">
 						{this.mainInvMenus.map(im => this.renderItemMenu(im))}
 					</div>
 				</div>
 			</div>
-			<div class="d-flex gap-4 my-4">
+			<div class="d-flex gap-4 my-4 screen-inventory-footer">
 				{<div>
 					Gold: <span class="text-money">{this.creature.money.format(",d")}</span>
 				</div>}

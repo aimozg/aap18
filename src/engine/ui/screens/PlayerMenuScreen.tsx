@@ -84,7 +84,7 @@ export class PlayerMenuScreen extends AbstractModalScreen<void> {
 
 	node(): VNode {
 		return <div class="d-flex flex-column ui-box ma-4 js-stretch">
-			<div class="grid-xl-12 grid-lg-6 grid-4 gap-2 ma-4">
+			<div class="grid-lg-12 grid-md-6 grid-sm-4 gap-2 ma-4">
 				<ButtonMenu items={this.tabs.map((tab,i)=>({
 					label: tab.label,
 					hotkey: KeyCodes.DefaultHotkeys[i],

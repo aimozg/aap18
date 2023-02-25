@@ -31,7 +31,7 @@ u, .text-u {
   font-size: 80%;
   transform: translate(0, -33%)
 }
-@each $sz in small, smaller, x-small, big, bigger, x-big {
+@each $sz in small, smaller, x-small, large, larger, x-large {
   .text-#{$sz} {
     font-size: $sz;
   }

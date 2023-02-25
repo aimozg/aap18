@@ -1,3 +1,5 @@
+@use "../media";
+
 $ctrlRadius: 4px;
 
 @mixin control {
@@ -17,10 +19,22 @@ $ctrlRadius: 4px;
   }
   font-family: var(--theme-ctrl-font-face);
   font-size: var(--theme-ctrl-font-size);
+  @include media.mq-md {
+    font-size: var(--theme-ctrl-font-size-md);
+  }
+  @include media.mq-sm {
+    font-size: var(--theme-ctrl-font-size-sm);
+  }
   padding: 1px 6px;
+  @include media.mq-sm {
+    padding: 1px 2px;
+  }
 
   &.-big {
     padding: 8px 12px;
+    @include media.mq-sm {
+      padding: 4px 6px;
+    }
   }
 
   &:disabled, &.-disabled {
