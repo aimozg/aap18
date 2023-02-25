@@ -7,7 +7,7 @@ module.exports = {
 	mode: "development",
 	entry: ['./src/extensions.ts', './src/index.tsx'],
 	output: {
-		filename: 'main.js',
+		filename: 'main.[contenthash].js',
 		path: path.resolve(__dirname, 'dist'),
 		clean: true
 	},

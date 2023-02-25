@@ -18,6 +18,9 @@ export class MainMenuScreen extends AbstractScreen {
 			await this.game.screenManager.addOnTop(this, 'fade');
 		}
 	}
+	async toggleFullscreen() {
+		await this.game.screenManager.toggleFullscreen();
+	}
 
 	node(): VNode {
 		return <div class="text-center text-intense screen-main-menu">
@@ -26,6 +29,11 @@ export class MainMenuScreen extends AbstractScreen {
 			<div class="text-s mb-8">{this.game.info.version}</div>
 
 			<div class="d-flex flex-column ai-center gap-4">
+				{this.game.screenManager.screenType !== "desktop" &&
+				<Button label="Fullscreen"
+				        className="-big"
+				        onClick={()=>this.toggleFullscreen()}
+				/>}
 				<Button label="Resume Game"
 				        disabled={!this.game.saveManager.isRecentSaveAvailable()}
 				        className="-big"

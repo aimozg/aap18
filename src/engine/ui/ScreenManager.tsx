@@ -32,12 +32,40 @@ export class ScreenManager {
 	}
 
 	constructor(
-		private screenHolder: HTMLElement
+		public readonly screenHolder: HTMLElement
 	) {
 		this.addTop(new EmptyScreen());
 	}
 	get top(): AbstractScreen {
 		return this.screens[this.screens.length - 1];
+	}
+
+	async toggleFullscreen() {
+		if (this.isFullscreen()) {
+			await this.exitFullscreen();
+		} else {
+			if (this.screenType === "phone") {
+				if (document.fullscreenEnabled) {
+					await this.screenHolder.requestFullscreen({navigationUI: "hide"});
+					if (!screen.orientation.type.includes("landscape")) {
+						try {
+							await screen.orientation.lock("landscape");
+						} catch (_) {}
+					}
+				} else {
+					// TODO properly report error
+					alert("Fullscreen feature disabled");
+				}
+			}
+		}
+	}
+
+	isFullscreen() {
+		return !!document.fullscreenElement;
+	}
+
+	async exitFullscreen() {
+		await document.exitFullscreen();
 	}
 
 	private removeTop(activateScreenBelow: boolean): void {
