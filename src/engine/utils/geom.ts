@@ -7,6 +7,14 @@ export interface XY {
 	x: number;
 	y: number;
 }
+export namespace XY {
+	export function distance2(p1:XY, p2:XY): number {
+		return (p1.x-p2.x)**2 + (p1.y-p2.y)**2
+	}
+	export function distance(p1:XY, p2:XY): number {
+		return Math.sqrt(distance2(p1,p2));
+	}
+}
 
 export interface XYRect {
 	top: number;

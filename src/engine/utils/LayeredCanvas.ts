@@ -232,56 +232,78 @@ export class LayeredCanvas {
 		c2d.restore();
 	}
 	private setupEvents() {
+		let element = this.element;
 		if (this.options.wheelZoom) {
-			this.element.addEventListener("wheel", (e)=>this.handleWheelEvent(e), { passive: false });
+			element.addEventListener("wheel", (e)=>this.handleWheelEvent(e), { passive: false });
 		}
 		if (this.options.dragPan) {
-			this.element.addEventListener("mousedown", (e)=>this.handlePan(e, "down"));
-			this.element.addEventListener("mouseleave", (e)=>this.handlePan(e, "leave"));
-			this.element.addEventListener("mouseup", (e)=>this.handlePan(e, "up"));
-			this.element.addEventListener("mousemove", (e)=>this.handlePan(e, "move"));
-			this.element.addEventListener("contextmenu",
-				(e)=> {if (this.wasDrag) e.preventDefault();}
-			);
-			// TODO process touch events, too
-		}
-		this.element.addEventListener("click", (e)=>this.handleClick(e));
-	}
-	private mouseX = 0;
-	private mouseY = 0;
-	private mouseDown = false;
-	private wasDrag = false;
-	private handleClick(e:MouseEvent) {
-		if (this.wasDrag) {
-			e.preventDefault();
-			return;
-		}
-	}
-	private handlePan(e:MouseEvent, type:"up"|"down"|"leave"|"move") {
-		if (type !== "move" && e.button !== this.options.dragPanButton) return;
-		switch (type) {
-			case "up":
-			case "leave":
-				if (this.mouseDown) {
+			element.addEventListener("mousedown", (e)=> {
+				if (e.button === this.options.dragPanButton) {
+					e.preventDefault();
+					this.panStart(e.screenX, e.screenY);
+				}
+			});
+			element.addEventListener("mouseleave", (e)=> {
+				this.panStop();
+			});
+			element.addEventListener("mouseup", (e)=> {
+				if (e.button === this.options.dragPanButton) {
 					e.preventDefault();
 					this.panStop();
 				}
-				break;
-			case "down":
-				this.wasDrag = false;
-				e.preventDefault();
-				this.panStart(e.offsetX, e.offsetY);
-				break;
-			case "move":
-				if (this.mouseDown) {
+			});
+			element.addEventListener("mousemove", (e)=> {
+				if (this.isPanning) {
 					e.preventDefault();
-					this.wasDrag = true;
-					this.panMove(e.offsetX, e.offsetY);
+					this.panMove(e.screenX, e.screenY);
 				}
-				break;
+			});
+			element.addEventListener("contextmenu",
+				(e)=> {if (this.wasDrag) e.preventDefault();}
+			);
 		}
+		element.addEventListener("click", (e)=> {
+			if (this.wasDrag) {
+				e.preventDefault();
+			}
+		});
+		element.addEventListener("touchstart", (e)=> {
+			if (e.touches.length === 1) {
+				e.preventDefault();
+				this.panStart(e.touches[0].screenX, e.touches[0].screenY);
+			} else if (e.touches.length === 2) {
+				e.preventDefault();
+				this.pinchZoomStart(
+					e.touches[0].screenX,
+					e.touches[0].screenY,
+					e.touches[1].screenX,
+					e.touches[1].screenY);
+			} else {
+				this.panStop();
+			}
+		}, {passive:false});
+		element.addEventListener("touchend", (e) => {
+			this.panStop();
+			this.pinchZoomEnd();
+		});
+		element.addEventListener("touchmove", (e)=>{
+			if (e.touches.length === 1 && this.isPanning) {
+				e.preventDefault();
+				this.panMove(e.touches[0].screenX, e.touches[0].screenY);
+			} else if (e.touches.length === 2 && this.isPinchZooming) {
+				e.preventDefault();
+				this.pinchZoomMove(
+					e.touches[0].screenX,
+					e.touches[0].screenY,
+					e.touches[1].screenX,
+					e.touches[1].screenY);
+			}
+		}, {passive:false});
 	}
-
+	private mouseX = 0;
+	private mouseY = 0;
+	private isPanning = false;
+	private wasDrag = false;
 	private panMove(x: number, y: number) {
 		let dx = this.mouseX - x;
 		let dy = this.mouseY - y;
@@ -291,19 +313,41 @@ export class LayeredCanvas {
 	}
 
 	private panStop() {
-		this.mouseDown = false;
+		this.isPanning = false;
 	}
 
 	private panStart(x: number, y: number) {
-		this.mouseDown = true;
+		this.wasDrag = false;
+		this.isPanning = true;
 		this.mouseX = x;
 		this.mouseY = y;
 	}
+
 
 	private handleWheelEvent(e:WheelEvent) {
 		if (!eventHasMod(this.options.wheelZoomMod, e)) return;
 		e.preventDefault();
 		this.modZoom(e.deltaY < 0 ? +1 : -1);
+	}
+
+	private isPinchZooming = false;
+	private pinchDistance = 0;
+	private pinchZoomSpeed = 1/32;
+	private pinchZoomStart(x1: number, y1: number, x2: number, y2: number) {
+		// logger.debug("pinchZoomStart {} {} {} {}",x1,y1,x2,y2);
+		this.isPinchZooming = true;
+		this.pinchDistance = XY.distance({x:x1,y:y1}, {x:x2,y:y2});
+	}
+
+	private pinchZoomEnd() {
+		this.isPinchZooming = false;
+	}
+
+	private pinchZoomMove(x1: number, y1: number, x2: number, y2: number) {
+		// logger.debug("pinchZoomMove {} {} {} {}",x1,y1,x2,y2);
+		let d2 = XY.distance({x:x1,y:y1}, {x:x2,y:y2});
+		this.modZoom((d2-this.pinchDistance)*this.pinchZoomSpeed);
+		this.pinchDistance = d2;
 	}
 }
 
