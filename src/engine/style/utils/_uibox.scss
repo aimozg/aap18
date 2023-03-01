@@ -1,14 +1,28 @@
+@use "../media";
+
 @mixin uibox {
   &:not(.-noborder) {
     border: 1px solid var(--theme-ctrl-fg);
   }
   background: var(--theme-bg);
-  padding: 0.5rem;
+  @include media.mq-ml {
+    padding: 0.5rem;
+  }
+  @include media.mq-sm {
+    padding: 0.25rem;
+  }
 
   .-bottom-collapser {
-    margin-left: -0.5rem;
-    margin-right: -0.5rem;
-    width: calc(100% + 1rem);
+    @include media.mq-ml {
+      margin-left: -0.5rem;
+      margin-right: -0.5rem;
+      width: calc(100% + 1rem);
+    }
+    @include media.mq-sm {
+      margin-left: -0.25rem;
+      margin-right: -0.25rem;
+      width: calc(100% + 0.5rem);
+    }
     border-radius: 0;
     padding: 0;
   }
