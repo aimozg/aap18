@@ -12,3 +12,7 @@ export const atMost = Math.min;
 export function lint(t:number, value0:number, value1:number):number {
 	return value0 + (value1-value0)*t;
 }
+
+export function logarithm(base:number, argument:number): number {
+	return Math.log(argument)/Math.log(base);
+}

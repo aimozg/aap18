@@ -92,6 +92,7 @@ function hexagon(orientation:HexMapOrientation, sideLength:number, bumpLength:nu
 }
 
 // TODO auto-scale with devicePixelRatio
+// TODO use LayeredCanvas
 export class HexCanvas {
 	constructor(
 		public readonly orientation:HexMapOrientation
