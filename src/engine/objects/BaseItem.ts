@@ -8,6 +8,7 @@ import {Item} from "./Item";
 import {WeaponComponent} from "./item/WeaponComponent";
 import {ArmorComponent} from "./item/ArmorComponent";
 import {ConsumableComponent} from "./item/ConsumableComponent";
+import {ItemProperty} from "./ItemProperty";
 
 export abstract class BaseItem implements IResource {
 	get resType() { return Symbols.ResTypeBaseItem }
@@ -16,9 +17,14 @@ export abstract class BaseItem implements IResource {
 		public name: string) { }
 
 	spawn():Item {
-		return new Item(this);
+		let item = new Item(this);
+		for (let prop of this.properties) {
+			item.addProperty(prop.clone());
+		}
+		return item;
 	}
 	readonly components: BaseItemComponent[] = [];
+	readonly properties: ItemProperty[] = [];
 
 	weapon: WeaponComponent | undefined;
 	get isWeapon(): boolean { return !!this.weapon };
@@ -28,6 +34,11 @@ export abstract class BaseItem implements IResource {
 
 	consumable: ConsumableComponent | undefined;
 	get isConsumable(): boolean { return !!this.consumable };
+
+	withProperty(ip:ItemProperty):this {
+		this.properties.push(ip);
+		return this;
+	}
 }
 
 export abstract class BaseItemComponent {

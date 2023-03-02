@@ -3,9 +3,9 @@ import {RacialGroups} from "../../game/data/racialGroups";
 import {Game} from "../../engine/Game";
 import {TinyFireBolt} from "./abilities/TinyFireBolt";
 import {LootTable, setupLoot} from "../../engine/objects/Loot";
-import {ConsumableLib} from "../../game/data/items/ConsumableLib";
 import {TSex} from "../../engine/rules/gender";
 import {buildScene} from "../../engine/scene/builder";
+import {MeleeWeaponLib} from "../../game/data/items/MeleeWeaponLib";
 
 const namespace = '/moimp';
 
@@ -59,8 +59,8 @@ export class Imp extends Character {
 		variants: [{
 			money: [5, 15],
 			items: [{
-				chance: 0.5,
-				base: ConsumableLib.PotionHealingLesser
+				chance: 0.25,
+				base: MeleeWeaponLib.Dagger1
 			}]
 		}]
 	}

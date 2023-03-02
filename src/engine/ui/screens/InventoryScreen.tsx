@@ -430,6 +430,10 @@ export class InventoryScreen extends AbstractModalScreen<void> {
 									{mode.name}: {damageSpan(mode.damage,mode.damageType)}
 								</div>)}
                             </div>}
+							{/* TODO rich IP descriptions, hidden IPs, IP hints */}
+							{selitem.properties.map(ip=>
+								<div>{ip.name}</div>
+							)}
                             <div class="d-flex gap-4 my-4">
 								{this.itemActions(selitem).map(action =>
 									<Button label={action.longLabel}

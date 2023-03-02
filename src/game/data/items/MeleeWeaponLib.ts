@@ -5,6 +5,7 @@
 import {BaseMeleeWeapon} from "../../../engine/objects/item/BaseMeleeWeapon";
 import {DamageTypes} from "../../../engine/rules/DamageType";
 import {meleeAttackMode} from "../../../engine/objects/item/WeaponComponent";
+import {IPDamageIncrease} from "./properties/WeaponIPLib";
 
 /*
  * Base values (by Liadri):
@@ -35,4 +36,8 @@ export namespace MeleeWeaponLib {
 		meleeAttackMode("Slash", "slash", "1d8", DamageTypes.SLASHING),
 		meleeAttackMode("Stab", "stab", "1d3", DamageTypes.PIERCING)
 	)
+
+	export const Dagger1 = new BaseMeleeWeapon("/mwpn_dagger_1", "dagger +1",
+		meleeAttackMode("Stab","stab","1d6", DamageTypes.PIERCING))
+		.withProperty(new IPDamageIncrease(+1));
 }

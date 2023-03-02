@@ -280,6 +280,7 @@ export class Creature {
 	ap = 0;
 	gobj: GOCreature|null = null;
 	ai: MonsterAI = new DefaultMonsterAI(this);
+	// TODO use name or damage type instead of MAM
 	preferredAttackMode: MeleeAttackMode|null = null;
 
 	// TODO make these computable

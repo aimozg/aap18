@@ -4,6 +4,10 @@ import {BaseItem} from "./BaseItem";
 import {dice} from "../math/Dice";
 import {Creature} from "./Creature";
 
+// TODO this needs to be reworked:
+//  - external item lists
+//  - item generators
+
 export interface LootTable {
 	variants: LootTableEntry[];
 }
